@@ -1,0 +1,12 @@
+--- 
+title: "Análisis de Tarjetas de Crédito"
+author: "Valeria Flórez"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+description: "Libro interactivo desarrollado con R Markdown y bookdown."
+---
+
+# Introducción
+
+Bienvenido a este libro interactivo.
