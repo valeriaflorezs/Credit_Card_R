@@ -1,6 +1,14 @@
 tab:duplicados-revision
 tab:univariado-categorica
+marco-del-proyecto
 introducción
+planteamiento-del-problema
+hipótesis-exploratorias
+justificación
+objetivos
+alcance-y-limitaciones
+marco-teórico
+metodología
 eda-default-of-credit-card-clients
 tipo-y-descripción-de-las-variables
 carga-y-preprocesamiento

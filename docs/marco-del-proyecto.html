@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>1 Marco del proyecto | EDA: Análisis Exploratorio de Datos</title>
+  <meta name="description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y el análisis exploratorio del dataset Default of Credit Card Clients." />
+  <meta name="generator" content="bookdown 0.48 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="1 Marco del proyecto | EDA: Análisis Exploratorio de Datos" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y el análisis exploratorio del dataset Default of Credit Card Clients." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="1 Marco del proyecto | EDA: Análisis Exploratorio de Datos" />
+  
+  <meta name="twitter:description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y el análisis exploratorio del dataset Default of Credit Card Clients." />
+  
+
+<meta name="author" content="Katherin Barrera y Valeria Florez" />
+
+
+<meta name="date" content="2026-05-10" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="eda-default-of-credit-card-clients.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.12.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Credit Card Default · Barrera &amp; Florez</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Portada</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#resumen-del-proyecto"><i class="fa fa-check"></i>Resumen del proyecto</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#resultados-en-cifras"><i class="fa fa-check"></i>Resultados en cifras</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contenido-del-libro"><i class="fa fa-check"></i>Contenido del libro</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html"><i class="fa fa-check"></i><b>1</b> Marco del proyecto</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#introducci%C3%B3n"><i class="fa fa-check"></i><b>1.1</b> Introducción</a></li>
+<li class="chapter" data-level="1.2" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#planteamiento-del-problema"><i class="fa fa-check"></i><b>1.2</b> Planteamiento del problema</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#pregunta-de-investigaci%C3%B3n"><i class="fa fa-check"></i>Pregunta de investigación</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#preguntas-espec%C3%ADficas"><i class="fa fa-check"></i>Preguntas específicas</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#hip%C3%B3tesis-exploratorias"><i class="fa fa-check"></i><b>1.3</b> Hipótesis exploratorias</a></li>
+<li class="chapter" data-level="1.4" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#justificaci%C3%B3n"><i class="fa fa-check"></i><b>1.4</b> Justificación</a></li>
+<li class="chapter" data-level="1.5" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#objetivos"><i class="fa fa-check"></i><b>1.5</b> Objetivos</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#objetivo-general"><i class="fa fa-check"></i>Objetivo general</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#objetivos-espec%C3%ADficos"><i class="fa fa-check"></i>Objetivos específicos</a></li>
+</ul></li>
+<li class="chapter" data-level="1.6" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#alcance-y-limitaciones"><i class="fa fa-check"></i><b>1.6</b> Alcance y limitaciones</a></li>
+<li class="chapter" data-level="1.7" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#marco-te%C3%B3rico"><i class="fa fa-check"></i><b>1.7</b> Marco teórico</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#riesgo-de-cr%C3%A9dito-y-default"><i class="fa fa-check"></i>Riesgo de crédito y <em>default</em></a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#an%C3%A1lisis-exploratorio-de-datos"><i class="fa fa-check"></i>Análisis exploratorio de datos</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#valores-at%C3%ADpicos-y-asimetr%C3%ADa"><i class="fa fa-check"></i>Valores atípicos y asimetría</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#desbalance-de-clases"><i class="fa fa-check"></i>Desbalance de clases</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#correlaci%C3%B3n-y-multicolinealidad"><i class="fa fa-check"></i>Correlación y multicolinealidad</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#asociaci%C3%B3n-y-comparaci%C3%B3n-de-grupos"><i class="fa fa-check"></i>Asociación y comparación de grupos</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#antecedentes"><i class="fa fa-check"></i>Antecedentes</a></li>
+</ul></li>
+<li class="chapter" data-level="1.8" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#metodolog%C3%ADa"><i class="fa fa-check"></i><b>1.8</b> Metodología</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#datos"><i class="fa fa-check"></i>Datos</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#proceso-etl"><i class="fa fa-check"></i>Proceso ETL</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#an%C3%A1lisis-exploratorio-de-datos-1"><i class="fa fa-check"></i>Análisis exploratorio de datos</a></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#modelo-base-y-dise%C3%B1o-experimental"><i class="fa fa-check"></i>Modelo base y diseño experimental</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="marco-del-proyecto.html"><a href="marco-del-proyecto.html#referencias"><i class="fa fa-check"></i>Referencias</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html"><i class="fa fa-check"></i><b>2</b> EDA: Default of Credit Card Clients</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#tipo-y-descripci%C3%B3n-de-las-variables"><i class="fa fa-check"></i><b>2.1</b> Tipo y descripción de las variables</a></li>
+<li class="chapter" data-level="2.2" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#carga-y-preprocesamiento"><i class="fa fa-check"></i><b>2.2</b> Carga y preprocesamiento</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#valores-nulos-y-duplicados"><i class="fa fa-check"></i><b>2.2.1</b> Valores nulos y duplicados</a></li>
+<li class="chapter" data-level="2.2.2" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#categor%C3%ADas-no-documentadas-valores-centinela"><i class="fa fa-check"></i><b>2.2.2</b> Categorías no documentadas / valores centinela</a></li>
+<li class="chapter" data-level="2.2.3" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#montos-de-facturaci%C3%B3n-negativos"><i class="fa fa-check"></i><b>2.2.3</b> Montos de facturación negativos</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#an%C3%A1lisis-de-la-variable-objetivo"><i class="fa fa-check"></i><b>2.3</b> Análisis de la variable objetivo</a></li>
+<li class="chapter" data-level="2.4" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#an%C3%A1lisis-univariado"><i class="fa fa-check"></i><b>2.4</b> Análisis Univariado</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#estad%C3%ADsticos-descriptivos-completos"><i class="fa fa-check"></i><b>2.4.1</b> 1.1 Estadísticos descriptivos completos</a></li>
+<li class="chapter" data-level="2.4.2" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#visualizaci%C3%B3n-interactiva"><i class="fa fa-check"></i><b>2.4.2</b> 1.2 Visualización interactiva</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="eda-default-of-credit-card-clients.html"><a href="eda-default-of-credit-card-clients.html#conclusiones-generales-del-eda"><i class="fa fa-check"></i><b>2.5</b> Conclusiones generales del EDA</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">EDA: Análisis Exploratorio de Datos</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="marco-del-proyecto" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">1</span> Marco del proyecto<a href="marco-del-proyecto.html#marco-del-proyecto" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="introducción" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> Introducción<a href="marco-del-proyecto.html#introducci%C3%B3n" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Las tarjetas de crédito son una de las líneas de la banca minorista con mayor exposición al riesgo: cada cliente recibe un cupo (límite de crédito) y se espera que lo pague en las fechas pactadas. Cuando no lo hace, la entidad enfrenta pérdidas, mayores costos de cobranza y la necesidad de provisionar capital. Anticipar qué clientes tienen mayor probabilidad de incurrir en mora permite ajustar límites de crédito, definir tasas diferenciadas y diseñar estrategias de cobranza preventivas [1].</p>
+<p>Desde la perspectiva técnica, el problema se ha abordado extensamente como una tarea de clasificación binaria, con modelos que van desde la regresión logística hasta métodos de ensamble como Random Forest y Gradient Boosting, evaluados originalmente sobre el conjunto de datos de este trabajo [1]. Técnicas de interpretabilidad como SHAP [2] complementan estos modelos con explicaciones a nivel de variable, algo valioso en contextos regulados como el financiero.</p>
+<p>Este libro presenta el análisis del conjunto <em>Default of Credit Card Clients</em> (UCI), con 30,000 clientes de un banco de Taiwán observados entre abril y septiembre de 2005. Para cada cliente se conoce su límite de crédito, sus características demográficas, su historial de pagos de seis meses, los montos facturados, los montos pagados y si incumplió el pago del mes siguiente (variable objetivo). El proyecto completo se desarrolló en etapas: comprensión del problema, proceso ETL, análisis exploratorio (EDA), modelo base de regresión logística y comparación sistemática de 112 configuraciones de modelos. El resumen de resultados está en la portada y el EDA completo, con gráficos interactivos, en el capítulo siguiente.</p>
+<p>Cifras de partida tras la limpieza: <strong>29,965 clientes</strong>, <strong>24 variables</strong> (23 predictoras y 1 objetivo) y una tasa de <em>default</em> de <strong>22.1%</strong> (6,630 clientes).</p>
+</div>
+<div id="planteamiento-del-problema" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> Planteamiento del problema<a href="marco-del-proyecto.html#planteamiento-del-problema" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Una entidad financiera otorga crédito sin saber con certeza quién pagará. Si concede cupos demasiado altos a clientes que luego incumplen, la cartera se deteriora: se pierde el capital no recuperado, aumentan los costos de cobranza y se deben constituir mayores provisiones. Si, por el contrario, restringe el crédito en exceso, pierde ingresos por intereses y comisiones.</p>
+<p>En esta muestra, el 22.1% de los clientes (6,630) no pagó su tarjeta el mes siguiente. Identificar tempranamente qué perfiles y comportamientos anticipan ese incumplimiento es la base para fijar límites, priorizar la cobranza preventiva y alimentar un modelo de <em>scoring</em>.</p>
+<p>Los errores no son simétricos: no detectar a quien incumplirá (falso negativo) suele costar más que revisar de más a quien sí pagaría (falso positivo). Por eso reportar solo el <em>accuracy</em> es engañoso: un clasificador que siempre prediga “no <em>default</em>” ya alcanzaría 77.9% de <em>accuracy</em> sin detectar a ningún cliente en riesgo.</p>
+<div id="pregunta-de-investigación" class="section level3 unnumbered hasAnchor">
+<h3>Pregunta de investigación<a href="marco-del-proyecto.html#pregunta-de-investigaci%C3%B3n" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>¿Qué características del cliente, de su línea de crédito y de su historial reciente de pagos se asocian con el incumplimiento del mes siguiente, y con qué intensidad?</strong></p>
+</div>
+<div id="preguntas-específicas" class="section level3 unnumbered hasAnchor">
+<h3>Preguntas específicas<a href="marco-del-proyecto.html#preguntas-espec%C3%ADficas" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ol style="list-style-type: decimal">
+<li>¿Cómo se distribuyen las variables y qué problemas de calidad presentan?</li>
+<li>¿Qué tan desbalanceada está la variable objetivo?</li>
+<li>¿Qué variables separan mejor a los clientes que incumplen?</li>
+<li>¿Existe redundancia entre las variables predictoras?</li>
+<li>¿Qué combinación de algoritmo, representación de variables y estrategia de balanceo detecta mejor a los clientes en riesgo, y cuánto mejora frente a un modelo base?</li>
+</ol>
+</div>
+</div>
+<div id="hipótesis-exploratorias" class="section level2 hasAnchor" number="1.3">
+<h2><span class="header-section-number">1.3</span> Hipótesis exploratorias<a href="marco-del-proyecto.html#hip%C3%B3tesis-exploratorias" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Se contrastan de forma descriptiva y visual a lo largo del EDA.</p>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Hipótesis</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>H1</td>
+<td>El historial reciente de pagos (<code>PAY_0</code> … <code>PAY_6</code>) es el factor más fuertemente asociado al incumplimiento.</td>
+</tr>
+<tr class="even">
+<td>H2</td>
+<td>Los clientes con menor límite de crédito (<code>LIMIT_BAL</code>) presentan una mayor tasa de <em>default</em>.</td>
+</tr>
+<tr class="odd">
+<td>H3</td>
+<td>Las variables demográficas (sexo, educación, estado civil, edad) se asocian con el <em>default</em>, pero con un tamaño de efecto pequeño.</td>
+</tr>
+<tr class="even">
+<td>H4</td>
+<td>Los montos facturados mensuales (<code>BILL_AMT1</code>–<code>BILL_AMT6</code>) están fuertemente correlacionados entre sí (multicolinealidad).</td>
+</tr>
+<tr class="odd">
+<td>H5</td>
+<td>La clase <em>default</em> es minoritaria, por lo que el problema presenta desbalance de clases.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="justificación" class="section level2 hasAnchor" number="1.4">
+<h2><span class="header-section-number">1.4</span> Justificación<a href="marco-del-proyecto.html#justificaci%C3%B3n" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Un EDA riguroso evita errores costosos en el modelado: revela datos mal codificados, variables redundantes, sesgos de muestreo y desbalance antes de que afecten al modelo. Además permite explicar a perfiles no técnicos (riesgos, cobranza, gerencia) qué señales preceden al incumplimiento, con evidencia visual y estadística.</p>
+</div>
+<div id="objetivos" class="section level2 hasAnchor" number="1.5">
+<h2><span class="header-section-number">1.5</span> Objetivos<a href="marco-del-proyecto.html#objetivos" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="objetivo-general" class="section level3 unnumbered hasAnchor">
+<h3>Objetivo general<a href="marco-del-proyecto.html#objetivo-general" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Analizar los factores que se asocian con el incumplimiento de pago (<em>default</em>) de los clientes de tarjetas de crédito mediante un análisis exploratorio de datos univariado y multivariado, y evaluar de forma sistemática modelos de clasificación frente a un modelo base.</p>
+</div>
+<div id="objetivos-específicos" class="section level3 unnumbered hasAnchor">
+<h3>Objetivos específicos<a href="marco-del-proyecto.html#objetivos-espec%C3%ADficos" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ol style="list-style-type: decimal">
+<li>Describir la calidad de los datos y documentar la limpieza aplicada (duplicados, categorías no documentadas, saldos negativos).</li>
+<li>Caracterizar la distribución de cada variable, su asimetría y la presencia de valores atípicos.</li>
+<li>Cuantificar el desbalance de clases de la variable objetivo.</li>
+<li>Comparar a los clientes con y sin <em>default</em> según variables demográficas, de crédito y de pagos.</li>
+<li>Identificar relaciones entre variables y detectar multicolinealidad (correlaciones, VIF).</li>
+<li>Entrenar un modelo base (regresión logística) sobre una partición <em>train/test</em> libre de fuga de información y cuantificar su margen de mejora, con atención a falsos negativos y falsos positivos.</li>
+<li>Comparar sistemáticamente algoritmos, representaciones de variables y estrategias de balanceo, y definir lineamientos de preprocesamiento para el modelado.</li>
+</ol>
+</div>
+</div>
+<div id="alcance-y-limitaciones" class="section level2 hasAnchor" number="1.6">
+<h2><span class="header-section-number">1.6</span> Alcance y limitaciones<a href="marco-del-proyecto.html#alcance-y-limitaciones" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ul>
+<li>Los datos provienen de un solo banco de Taiwán y de un periodo corto (abril–septiembre de 2005): no se generalizan sin cautela a otros mercados o épocas.</li>
+<li>El análisis es asociativo; una correlación no implica causalidad.</li>
+<li>Este libro desarrolla la fase exploratoria; el modelado se resume en la portada y se documenta en el informe del proyecto.</li>
+<li>Los códigos <code>-2</code> y <code>0</code> de <code>PAY_x</code> no están documentados con precisión en la fuente; se conservan sin recodificar.</li>
+<li>Existen grupos de clientes con predictoras idénticas pero etiqueta distinta (ruido propio de la fuente), lo que impone un techo al desempeño de cualquier modelo con estas variables.</li>
+</ul>
+</div>
+<div id="marco-teórico" class="section level2 hasAnchor" number="1.7">
+<h2><span class="header-section-number">1.7</span> Marco teórico<a href="marco-del-proyecto.html#marco-te%C3%B3rico" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="riesgo-de-crédito-y-default" class="section level3 unnumbered hasAnchor">
+<h3>Riesgo de crédito y <em>default</em><a href="marco-del-proyecto.html#riesgo-de-cr%C3%A9dito-y-default" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>El riesgo de crédito es la posibilidad de que una entidad sufra pérdidas porque un deudor no cumple, total o parcialmente, sus obligaciones. En la regulación bancaria (Basilea II) la pérdida esperada se descompone así:</p>
+<p><span class="math display">\[EL = PD \times LGD \times EAD\]</span></p>
+<p>donde <em>PD</em> es la probabilidad de incumplimiento en un horizonte dado (lo que estudian estos datos), <em>LGD</em> el porcentaje de la exposición que se pierde si hay incumplimiento y <em>EAD</em> el monto expuesto en ese momento. En este proyecto, <em>default</em> es la variable binaria que indica si el cliente no pagó en el mes siguiente. Los modelos de <em>scoring</em> estiman la PD a partir del comportamiento de pago, el límite, la deuda y el perfil demográfico.</p>
+</div>
+<div id="análisis-exploratorio-de-datos" class="section level3 unnumbered hasAnchor">
+<h3>Análisis exploratorio de datos<a href="marco-del-proyecto.html#an%C3%A1lisis-exploratorio-de-datos" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Propuesto por Tukey [7], consiste en explorar los datos con resúmenes numéricos y gráficos antes de ajustar modelos, para descubrir patrones, anomalías y supuestos. El análisis univariado estudia una variable a la vez; el bivariado y multivariado, las relaciones entre dos o más variables.</p>
+</div>
+<div id="valores-atípicos-y-asimetría" class="section level3 unnumbered hasAnchor">
+<h3>Valores atípicos y asimetría<a href="marco-del-proyecto.html#valores-at%C3%ADpicos-y-asimetr%C3%ADa" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>La asimetría indica hacia dónde se alarga la cola de una distribución y la curtosis qué tan pesadas son sus colas. Según el criterio de Tukey, un valor es atípico si <span class="math inline">\(x &lt; Q_1 - 1.5\,IQR\)</span> o <span class="math inline">\(x &gt; Q_3 + 1.5\,IQR\)</span>. La winsorización recorta los extremos a percentiles (por ejemplo P1–P99) sin eliminar clientes.</p>
+</div>
+<div id="desbalance-de-clases" class="section level3 unnumbered hasAnchor">
+<h3>Desbalance de clases<a href="marco-del-proyecto.html#desbalance-de-clases" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Cuando una clase es mucho menos frecuente, un clasificador puede lograr alta exactitud ignorándola. Se recomienda ponderar las clases (<code>class_weight</code>) o sobremuestrear la minoritaria (SMOTE [8]), ajustar el umbral de decisión y evaluar con AUC-ROC, F1 y <em>recall</em> de la clase minoritaria en lugar del <em>accuracy</em>.</p>
+</div>
+<div id="correlación-y-multicolinealidad" class="section level3 unnumbered hasAnchor">
+<h3>Correlación y multicolinealidad<a href="marco-del-proyecto.html#correlaci%C3%B3n-y-multicolinealidad" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>La correlación de Spearman mide asociación monótona usando los rangos de los datos; no exige linealidad ni normalidad y resiste valores extremos, lo que la hace adecuada para montos muy asimétricos, variables <code>PAY_x</code> ordinales y un objetivo binario. La multicolinealidad se evalúa con el Factor de Inflación de la Varianza:</p>
+<p><span class="math display">\[VIF_j = \frac{1}{1 - R_j^2}\]</span></p>
+<p>Un VIF mayor que 10 (algunos autores usan 5) es señal de alerta.</p>
+</div>
+<div id="asociación-y-comparación-de-grupos" class="section level3 unnumbered hasAnchor">
+<h3>Asociación y comparación de grupos<a href="marco-del-proyecto.html#asociaci%C3%B3n-y-comparaci%C3%B3n-de-grupos" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>La prueba <span class="math inline">\(\chi^2\)</span> de independencia contrasta si dos variables categóricas están asociadas; su tamaño de efecto se mide con la V de Cramér, con <span class="math inline">\(V &lt; 0.1\)</span> como efecto pequeño. Para comparar grupos se usan Mann–Whitney U [9] (dos grupos, sin suponer normalidad), Kruskal–Wallis (tres o más grupos) y t de Welch (medias con varianzas distintas). Con <span class="math inline">\(n \approx 30{,}000\)</span> casi cualquier diferencia resulta significativa, por lo que se reporta el tamaño del efecto y no solo el p-valor.</p>
+</div>
+<div id="antecedentes" class="section level3 unnumbered hasAnchor">
+<h3>Antecedentes<a href="marco-del-proyecto.html#antecedentes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Yeh y Lien [1] compararon seis técnicas de minería de datos (regresión logística, análisis discriminante, k vecinos, Naive Bayes, redes neuronales y árboles de clasificación) para predecir el incumplimiento con estos mismos datos, y propusieron un método de suavizado por ordenamiento para estimar la probabilidad real de incumplimiento.</p>
+</div>
+</div>
+<div id="metodología" class="section level2 hasAnchor" number="1.8">
+<h2><span class="header-section-number">1.8</span> Metodología<a href="marco-del-proyecto.html#metodolog%C3%ADa" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="datos" class="section level3 unnumbered hasAnchor">
+<h3>Datos<a href="marco-del-proyecto.html#datos" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Se utilizó el conjunto <em>Default of Credit Card Clients</em>, disponible en el repositorio UCI Machine Learning [3] y publicado por Yeh y Lien [1]: 30,000 clientes, 23 variables predictoras y la variable objetivo <code>default_payment_next_month</code> (1 = incumplió al mes siguiente, 0 = no incumplió). Las predictoras son el límite de crédito (<code>LIMIT_BAL</code>), variables demográficas (<code>SEX</code>, <code>EDUCATION</code>, <code>MARRIAGE</code>, <code>AGE</code>), el estado de pago de los seis meses previos (<code>PAY_0</code>, <code>PAY_2</code> a <code>PAY_6</code>), los montos facturados (<code>BILL_AMT1</code> a <code>BILL_AMT6</code>) y los montos pagados (<code>PAY_AMT1</code> a <code>PAY_AMT6</code>). Cifras monetarias en dólares taiwaneses (NT$).</p>
+</div>
+<div id="proceso-etl" class="section level3 unnumbered hasAnchor">
+<h3>Proceso ETL<a href="marco-del-proyecto.html#proceso-etl" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li><strong>Extract:</strong> se cargó el archivo fuente indicando que la primera fila es un título y no los nombres de columna; se renombró la variable objetivo y se usó <code>ID</code> como identificador sin valor predictivo.</li>
+<li><strong>Transform:</strong>
+<ul>
+<li><em>Valores nulos:</em> no se detectó ninguno, por lo que no hubo imputación.</li>
+<li><em>Duplicados:</em> se eliminaron 35 filas idénticas (0.12%) antes del EDA y de la partición, para evitar que una fila quede en entrenamiento y su copia en prueba e infle las métricas.</li>
+<li><em>Categorías no documentadas:</em> en <code>EDUCATION</code>, los códigos 0, 5 y 6 se reagruparon en “Otros”; en <code>MARRIAGE</code>, el código 0 (54 registros) también.</li>
+<li><em>Códigos <code>-2</code> y <code>0</code> de <code>PAY_x</code>:</em> se conservaron sin recodificar, por ser mayoritarios y contener información real.</li>
+<li><em>Montos de facturación negativos:</em> se conservaron (1,930 clientes), porque un saldo a favor es económicamente válido.</li>
+<li><em>Escalado:</em> no se aplicó antes de la partición, para evitar fuga de información (<em>data leakage</em>).</li>
+</ul></li>
+<li><strong>Load:</strong> la matriz limpia queda con 29,965 filas y 24 columnas, más la variable derivada <code>BILL_AVG</code> creada en el EDA.</li>
+</ul>
+</div>
+<div id="análisis-exploratorio-de-datos-1" class="section level3 unnumbered hasAnchor">
+<h3>Análisis exploratorio de datos<a href="marco-del-proyecto.html#an%C3%A1lisis-exploratorio-de-datos-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Estadística descriptiva (tendencia central, dispersión y forma), diagnóstico de faltantes, detección de atípicos con el criterio de Tukey, análisis de la variable objetivo y su desbalance, comparación de grupos (Mann–Whitney U y t de Welch), pruebas <span class="math inline">\(\chi^2\)</span> para las variables categóricas, y multicolinealidad con correlación y VIF. Como apoyo de interpretabilidad se usó un Random Forest preliminar [6] con valores SHAP [2], sin reportar métricas de desempeño. El capítulo siguiente reproduce este EDA en R, con gráficos interactivos y su interpretación en versión básica y técnica.</p>
+</div>
+<div id="modelo-base-y-diseño-experimental" class="section level3 unnumbered hasAnchor">
+<h3>Modelo base y diseño experimental<a href="marco-del-proyecto.html#modelo-base-y-dise%C3%B1o-experimental" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li><strong>Modelo base:</strong> regresión logística con penalización L2 por defecto, dentro de un <code>Pipeline</code> de scikit-learn [10] con codificación <em>one-hot</em> y estandarización ajustadas solo sobre entrenamiento. Partición estratificada 80/20: 23,972 observaciones de entrenamiento y 5,993 de prueba, con 22.13% de <em>default</em> en ambas.</li>
+<li><strong>Diseño factorial de 112 configuraciones</strong> (7 × 2 × 2 × 4):
+<ol style="list-style-type: decimal">
+<li>Algoritmos (7): regresión logística, Random Forest [6], XGBoost [4], LightGBM [5], SVC, KNN y Naive Bayes gaussiano.</li>
+<li>Representación de <code>PAY_x</code> (2): continua u <em>one-hot</em>.</li>
+<li>Estrategia para <code>BILL_AMT</code> (2): conservar las seis variables o reducirlas con PCA (95% de la varianza).</li>
+<li>Balanceo (4): ninguno, ponderación de clases, SMOTE [8] y <em>undersampling</em>.</li>
+</ol></li>
+<li><strong>Validación:</strong> validación cruzada estratificada de 5 pliegues sobre entrenamiento, con una partición de prueba independiente que no participa en la selección del modelo.</li>
+<li><strong>Métricas:</strong> AUC-ROC como criterio principal; <em>accuracy</em>, F1 macro y <em>recall</em> de la clase <em>default</em> como complementarias. En la fase final se usó el F1-score de la clase <em>default</em> como métrica principal, porque combina precisión y <em>recall</em>.</li>
+<li><strong>Comparación estadística:</strong> pruebas de Friedman, Nemenyi y DeLong (con corrección de Holm), delta de Cliff y calibración de probabilidades (Brier, ECE y recalibración isotónica).</li>
+</ul>
+</div>
+</div>
+<div id="referencias" class="section level2 unnumbered hasAnchor">
+<h2>Referencias<a href="marco-del-proyecto.html#referencias" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>[1] I. C. Yeh y C. F. Lien, “The comparisons of data mining techniques for the predictive accuracy of probability of default of credit card clients,” <em>Expert Systems with Applications</em>, vol. 36, no. 2, pp. 2473–2480, 2009.</p>
+<p>[2] S. M. Lundberg y S. I. Lee, “A unified approach to interpreting model predictions,” en <em>Advances in Neural Information Processing Systems</em>, vol. 30, 2017, pp. 4765–4774.</p>
+<p>[3] UCI Machine Learning Repository, “Default of Credit Card Clients Dataset,” University of California, Irvine.</p>
+<p>[4] T. Chen y C. Guestrin, “XGBoost: A scalable tree boosting system,” en <em>Proc. 22nd ACM SIGKDD</em>, pp. 785–794, 2016.</p>
+<p>[5] G. Ke <em>et al.</em>, “LightGBM: A highly efficient gradient boosting decision tree,” en <em>Advances in Neural Information Processing Systems</em>, vol. 30, 2017.</p>
+<p>[6] L. Breiman, “Random forests,” <em>Machine Learning</em>, vol. 45, no. 1, pp. 5–32, 2001.</p>
+<p>[7] J. W. Tukey, <em>Exploratory Data Analysis</em>, Addison-Wesley, 1977.</p>
+<p>[8] N. V. Chawla, K. W. Bowyer, L. O. Hall y W. P. Kegelmeyer, “SMOTE: Synthetic minority over-sampling technique,” <em>Journal of Artificial Intelligence Research</em>, vol. 16, pp. 321–357, 2002.</p>
+<p>[9] H. B. Mann y D. R. Whitney, “On a test of whether one of two random variables is stochastically larger than the other,” <em>Annals of Mathematical Statistics</em>, vol. 18, no. 1, pp. 50–60, 1947.</p>
+<p>[10] F. Pedregosa <em>et al.</em>, “Scikit-learn: Machine learning in Python,” <em>Journal of Machine Learning Research</em>, vol. 12, pp. 2825–2830, 2011.</p>
+<p>[11] Basel Committee on Banking Supervision, <em>International Convergence of Capital Measurement and Capital Standards</em> (Basilea II), 2006.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="eda-default-of-credit-card-clients.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
