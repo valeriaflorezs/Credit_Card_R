@@ -1,0 +1,14 @@
+tab:duplicados-revision
+tab:univariado-categorica
+introducción
+eda-default-of-credit-card-clients
+tipo-y-descripción-de-las-variables
+carga-y-preprocesamiento
+valores-nulos-y-duplicados
+categorías-no-documentadas-valores-centinela
+montos-de-facturación-negativos
+análisis-de-la-variable-objetivo
+análisis-univariado
+estadísticos-descriptivos-completos
+visualización-interactiva
+conclusiones-generales-del-eda
