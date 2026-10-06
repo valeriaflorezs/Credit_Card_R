@@ -1,6 +1,6 @@
 ---
 title: "EDA: Análisis Exploratorio de Datos"
-subtitle: "Default of Credit Card Clients (UCI) — versión en R"
+subtitle: "Default of Credit Card Clients (UCI), versión en R"
 output:
   html_document:
     toc: true
@@ -11,7 +11,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
-options(knitr.kable.NA = "–", digits = 6)
+options(knitr.kable.NA = "NA", digits = 6)
 ```
 
 # EDA: Default of Credit Card Clients
@@ -49,7 +49,7 @@ target        <- "default_payment_next_month"
 | **EDUCATION** | Categórica | Nivel educativo. `1` = posgrado, `2` = universidad, `3` = secundaria, `4` = otros. También existen los códigos `0`, `5` y `6`, no documentados oficialmente por la fuente. |
 | **MARRIAGE** | Categórica | Estado civil. `1` = casado, `2` = soltero, `3` = otros. También existe el código `0`, no documentado. |
 | **AGE** | Numérica discreta | Edad del cliente en años. |
-| **PAY_0, PAY_2 … PAY_6** | Numérica discreta / ordinal | Estado de pago mensual de septiembre a abril de 2005 (`PAY_0` = mes más reciente). `-1` = pago puntual, `1-9` = meses de atraso. Los valores `-2` y `0` aparecen en la documentación original sin una definición unívoca; se conservan como están por ser mayoritarios, pero su interpretación exacta es una limitación conocida del dataset. |
+| **PAY_0, PAY_2 a PAY_6** | Numérica discreta / ordinal | Estado de pago mensual de septiembre a abril de 2005 (`PAY_0` = mes más reciente). `-1` = pago puntual, `1-9` = meses de atraso. Los valores `-2` y `0` aparecen en la documentación original sin una definición unívoca; se conservan como están por ser mayoritarios, pero su interpretación exacta es una limitación conocida del dataset. |
 | **BILL_AMT1 a BILL_AMT6** | Numérica continua | Monto facturado en el estado de cuenta de cada uno de los últimos 6 meses. |
 | **PAY_AMT1 a PAY_AMT6** | Numérica continua | Monto efectivamente pagado por el cliente en cada uno de los últimos 6 meses. |
 | **default payment next month** | Categórica binaria | **Variable objetivo.** `1` = incurrió en incumplimiento al mes siguiente, `0` = no incurrió. |
@@ -57,7 +57,7 @@ target        <- "default_payment_next_month"
 ## Carga y preprocesamiento
 
 ```{r carga}
-# header = 1 en pandas  ->  skip = 1 en readxl (la fila 0 del .xls es una fila de títulos)
+# header = 1 en pandas equivale a skip = 1 en readxl (la fila 0 del .xls es una fila de títulos)
 df <- read_excel(RAW_DATA_PATH, skip = 1) %>%
   rename(default_payment_next_month = `default payment next month`)
 
@@ -512,9 +512,9 @@ sessionInfo()
 ## Conclusiones generales del EDA
 
 - **Calidad de datos**: el dataset no tiene valores nulos. Las 35 filas duplicadas se eliminan y las categorías no oficiales de `EDUCATION` y `MARRIAGE` se reagrupan en "Otros". Los códigos -2 y 0 de las variables `PAY_x` tienen una definición ambigua en la fuente original, una limitación a tener en cuenta al comunicar resultados.
-- **Desbalance de clases**: ~78% no-default vs ~22% default. Se aborda en el modelamiento, dentro de la validación cruzada (`class_weight`, remuestreo), con métricas robustas al desbalance.
+- **Desbalance de clases**: cerca de 78% no-default frente a cerca de 22% default. Se aborda en el modelamiento, dentro de la validación cruzada (`class_weight`, remuestreo), con métricas robustas al desbalance.
 - **Mejor variable predictora, por lejos**: el estado de pago del mes más reciente (`PAY_0`), seguido de los meses anteriores y del límite de crédito (`LIMIT_BAL`). Las variables demográficas (`AGE`, `SEX`, `EDUCATION`, `MARRIAGE`) aportan señal, pero mucho más débil.
-- **Multicolinealidad severa** entre las seis variables de facturación (`BILL_AMT1`-`BILL_AMT6`, VIF hasta ~25): se resuelven reemplazándolas por su nivel medio y su tendencia, con lo que el VIF máximo del dataset final queda por debajo de 10 (Parte 5).
+- **Multicolinealidad severa** entre las seis variables de facturación (`BILL_AMT1`-`BILL_AMT6`, VIF hasta cerca de 25): se resuelven reemplazándolas por su nivel medio y su tendencia, con lo que el VIF máximo del dataset final queda por debajo de 10 (Parte 5).
 - **Variables muy asimétricas** (`LIMIT_BAL`, `PAY_AMT*`): se transforman con log con signo (Parte 5).
 - **Recomendación para el modelamiento**: dada la relación no lineal entre atrasos y riesgo (vista en los dependence plots), un modelo basado en árboles (Random Forest, Gradient Boosting) es una opción natural, como ya lo sugiere el buen desempeño cualitativo del Random Forest usado para SHAP. Si se prefiere un modelo lineal por interpretabilidad, conviene categorizar/discretizar `PAY_x`.
 - **Resultado final**: el dataset preprocesado queda guardado en `data/processed/dataset_final.csv` y todas las verificaciones de la sección 5.3 pasan.

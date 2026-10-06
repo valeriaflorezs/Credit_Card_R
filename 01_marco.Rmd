@@ -36,10 +36,10 @@ Se contrastan de forma descriptiva y visual a lo largo del EDA.
 
 | # | Hipótesis |
 |---|---|
-| H1 | El historial reciente de pagos (`PAY_0` … `PAY_6`) es el factor más fuertemente asociado al incumplimiento. |
+| H1 | El historial reciente de pagos (`PAY_0` a `PAY_6`) es el factor más fuertemente asociado al incumplimiento. |
 | H2 | Los clientes con menor límite de crédito (`LIMIT_BAL`) presentan una mayor tasa de *default*. |
 | H3 | Las variables demográficas (sexo, educación, estado civil, edad) se asocian con el *default*, pero con un tamaño de efecto pequeño. |
-| H4 | Los montos facturados mensuales (`BILL_AMT1`–`BILL_AMT6`) están fuertemente correlacionados entre sí (multicolinealidad). |
+| H4 | Los montos facturados mensuales (`BILL_AMT1` a `BILL_AMT6`) están fuertemente correlacionados entre sí (multicolinealidad). |
 | H5 | La clase *default* es minoritaria, por lo que el problema presenta desbalance de clases. |
 
 ## Justificación
@@ -64,7 +64,7 @@ Analizar los factores que se asocian con el incumplimiento de pago (*default*) d
 
 ## Alcance y limitaciones
 
-- Los datos provienen de un solo banco de Taiwán y de un periodo corto (abril–septiembre de 2005): no se generalizan sin cautela a otros mercados o épocas.
+- Los datos provienen de un solo banco de Taiwán y de un periodo corto (de abril a septiembre de 2005): no se generalizan sin cautela a otros mercados o épocas.
 - El análisis es asociativo; una correlación no implica causalidad.
 - Este libro desarrolla la fase exploratoria; el modelado se resume en la portada y se documenta en el informe del proyecto.
 - Los códigos `-2` y `0` de `PAY_x` no están documentados con precisión en la fuente; se conservan sin recodificar.
@@ -76,7 +76,7 @@ Analizar los factores que se asocian con el incumplimiento de pago (*default*) d
 
 El riesgo de crédito es la posibilidad de que una entidad sufra pérdidas porque un deudor no cumple, total o parcialmente, sus obligaciones. En la regulación bancaria (Basilea II) la pérdida esperada se descompone así:
 
-$$EL = PD \times LGD \times EAD$$
+$$EL = PD \cdot LGD \cdot EAD$$
 
 donde *PD* es la probabilidad de incumplimiento en un horizonte dado (lo que estudian estos datos), *LGD* el porcentaje de la exposición que se pierde si hay incumplimiento y *EAD* el monto expuesto en ese momento. En este proyecto, *default* es la variable binaria que indica si el cliente no pagó en el mes siguiente. Los modelos de *scoring* estiman la PD a partir del comportamiento de pago, el límite, la deuda y el perfil demográfico.
 
@@ -86,7 +86,7 @@ Propuesto por Tukey [7], consiste en explorar los datos con resúmenes numérico
 
 ### Valores atípicos y asimetría {-}
 
-La asimetría indica hacia dónde se alarga la cola de una distribución y la curtosis qué tan pesadas son sus colas. Según el criterio de Tukey, un valor es atípico si $x < Q_1 - 1.5\,IQR$ o $x > Q_3 + 1.5\,IQR$. La winsorización recorta los extremos a percentiles (por ejemplo P1–P99) sin eliminar clientes.
+La asimetría indica hacia dónde se alarga la cola de una distribución y la curtosis qué tan pesadas son sus colas. Según el criterio de Tukey, un valor es atípico si $x < Q_1 - 1.5\,IQR$ o $x > Q_3 + 1.5\,IQR$. La winsorización recorta los extremos a percentiles (por ejemplo P1 a P99) sin eliminar clientes.
 
 ### Desbalance de clases {-}
 
@@ -102,7 +102,7 @@ Un VIF mayor que 10 (algunos autores usan 5) es señal de alerta.
 
 ### Asociación y comparación de grupos {-}
 
-La prueba $\chi^2$ de independencia contrasta si dos variables categóricas están asociadas; su tamaño de efecto se mide con la V de Cramér, con $V < 0.1$ como efecto pequeño. Para comparar grupos se usan Mann–Whitney U [9] (dos grupos, sin suponer normalidad), Kruskal–Wallis (tres o más grupos) y t de Welch (medias con varianzas distintas). Con $n \approx 30{,}000$ casi cualquier diferencia resulta significativa, por lo que se reporta el tamaño del efecto y no solo el p-valor.
+La prueba $\chi^2$ de independencia contrasta si dos variables categóricas están asociadas; su tamaño de efecto se mide con la V de Cramér, con $V < 0.1$ como efecto pequeño. Para comparar grupos se usan Mann-Whitney U [9] (dos grupos, sin suponer normalidad), Kruskal-Wallis (tres o más grupos) y t de Welch (medias con varianzas distintas). Con cerca de 30,000 observaciones casi cualquier diferencia resulta significativa, por lo que se reporta el tamaño del efecto y no solo el p-valor.
 
 ### Antecedentes {-}
 
@@ -128,12 +128,12 @@ Se utilizó el conjunto *Default of Credit Card Clients*, disponible en el repos
 
 ### Análisis exploratorio de datos {-}
 
-Estadística descriptiva (tendencia central, dispersión y forma), diagnóstico de faltantes, detección de atípicos con el criterio de Tukey, análisis de la variable objetivo y su desbalance, comparación de grupos (Mann–Whitney U y t de Welch), pruebas $\chi^2$ para las variables categóricas, y multicolinealidad con correlación y VIF. Como apoyo de interpretabilidad se usó un Random Forest preliminar [6] con valores SHAP [2], sin reportar métricas de desempeño. El capítulo siguiente reproduce este EDA en R, con gráficos interactivos y su interpretación en versión básica y técnica.
+Estadística descriptiva (tendencia central, dispersión y forma), diagnóstico de faltantes, detección de atípicos con el criterio de Tukey, análisis de la variable objetivo y su desbalance, comparación de grupos (Mann-Whitney U y t de Welch), pruebas $\chi^2$ para las variables categóricas, y multicolinealidad con correlación y VIF. Como apoyo de interpretabilidad se usó un Random Forest preliminar [6] con valores SHAP [2], sin reportar métricas de desempeño. El capítulo siguiente reproduce este EDA en R, con gráficos interactivos y su interpretación en versión básica y técnica.
 
 ### Modelo base y diseño experimental {-}
 
 - **Modelo base:** regresión logística con penalización L2 por defecto, dentro de un `Pipeline` de scikit-learn [10] con codificación *one-hot* y estandarización ajustadas solo sobre entrenamiento. Partición estratificada 80/20: 23,972 observaciones de entrenamiento y 5,993 de prueba, con 22.13% de *default* en ambas.
-- **Diseño factorial de 112 configuraciones** (7 × 2 × 2 × 4):
+- **Diseño factorial de 112 configuraciones** (7 por 2 por 2 por 4):
     1. Algoritmos (7): regresión logística, Random Forest [6], XGBoost [4], LightGBM [5], SVC, KNN y Naive Bayes gaussiano.
     2. Representación de `PAY_x` (2): continua u *one-hot*.
     3. Estrategia para `BILL_AMT` (2): conservar las seis variables o reducirlas con PCA (95% de la varianza).
@@ -144,24 +144,24 @@ Estadística descriptiva (tendencia central, dispersión y forma), diagnóstico 
 
 ## Referencias {-}
 
-[1] I. C. Yeh y C. F. Lien, "The comparisons of data mining techniques for the predictive accuracy of probability of default of credit card clients," *Expert Systems with Applications*, vol. 36, no. 2, pp. 2473–2480, 2009.
+[1] I. C. Yeh y C. F. Lien, "The comparisons of data mining techniques for the predictive accuracy of probability of default of credit card clients," *Expert Systems with Applications*, vol. 36, no. 2, pp. 2473-2480, 2009.
 
-[2] S. M. Lundberg y S. I. Lee, "A unified approach to interpreting model predictions," en *Advances in Neural Information Processing Systems*, vol. 30, 2017, pp. 4765–4774.
+[2] S. M. Lundberg y S. I. Lee, "A unified approach to interpreting model predictions," en *Advances in Neural Information Processing Systems*, vol. 30, 2017, pp. 4765-4774.
 
 [3] UCI Machine Learning Repository, "Default of Credit Card Clients Dataset," University of California, Irvine.
 
-[4] T. Chen y C. Guestrin, "XGBoost: A scalable tree boosting system," en *Proc. 22nd ACM SIGKDD*, pp. 785–794, 2016.
+[4] T. Chen y C. Guestrin, "XGBoost: A scalable tree boosting system," en *Proc. 22nd ACM SIGKDD*, pp. 785-794, 2016.
 
 [5] G. Ke *et al.*, "LightGBM: A highly efficient gradient boosting decision tree," en *Advances in Neural Information Processing Systems*, vol. 30, 2017.
 
-[6] L. Breiman, "Random forests," *Machine Learning*, vol. 45, no. 1, pp. 5–32, 2001.
+[6] L. Breiman, "Random forests," *Machine Learning*, vol. 45, no. 1, pp. 5-32, 2001.
 
 [7] J. W. Tukey, *Exploratory Data Analysis*, Addison-Wesley, 1977.
 
-[8] N. V. Chawla, K. W. Bowyer, L. O. Hall y W. P. Kegelmeyer, "SMOTE: Synthetic minority over-sampling technique," *Journal of Artificial Intelligence Research*, vol. 16, pp. 321–357, 2002.
+[8] N. V. Chawla, K. W. Bowyer, L. O. Hall y W. P. Kegelmeyer, "SMOTE: Synthetic minority over-sampling technique," *Journal of Artificial Intelligence Research*, vol. 16, pp. 321-357, 2002.
 
-[9] H. B. Mann y D. R. Whitney, "On a test of whether one of two random variables is stochastically larger than the other," *Annals of Mathematical Statistics*, vol. 18, no. 1, pp. 50–60, 1947.
+[9] H. B. Mann y D. R. Whitney, "On a test of whether one of two random variables is stochastically larger than the other," *Annals of Mathematical Statistics*, vol. 18, no. 1, pp. 50-60, 1947.
 
-[10] F. Pedregosa *et al.*, "Scikit-learn: Machine learning in Python," *Journal of Machine Learning Research*, vol. 12, pp. 2825–2830, 2011.
+[10] F. Pedregosa *et al.*, "Scikit-learn: Machine learning in Python," *Journal of Machine Learning Research*, vol. 12, pp. 2825-2830, 2011.
 
 [11] Basel Committee on Banking Supervision, *International Convergence of Capital Measurement and Capital Standards* (Basilea II), 2006.

@@ -3,6 +3,6 @@ bookdown::gitbook:
   config:
     toc:
       before: |
-        <li><a href="./">Credit Card Default · Barrera &amp; Florez</a></li>
+        <li><a href="./">Credit Card Default (Barrera y Florez)</a></li>
       after: |
         <li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>

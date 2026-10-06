@@ -145,7 +145,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <nav role="navigation">
 
 <ul class="summary">
-<li><a href="./">Credit Card Default · Barrera &amp; Florez</a></li>
+<li><a href="./">Credit Card Default (Barrera y Florez)</a></li>
 
 <li class="divider"></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Portada</a>
@@ -273,7 +273,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tbody>
 <tr class="odd">
 <td>H1</td>
-<td>El historial reciente de pagos (<code>PAY_0</code> … <code>PAY_6</code>) es el factor más fuertemente asociado al incumplimiento.</td>
+<td>El historial reciente de pagos (<code>PAY_0</code> a <code>PAY_6</code>) es el factor más fuertemente asociado al incumplimiento.</td>
 </tr>
 <tr class="even">
 <td>H2</td>
@@ -285,7 +285,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="even">
 <td>H4</td>
-<td>Los montos facturados mensuales (<code>BILL_AMT1</code>–<code>BILL_AMT6</code>) están fuertemente correlacionados entre sí (multicolinealidad).</td>
+<td>Los montos facturados mensuales (<code>BILL_AMT1</code> a <code>BILL_AMT6</code>) están fuertemente correlacionados entre sí (multicolinealidad).</td>
 </tr>
 <tr class="odd">
 <td>H5</td>
@@ -320,7 +320,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="alcance-y-limitaciones" class="section level2 hasAnchor" number="1.6">
 <h2><span class="header-section-number">1.6</span> Alcance y limitaciones<a href="marco-del-proyecto.html#alcance-y-limitaciones" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
-<li>Los datos provienen de un solo banco de Taiwán y de un periodo corto (abril–septiembre de 2005): no se generalizan sin cautela a otros mercados o épocas.</li>
+<li>Los datos provienen de un solo banco de Taiwán y de un periodo corto (de abril a septiembre de 2005): no se generalizan sin cautela a otros mercados o épocas.</li>
 <li>El análisis es asociativo; una correlación no implica causalidad.</li>
 <li>Este libro desarrolla la fase exploratoria; el modelado se resume en la portada y se documenta en el informe del proyecto.</li>
 <li>Los códigos <code>-2</code> y <code>0</code> de <code>PAY_x</code> no están documentados con precisión en la fuente; se conservan sin recodificar.</li>
@@ -332,7 +332,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="riesgo-de-crédito-y-default" class="section level3 unnumbered hasAnchor">
 <h3>Riesgo de crédito y <em>default</em><a href="marco-del-proyecto.html#riesgo-de-cr%C3%A9dito-y-default" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>El riesgo de crédito es la posibilidad de que una entidad sufra pérdidas porque un deudor no cumple, total o parcialmente, sus obligaciones. En la regulación bancaria (Basilea II) la pérdida esperada se descompone así:</p>
-<p><span class="math display">\[EL = PD \times LGD \times EAD\]</span></p>
+<p><span class="math display">\[EL = PD \cdot LGD \cdot EAD\]</span></p>
 <p>donde <em>PD</em> es la probabilidad de incumplimiento en un horizonte dado (lo que estudian estos datos), <em>LGD</em> el porcentaje de la exposición que se pierde si hay incumplimiento y <em>EAD</em> el monto expuesto en ese momento. En este proyecto, <em>default</em> es la variable binaria que indica si el cliente no pagó en el mes siguiente. Los modelos de <em>scoring</em> estiman la PD a partir del comportamiento de pago, el límite, la deuda y el perfil demográfico.</p>
 </div>
 <div id="análisis-exploratorio-de-datos" class="section level3 unnumbered hasAnchor">
@@ -341,7 +341,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="valores-atípicos-y-asimetría" class="section level3 unnumbered hasAnchor">
 <h3>Valores atípicos y asimetría<a href="marco-del-proyecto.html#valores-at%C3%ADpicos-y-asimetr%C3%ADa" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>La asimetría indica hacia dónde se alarga la cola de una distribución y la curtosis qué tan pesadas son sus colas. Según el criterio de Tukey, un valor es atípico si <span class="math inline">\(x &lt; Q_1 - 1.5\,IQR\)</span> o <span class="math inline">\(x &gt; Q_3 + 1.5\,IQR\)</span>. La winsorización recorta los extremos a percentiles (por ejemplo P1–P99) sin eliminar clientes.</p>
+<p>La asimetría indica hacia dónde se alarga la cola de una distribución y la curtosis qué tan pesadas son sus colas. Según el criterio de Tukey, un valor es atípico si <span class="math inline">\(x &lt; Q_1 - 1.5\,IQR\)</span> o <span class="math inline">\(x &gt; Q_3 + 1.5\,IQR\)</span>. La winsorización recorta los extremos a percentiles (por ejemplo P1 a P99) sin eliminar clientes.</p>
 </div>
 <div id="desbalance-de-clases" class="section level3 unnumbered hasAnchor">
 <h3>Desbalance de clases<a href="marco-del-proyecto.html#desbalance-de-clases" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -355,7 +355,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="asociación-y-comparación-de-grupos" class="section level3 unnumbered hasAnchor">
 <h3>Asociación y comparación de grupos<a href="marco-del-proyecto.html#asociaci%C3%B3n-y-comparaci%C3%B3n-de-grupos" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>La prueba <span class="math inline">\(\chi^2\)</span> de independencia contrasta si dos variables categóricas están asociadas; su tamaño de efecto se mide con la V de Cramér, con <span class="math inline">\(V &lt; 0.1\)</span> como efecto pequeño. Para comparar grupos se usan Mann–Whitney U [9] (dos grupos, sin suponer normalidad), Kruskal–Wallis (tres o más grupos) y t de Welch (medias con varianzas distintas). Con <span class="math inline">\(n \approx 30{,}000\)</span> casi cualquier diferencia resulta significativa, por lo que se reporta el tamaño del efecto y no solo el p-valor.</p>
+<p>La prueba <span class="math inline">\(\chi^2\)</span> de independencia contrasta si dos variables categóricas están asociadas; su tamaño de efecto se mide con la V de Cramér, con <span class="math inline">\(V &lt; 0.1\)</span> como efecto pequeño. Para comparar grupos se usan Mann-Whitney U [9] (dos grupos, sin suponer normalidad), Kruskal-Wallis (tres o más grupos) y t de Welch (medias con varianzas distintas). Con cerca de 30,000 observaciones casi cualquier diferencia resulta significativa, por lo que se reporta el tamaño del efecto y no solo el p-valor.</p>
 </div>
 <div id="antecedentes" class="section level3 unnumbered hasAnchor">
 <h3>Antecedentes<a href="marco-del-proyecto.html#antecedentes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -386,13 +386,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="análisis-exploratorio-de-datos-1" class="section level3 unnumbered hasAnchor">
 <h3>Análisis exploratorio de datos<a href="marco-del-proyecto.html#an%C3%A1lisis-exploratorio-de-datos-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Estadística descriptiva (tendencia central, dispersión y forma), diagnóstico de faltantes, detección de atípicos con el criterio de Tukey, análisis de la variable objetivo y su desbalance, comparación de grupos (Mann–Whitney U y t de Welch), pruebas <span class="math inline">\(\chi^2\)</span> para las variables categóricas, y multicolinealidad con correlación y VIF. Como apoyo de interpretabilidad se usó un Random Forest preliminar [6] con valores SHAP [2], sin reportar métricas de desempeño. El capítulo siguiente reproduce este EDA en R, con gráficos interactivos y su interpretación en versión básica y técnica.</p>
+<p>Estadística descriptiva (tendencia central, dispersión y forma), diagnóstico de faltantes, detección de atípicos con el criterio de Tukey, análisis de la variable objetivo y su desbalance, comparación de grupos (Mann-Whitney U y t de Welch), pruebas <span class="math inline">\(\chi^2\)</span> para las variables categóricas, y multicolinealidad con correlación y VIF. Como apoyo de interpretabilidad se usó un Random Forest preliminar [6] con valores SHAP [2], sin reportar métricas de desempeño. El capítulo siguiente reproduce este EDA en R, con gráficos interactivos y su interpretación en versión básica y técnica.</p>
 </div>
 <div id="modelo-base-y-diseño-experimental" class="section level3 unnumbered hasAnchor">
 <h3>Modelo base y diseño experimental<a href="marco-del-proyecto.html#modelo-base-y-dise%C3%B1o-experimental" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><strong>Modelo base:</strong> regresión logística con penalización L2 por defecto, dentro de un <code>Pipeline</code> de scikit-learn [10] con codificación <em>one-hot</em> y estandarización ajustadas solo sobre entrenamiento. Partición estratificada 80/20: 23,972 observaciones de entrenamiento y 5,993 de prueba, con 22.13% de <em>default</em> en ambas.</li>
-<li><strong>Diseño factorial de 112 configuraciones</strong> (7 × 2 × 2 × 4):
+<li><strong>Diseño factorial de 112 configuraciones</strong> (7 por 2 por 2 por 4):
 <ol style="list-style-type: decimal">
 <li>Algoritmos (7): regresión logística, Random Forest [6], XGBoost [4], LightGBM [5], SVC, KNN y Naive Bayes gaussiano.</li>
 <li>Representación de <code>PAY_x</code> (2): continua u <em>one-hot</em>.</li>
@@ -407,16 +407,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="referencias" class="section level2 unnumbered hasAnchor">
 <h2>Referencias<a href="marco-del-proyecto.html#referencias" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>[1] I. C. Yeh y C. F. Lien, “The comparisons of data mining techniques for the predictive accuracy of probability of default of credit card clients,” <em>Expert Systems with Applications</em>, vol. 36, no. 2, pp. 2473–2480, 2009.</p>
-<p>[2] S. M. Lundberg y S. I. Lee, “A unified approach to interpreting model predictions,” en <em>Advances in Neural Information Processing Systems</em>, vol. 30, 2017, pp. 4765–4774.</p>
+<p>[1] I. C. Yeh y C. F. Lien, “The comparisons of data mining techniques for the predictive accuracy of probability of default of credit card clients,” <em>Expert Systems with Applications</em>, vol. 36, no. 2, pp. 2473-2480, 2009.</p>
+<p>[2] S. M. Lundberg y S. I. Lee, “A unified approach to interpreting model predictions,” en <em>Advances in Neural Information Processing Systems</em>, vol. 30, 2017, pp. 4765-4774.</p>
 <p>[3] UCI Machine Learning Repository, “Default of Credit Card Clients Dataset,” University of California, Irvine.</p>
-<p>[4] T. Chen y C. Guestrin, “XGBoost: A scalable tree boosting system,” en <em>Proc. 22nd ACM SIGKDD</em>, pp. 785–794, 2016.</p>
+<p>[4] T. Chen y C. Guestrin, “XGBoost: A scalable tree boosting system,” en <em>Proc. 22nd ACM SIGKDD</em>, pp. 785-794, 2016.</p>
 <p>[5] G. Ke <em>et al.</em>, “LightGBM: A highly efficient gradient boosting decision tree,” en <em>Advances in Neural Information Processing Systems</em>, vol. 30, 2017.</p>
-<p>[6] L. Breiman, “Random forests,” <em>Machine Learning</em>, vol. 45, no. 1, pp. 5–32, 2001.</p>
+<p>[6] L. Breiman, “Random forests,” <em>Machine Learning</em>, vol. 45, no. 1, pp. 5-32, 2001.</p>
 <p>[7] J. W. Tukey, <em>Exploratory Data Analysis</em>, Addison-Wesley, 1977.</p>
-<p>[8] N. V. Chawla, K. W. Bowyer, L. O. Hall y W. P. Kegelmeyer, “SMOTE: Synthetic minority over-sampling technique,” <em>Journal of Artificial Intelligence Research</em>, vol. 16, pp. 321–357, 2002.</p>
-<p>[9] H. B. Mann y D. R. Whitney, “On a test of whether one of two random variables is stochastically larger than the other,” <em>Annals of Mathematical Statistics</em>, vol. 18, no. 1, pp. 50–60, 1947.</p>
-<p>[10] F. Pedregosa <em>et al.</em>, “Scikit-learn: Machine learning in Python,” <em>Journal of Machine Learning Research</em>, vol. 12, pp. 2825–2830, 2011.</p>
+<p>[8] N. V. Chawla, K. W. Bowyer, L. O. Hall y W. P. Kegelmeyer, “SMOTE: Synthetic minority over-sampling technique,” <em>Journal of Artificial Intelligence Research</em>, vol. 16, pp. 321-357, 2002.</p>
+<p>[9] H. B. Mann y D. R. Whitney, “On a test of whether one of two random variables is stochastically larger than the other,” <em>Annals of Mathematical Statistics</em>, vol. 18, no. 1, pp. 50-60, 1947.</p>
+<p>[10] F. Pedregosa <em>et al.</em>, “Scikit-learn: Machine learning in Python,” <em>Journal of Machine Learning Research</em>, vol. 12, pp. 2825-2830, 2011.</p>
 <p>[11] Basel Committee on Banking Supervision, <em>International Convergence of Capital Measurement and Capital Standards</em> (Basilea II), 2006.</p>
 
 </div>
