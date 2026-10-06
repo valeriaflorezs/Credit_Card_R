@@ -1,2 +1,9 @@
 /* Estilos adicionales del libro */
 .book .book-body .page-wrapper .page-inner section.normal table { font-size: 0.9em; }
+
+/* Portada */
+.portada { text-align: center; padding: 2.5em 1em; margin-bottom: 1.5em; border-bottom: 3px solid #c9a227; background: #0f2a4a; color: #fff; border-radius: 6px; }
+.portada p { margin: 0.6em 0; color: #fff; }
+.portada-titulo { font-size: 1.6em; font-weight: 700; line-height: 1.3; }
+.portada-autoras { font-size: 1.15em; color: #e8c85a !important; }
+.portada-inst { font-size: 0.95em; opacity: 0.9; }

@@ -2,5 +2,6 @@ book_filename: "Credit_cart_r"
 output_dir: "docs"
 rmd_files: [
   "index.Rmd",
+  "01_marco.Rmd",
   "notebooks/00_eda.Rmd"
 ]

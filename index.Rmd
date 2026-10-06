@@ -1,12 +1,44 @@
---- 
-title: "Análisis de Tarjetas de Crédito"
-author: "Valeria Flórez"
-date: "`r Sys.Date()`"
+---
+title: "Evaluación de Preprocesamiento, Análisis Exploratorio y Comparación Sistemática de Modelos para la Predicción de Incumplimiento de Pago en Tarjetas de Crédito"
+author: "Katherin Barrera y Valeria Florez"
+date: "`r format(Sys.Date(), '%d/%m/%Y')`"
 site: bookdown::bookdown_site
 documentclass: book
-description: "Libro interactivo desarrollado con R Markdown y bookdown."
+description: "Libro interactivo (R bookdown) con la portada, el marco del proyecto y el análisis exploratorio del dataset Default of Credit Card Clients."
 ---
 
-# Introducción
+# Portada {-}
 
-Bienvenido a este libro interactivo.
+<div class="portada">
+
+<p class="portada-titulo">Evaluación de Preprocesamiento, Análisis Exploratorio y Comparación Sistemática de Modelos para la Predicción de Incumplimiento de Pago en Tarjetas de Crédito</p>
+
+<p class="portada-autoras"><strong>Autoras:</strong> Katherin Barrera y Valeria Florez</p>
+
+<p class="portada-inst">Departamento de Matemáticas, Física y Ciencia de Datos<br>Universidad del Norte, Barranquilla, Colombia</p>
+
+</div>
+
+## Resumen del proyecto {-}
+
+Este trabajo presenta un flujo completo de aprendizaje automático para la predicción del incumplimiento de pago (*default*) de clientes de tarjetas de crédito, utilizando el conjunto de datos público *Default of Credit Card Clients* del repositorio UCI, compuesto originalmente por 30,000 observaciones y 23 variables predictoras. El estudio integra el proceso de extracción, transformación y carga (ETL), un análisis exploratorio de datos (EDA) y una evaluación sistemática de modelos de clasificación.
+
+El EDA incluyó estadística descriptiva, diagnóstico de valores faltantes y duplicados, análisis de la forma de las distribuciones, detección de valores atípicos, comparación formal de grupos mediante pruebas no paramétricas y de independencia, y evaluación de multicolinealidad mediante correlaciones y el Factor de Inflación de la Varianza (VIF). Se eliminaron 35 registros duplicados desde el ETL, se encontraron categorías no oficiales en `EDUCATION` y `MARRIAGE`, y se halló una multicolinealidad severa entre las variables de facturación mensual, que se abordó con una variable de facturación promedio (`BILL_AVG`). La variable `PAY_0` destacó como la señal individual más discriminante. La variable objetivo presenta un desbalance moderado: 77.9% sin *default* y 22.1% con *default*.
+
+Como línea base se entrenó una regresión logística con partición estratificada 80/20, que obtuvo un *accuracy* de 81.34% y un AUC-ROC de 0.7184, pero identificó correctamente solo el 25.2% de los casos de *default*. Después se evaluaron 112 configuraciones mediante un diseño factorial (7 familias de algoritmos, 2 representaciones de las variables `PAY_x`, 2 estrategias para `BILL_AMT` y 4 estrategias de balanceo). La mejor configuración por AUC-ROC fue XGBoost con ponderación balanceada de clases (AUC-ROC de 0.7812), que en la partición de prueba alcanzó un *recall* de 62.37% y redujo los falsos negativos de 992 a 499. Con el F1-score de la clase *default* como métrica principal, la mejor configuración fue un Random Forest con ponderación de clases y búsqueda genética de hiperparámetros (F1 de 0.546 y *recall* de 60.4%).
+
+**Palabras clave:** aprendizaje automático, análisis exploratorio de datos, preprocesamiento, clasificación binaria, riesgo crediticio, desbalance de clases, XGBoost, F1-score, validación cruzada.
+
+### Resultados en cifras {-}
+
+| Modelo | AUC-ROC | *Recall* clase *default* | Falsos negativos |
+|---|---|---|---|
+| Regresión logística (línea base) | 0.7184 | 25.2% | 992 |
+| XGBoost con ponderación de clases | 0.7812 | 62.37% | 499 |
+
+*Cifras sobre la partición de prueba independiente (n = 5,993).*
+
+### Contenido del libro {-}
+
+- **Marco del proyecto:** introducción, planteamiento del problema, objetivos y metodología.
+- **EDA:** análisis exploratorio interactivo del conjunto de datos, con gráficos y su interpretación.

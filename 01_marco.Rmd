@@ -1,0 +1,167 @@
+# Marco del proyecto
+
+## Introducción
+
+Las tarjetas de crédito son una de las líneas de la banca minorista con mayor exposición al riesgo: cada cliente recibe un cupo (límite de crédito) y se espera que lo pague en las fechas pactadas. Cuando no lo hace, la entidad enfrenta pérdidas, mayores costos de cobranza y la necesidad de provisionar capital. Anticipar qué clientes tienen mayor probabilidad de incurrir en mora permite ajustar límites de crédito, definir tasas diferenciadas y diseñar estrategias de cobranza preventivas [1].
+
+Desde la perspectiva técnica, el problema se ha abordado extensamente como una tarea de clasificación binaria, con modelos que van desde la regresión logística hasta métodos de ensamble como Random Forest y Gradient Boosting, evaluados originalmente sobre el conjunto de datos de este trabajo [1]. Técnicas de interpretabilidad como SHAP [2] complementan estos modelos con explicaciones a nivel de variable, algo valioso en contextos regulados como el financiero.
+
+Este libro presenta el análisis del conjunto *Default of Credit Card Clients* (UCI), con 30,000 clientes de un banco de Taiwán observados entre abril y septiembre de 2005. Para cada cliente se conoce su límite de crédito, sus características demográficas, su historial de pagos de seis meses, los montos facturados, los montos pagados y si incumplió el pago del mes siguiente (variable objetivo). El proyecto completo se desarrolló en etapas: comprensión del problema, proceso ETL, análisis exploratorio (EDA), modelo base de regresión logística y comparación sistemática de 112 configuraciones de modelos. El resumen de resultados está en la portada y el EDA completo, con gráficos interactivos, en el capítulo siguiente.
+
+Cifras de partida tras la limpieza: **29,965 clientes**, **24 variables** (23 predictoras y 1 objetivo) y una tasa de *default* de **22.1%** (6,630 clientes).
+
+## Planteamiento del problema
+
+Una entidad financiera otorga crédito sin saber con certeza quién pagará. Si concede cupos demasiado altos a clientes que luego incumplen, la cartera se deteriora: se pierde el capital no recuperado, aumentan los costos de cobranza y se deben constituir mayores provisiones. Si, por el contrario, restringe el crédito en exceso, pierde ingresos por intereses y comisiones.
+
+En esta muestra, el 22.1% de los clientes (6,630) no pagó su tarjeta el mes siguiente. Identificar tempranamente qué perfiles y comportamientos anticipan ese incumplimiento es la base para fijar límites, priorizar la cobranza preventiva y alimentar un modelo de *scoring*.
+
+Los errores no son simétricos: no detectar a quien incumplirá (falso negativo) suele costar más que revisar de más a quien sí pagaría (falso positivo). Por eso reportar solo el *accuracy* es engañoso: un clasificador que siempre prediga "no *default*" ya alcanzaría 77.9% de *accuracy* sin detectar a ningún cliente en riesgo.
+
+### Pregunta de investigación {-}
+
+**¿Qué características del cliente, de su línea de crédito y de su historial reciente de pagos se asocian con el incumplimiento del mes siguiente, y con qué intensidad?**
+
+### Preguntas específicas {-}
+
+1. ¿Cómo se distribuyen las variables y qué problemas de calidad presentan?
+2. ¿Qué tan desbalanceada está la variable objetivo?
+3. ¿Qué variables separan mejor a los clientes que incumplen?
+4. ¿Existe redundancia entre las variables predictoras?
+5. ¿Qué combinación de algoritmo, representación de variables y estrategia de balanceo detecta mejor a los clientes en riesgo, y cuánto mejora frente a un modelo base?
+
+## Hipótesis exploratorias
+
+Se contrastan de forma descriptiva y visual a lo largo del EDA.
+
+| # | Hipótesis |
+|---|---|
+| H1 | El historial reciente de pagos (`PAY_0` … `PAY_6`) es el factor más fuertemente asociado al incumplimiento. |
+| H2 | Los clientes con menor límite de crédito (`LIMIT_BAL`) presentan una mayor tasa de *default*. |
+| H3 | Las variables demográficas (sexo, educación, estado civil, edad) se asocian con el *default*, pero con un tamaño de efecto pequeño. |
+| H4 | Los montos facturados mensuales (`BILL_AMT1`–`BILL_AMT6`) están fuertemente correlacionados entre sí (multicolinealidad). |
+| H5 | La clase *default* es minoritaria, por lo que el problema presenta desbalance de clases. |
+
+## Justificación
+
+Un EDA riguroso evita errores costosos en el modelado: revela datos mal codificados, variables redundantes, sesgos de muestreo y desbalance antes de que afecten al modelo. Además permite explicar a perfiles no técnicos (riesgos, cobranza, gerencia) qué señales preceden al incumplimiento, con evidencia visual y estadística.
+
+## Objetivos
+
+### Objetivo general {-}
+
+Analizar los factores que se asocian con el incumplimiento de pago (*default*) de los clientes de tarjetas de crédito mediante un análisis exploratorio de datos univariado y multivariado, y evaluar de forma sistemática modelos de clasificación frente a un modelo base.
+
+### Objetivos específicos {-}
+
+1. Describir la calidad de los datos y documentar la limpieza aplicada (duplicados, categorías no documentadas, saldos negativos).
+2. Caracterizar la distribución de cada variable, su asimetría y la presencia de valores atípicos.
+3. Cuantificar el desbalance de clases de la variable objetivo.
+4. Comparar a los clientes con y sin *default* según variables demográficas, de crédito y de pagos.
+5. Identificar relaciones entre variables y detectar multicolinealidad (correlaciones, VIF).
+6. Entrenar un modelo base (regresión logística) sobre una partición *train/test* libre de fuga de información y cuantificar su margen de mejora, con atención a falsos negativos y falsos positivos.
+7. Comparar sistemáticamente algoritmos, representaciones de variables y estrategias de balanceo, y definir lineamientos de preprocesamiento para el modelado.
+
+## Alcance y limitaciones
+
+- Los datos provienen de un solo banco de Taiwán y de un periodo corto (abril–septiembre de 2005): no se generalizan sin cautela a otros mercados o épocas.
+- El análisis es asociativo; una correlación no implica causalidad.
+- Este libro desarrolla la fase exploratoria; el modelado se resume en la portada y se documenta en el informe del proyecto.
+- Los códigos `-2` y `0` de `PAY_x` no están documentados con precisión en la fuente; se conservan sin recodificar.
+- Existen grupos de clientes con predictoras idénticas pero etiqueta distinta (ruido propio de la fuente), lo que impone un techo al desempeño de cualquier modelo con estas variables.
+
+## Marco teórico
+
+### Riesgo de crédito y *default* {-}
+
+El riesgo de crédito es la posibilidad de que una entidad sufra pérdidas porque un deudor no cumple, total o parcialmente, sus obligaciones. En la regulación bancaria (Basilea II) la pérdida esperada se descompone así:
+
+$$EL = PD \times LGD \times EAD$$
+
+donde *PD* es la probabilidad de incumplimiento en un horizonte dado (lo que estudian estos datos), *LGD* el porcentaje de la exposición que se pierde si hay incumplimiento y *EAD* el monto expuesto en ese momento. En este proyecto, *default* es la variable binaria que indica si el cliente no pagó en el mes siguiente. Los modelos de *scoring* estiman la PD a partir del comportamiento de pago, el límite, la deuda y el perfil demográfico.
+
+### Análisis exploratorio de datos {-}
+
+Propuesto por Tukey [7], consiste en explorar los datos con resúmenes numéricos y gráficos antes de ajustar modelos, para descubrir patrones, anomalías y supuestos. El análisis univariado estudia una variable a la vez; el bivariado y multivariado, las relaciones entre dos o más variables.
+
+### Valores atípicos y asimetría {-}
+
+La asimetría indica hacia dónde se alarga la cola de una distribución y la curtosis qué tan pesadas son sus colas. Según el criterio de Tukey, un valor es atípico si $x < Q_1 - 1.5\,IQR$ o $x > Q_3 + 1.5\,IQR$. La winsorización recorta los extremos a percentiles (por ejemplo P1–P99) sin eliminar clientes.
+
+### Desbalance de clases {-}
+
+Cuando una clase es mucho menos frecuente, un clasificador puede lograr alta exactitud ignorándola. Se recomienda ponderar las clases (`class_weight`) o sobremuestrear la minoritaria (SMOTE [8]), ajustar el umbral de decisión y evaluar con AUC-ROC, F1 y *recall* de la clase minoritaria en lugar del *accuracy*.
+
+### Correlación y multicolinealidad {-}
+
+La correlación de Spearman mide asociación monótona usando los rangos de los datos; no exige linealidad ni normalidad y resiste valores extremos, lo que la hace adecuada para montos muy asimétricos, variables `PAY_x` ordinales y un objetivo binario. La multicolinealidad se evalúa con el Factor de Inflación de la Varianza:
+
+$$VIF_j = \frac{1}{1 - R_j^2}$$
+
+Un VIF mayor que 10 (algunos autores usan 5) es señal de alerta.
+
+### Asociación y comparación de grupos {-}
+
+La prueba $\chi^2$ de independencia contrasta si dos variables categóricas están asociadas; su tamaño de efecto se mide con la V de Cramér, con $V < 0.1$ como efecto pequeño. Para comparar grupos se usan Mann–Whitney U [9] (dos grupos, sin suponer normalidad), Kruskal–Wallis (tres o más grupos) y t de Welch (medias con varianzas distintas). Con $n \approx 30{,}000$ casi cualquier diferencia resulta significativa, por lo que se reporta el tamaño del efecto y no solo el p-valor.
+
+### Antecedentes {-}
+
+Yeh y Lien [1] compararon seis técnicas de minería de datos (regresión logística, análisis discriminante, k vecinos, Naive Bayes, redes neuronales y árboles de clasificación) para predecir el incumplimiento con estos mismos datos, y propusieron un método de suavizado por ordenamiento para estimar la probabilidad real de incumplimiento.
+
+## Metodología
+
+### Datos {-}
+
+Se utilizó el conjunto *Default of Credit Card Clients*, disponible en el repositorio UCI Machine Learning [3] y publicado por Yeh y Lien [1]: 30,000 clientes, 23 variables predictoras y la variable objetivo `default_payment_next_month` (1 = incumplió al mes siguiente, 0 = no incumplió). Las predictoras son el límite de crédito (`LIMIT_BAL`), variables demográficas (`SEX`, `EDUCATION`, `MARRIAGE`, `AGE`), el estado de pago de los seis meses previos (`PAY_0`, `PAY_2` a `PAY_6`), los montos facturados (`BILL_AMT1` a `BILL_AMT6`) y los montos pagados (`PAY_AMT1` a `PAY_AMT6`). Cifras monetarias en dólares taiwaneses (NT$).
+
+### Proceso ETL {-}
+
+- **Extract:** se cargó el archivo fuente indicando que la primera fila es un título y no los nombres de columna; se renombró la variable objetivo y se usó `ID` como identificador sin valor predictivo.
+- **Transform:**
+    - *Valores nulos:* no se detectó ninguno, por lo que no hubo imputación.
+    - *Duplicados:* se eliminaron 35 filas idénticas (0.12%) antes del EDA y de la partición, para evitar que una fila quede en entrenamiento y su copia en prueba e infle las métricas.
+    - *Categorías no documentadas:* en `EDUCATION`, los códigos 0, 5 y 6 se reagruparon en "Otros"; en `MARRIAGE`, el código 0 (54 registros) también.
+    - *Códigos `-2` y `0` de `PAY_x`:* se conservaron sin recodificar, por ser mayoritarios y contener información real.
+    - *Montos de facturación negativos:* se conservaron (1,930 clientes), porque un saldo a favor es económicamente válido.
+    - *Escalado:* no se aplicó antes de la partición, para evitar fuga de información (*data leakage*).
+- **Load:** la matriz limpia queda con 29,965 filas y 24 columnas, más la variable derivada `BILL_AVG` creada en el EDA.
+
+### Análisis exploratorio de datos {-}
+
+Estadística descriptiva (tendencia central, dispersión y forma), diagnóstico de faltantes, detección de atípicos con el criterio de Tukey, análisis de la variable objetivo y su desbalance, comparación de grupos (Mann–Whitney U y t de Welch), pruebas $\chi^2$ para las variables categóricas, y multicolinealidad con correlación y VIF. Como apoyo de interpretabilidad se usó un Random Forest preliminar [6] con valores SHAP [2], sin reportar métricas de desempeño. El capítulo siguiente reproduce este EDA en R, con gráficos interactivos y su interpretación en versión básica y técnica.
+
+### Modelo base y diseño experimental {-}
+
+- **Modelo base:** regresión logística con penalización L2 por defecto, dentro de un `Pipeline` de scikit-learn [10] con codificación *one-hot* y estandarización ajustadas solo sobre entrenamiento. Partición estratificada 80/20: 23,972 observaciones de entrenamiento y 5,993 de prueba, con 22.13% de *default* en ambas.
+- **Diseño factorial de 112 configuraciones** (7 × 2 × 2 × 4):
+    1. Algoritmos (7): regresión logística, Random Forest [6], XGBoost [4], LightGBM [5], SVC, KNN y Naive Bayes gaussiano.
+    2. Representación de `PAY_x` (2): continua u *one-hot*.
+    3. Estrategia para `BILL_AMT` (2): conservar las seis variables o reducirlas con PCA (95% de la varianza).
+    4. Balanceo (4): ninguno, ponderación de clases, SMOTE [8] y *undersampling*.
+- **Validación:** validación cruzada estratificada de 5 pliegues sobre entrenamiento, con una partición de prueba independiente que no participa en la selección del modelo.
+- **Métricas:** AUC-ROC como criterio principal; *accuracy*, F1 macro y *recall* de la clase *default* como complementarias. En la fase final se usó el F1-score de la clase *default* como métrica principal, porque combina precisión y *recall*.
+- **Comparación estadística:** pruebas de Friedman, Nemenyi y DeLong (con corrección de Holm), delta de Cliff y calibración de probabilidades (Brier, ECE y recalibración isotónica).
+
+## Referencias {-}
+
+[1] I. C. Yeh y C. F. Lien, "The comparisons of data mining techniques for the predictive accuracy of probability of default of credit card clients," *Expert Systems with Applications*, vol. 36, no. 2, pp. 2473–2480, 2009.
+
+[2] S. M. Lundberg y S. I. Lee, "A unified approach to interpreting model predictions," en *Advances in Neural Information Processing Systems*, vol. 30, 2017, pp. 4765–4774.
+
+[3] UCI Machine Learning Repository, "Default of Credit Card Clients Dataset," University of California, Irvine.
+
+[4] T. Chen y C. Guestrin, "XGBoost: A scalable tree boosting system," en *Proc. 22nd ACM SIGKDD*, pp. 785–794, 2016.
+
+[5] G. Ke *et al.*, "LightGBM: A highly efficient gradient boosting decision tree," en *Advances in Neural Information Processing Systems*, vol. 30, 2017.
+
+[6] L. Breiman, "Random forests," *Machine Learning*, vol. 45, no. 1, pp. 5–32, 2001.
+
+[7] J. W. Tukey, *Exploratory Data Analysis*, Addison-Wesley, 1977.
+
+[8] N. V. Chawla, K. W. Bowyer, L. O. Hall y W. P. Kegelmeyer, "SMOTE: Synthetic minority over-sampling technique," *Journal of Artificial Intelligence Research*, vol. 16, pp. 321–357, 2002.
+
+[9] H. B. Mann y D. R. Whitney, "On a test of whether one of two random variables is stochastically larger than the other," *Annals of Mathematical Statistics*, vol. 18, no. 1, pp. 50–60, 1947.
+
+[10] F. Pedregosa *et al.*, "Scikit-learn: Machine learning in Python," *Journal of Machine Learning Research*, vol. 12, pp. 2825–2830, 2011.
+
+[11] Basel Committee on Banking Supervision, *International Convergence of Capital Measurement and Capital Standards* (Basilea II), 2006.
