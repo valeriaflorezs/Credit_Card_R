@@ -10,9 +10,7 @@ rmd_files: [
   "06_nb04_run_experiments.Rmd",
   "07_nb05_results_analysis.Rmd",
   "08_nb06_interpretability.Rmd",
-  "09_nb07_svm_gpu_colab.Rmd",
   "10_nb08_tabla_maestra_svm.Rmd",
   "11_nb09_anytime_multifidelidad.Rmd",
-  "12_nb10_modelo_original_cs_fof.Rmd",
-  "13_nb12_colab_5x5.Rmd"
+  "12_nb10_modelo_original_cs_fof.Rmd"
 ]
