@@ -33,13 +33,11 @@ El libro reproduce completo el [Jupyter Book del proyecto](https://github.com/va
 | `06_nb04_run_experiments.Rmd` | Notebook 04: corrida de experimentos |
 | `07_nb05_results_analysis.Rmd` | Notebook 05: análisis de resultados |
 | `08_nb06_interpretability.Rmd` | Notebook 06: interpretabilidad (SHAP y LIME) |
-| `09_nb07_svm_gpu_colab.Rmd` | Notebook 07: SVM en GPU (Colab) |
 | `10_nb08_tabla_maestra_svm.Rmd` | Notebook 08: tabla maestra y comparabilidad del SVM |
 | `11_nb09_anytime_multifidelidad.Rmd` | Notebook 09: curvas anytime y multi-fidelidad |
 | `12_nb10_modelo_original_cs_fof.Rmd` | Notebook 10: modelo original (CS-FOF), LightGBM y CatBoost |
-| `13_nb12_colab_5x5.Rmd` | Notebook 12: corrida 5 x 5 en Colab |
 
-Los notebooks 01 a 12 se escribieron en Python y su experimento (GPU, Colab) fue muy largo, así que **no se reejecutan**: cada capítulo muestra el texto, el código de Python (plegado, sin ejecutar) y los resultados guardados en el notebook (tablas y gráficos). El EDA (notebook 00) sí se recalcula en R a partir de `data/raw/`; solo las secciones de SHAP y de preprocesamiento final (que dependen de `src/` y del modelo de Python) muestran las salidas del notebook.
+Los notebooks 01 a 10 se escribieron en Python y su experimento (GPU, Colab) fue muy largo, así que **no se reejecutan**: cada capítulo muestra el texto, el código de Python (plegado, sin ejecutar) y los resultados guardados en el notebook (tablas y gráficos). El EDA (notebook 00) sí se recalcula en R a partir de `data/raw/`; solo las secciones de SHAP y de preprocesamiento final (que dependen de `src/` y del modelo de Python) muestran las salidas del notebook.
 
 ---
 
@@ -59,7 +57,7 @@ Credit_Card_R/
 ├── index.Rmd                # Portada y resumen del proyecto
 ├── 01_marco.Rmd             # Introducción, problema, objetivos y metodología
 ├── 02_nb00_eda.Rmd          # Notebook 00: EDA (R + Plotly)
-├── 03_nb01_...Rmd a 13_nb12_...Rmd   # Notebooks 01 a 12 (ver tabla de capítulos)
+├── 03_nb01_...Rmd a 12_nb10_...Rmd   # Notebooks 01 a 10 (ver tabla de capítulos)
 ├── references.bib           # Referencias bibliográficas
 ├── _bookdown.yml            # Orden de los capítulos y carpeta de salida
 ├── _output.yml              # Formato y estilo del libro (menú lateral)
