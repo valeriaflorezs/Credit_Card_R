@@ -1,0 +1,17 @@
+,technique,method,f1_colab_mean,f1_local_mean,f1_max_abs_diff_per_fold,roc_auc_max_abs_diff_per_fold,dif_media_f1 (local - colab)
+0,adasyn,bayesian_optuna,0.5298,0.5390,0.0117,0.0008,0.0092
+1,adasyn,genetic_deap,0.5301,0.5379,0.0134,0.0005,0.0079
+2,adasyn,grid_search,0.5287,0.5342,0.0135,0.0010,0.0055
+3,adasyn,random_search,0.5293,0.5384,0.0133,0.0008,0.0091
+4,class_weight,bayesian_optuna,0.5385,0.5440,0.0088,0.0000,0.0056
+5,class_weight,genetic_deap,0.5386,0.5446,0.0098,0.0009,0.0059
+6,class_weight,grid_search,0.5372,0.5446,0.0115,0.0006,0.0074
+7,class_weight,random_search,0.5385,0.5440,0.0086,0.0000,0.0055
+8,none,bayesian_optuna,0.4446,0.4668,0.0264,0.0002,0.0221
+9,none,genetic_deap,0.4390,0.4541,0.0237,0.0005,0.0152
+10,none,grid_search,0.4373,0.4535,0.0250,0.0009,0.0162
+11,none,random_search,0.4368,0.4523,0.0235,0.0004,0.0155
+12,smote,bayesian_optuna,0.5376,0.5414,0.0074,0.0002,0.0039
+13,smote,genetic_deap,0.5378,0.5423,0.0088,0.0000,0.0045
+14,smote,grid_search,0.5340,0.5398,0.0084,0.0002,0.0058
+15,smote,random_search,0.5387,0.5420,0.0085,0.0002,0.0033

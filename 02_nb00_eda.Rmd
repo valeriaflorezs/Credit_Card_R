@@ -1,0 +1,1443 @@
+# EDA: Análisis Exploratorio de Datos {#nb00}
+
+```{r setup-nb00, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, python.reticulate = FALSE)
+options(knitr.kable.NA = "NA", digits = 6)
+```
+
+<!-- nb:md cell=0 -->
+Este conjunto de datos Default of Credit Card Clients (UCI Machine Learning Repository) contiene información de 30,000 clientes de tarjetas de crédito en Taiwán, recolectada en 2005. El objetivo original del dataset es predecir si un cliente incurrirá en un incumplimiento de pago (default) al mes siguiente, a partir de su límite de crédito, información demográfica, historial de pagos de los últimos 6 meses y montos facturados en ese mismo periodo.
+
+La variable objetivo es `default payment next month`, que indica si el cliente incurrió **(1)** o no **(0)** en incumplimiento de pago al mes siguiente. Esto permite plantear el problema como una tarea de **clasificación binaria**.
+
+Este EDA revisa explícitamente los duplicados (y los **elimina**), trata las categorías no oficiales, controla los outliers antes de calcular correlación y VIF, y cada gráfico interactivo va acompañado de su interpretación, con una versión **básica** (palabras sencillas) y una **técnica**. En la Parte 5 se aplica y se guarda el preprocesamiento que resuelve todos los hallazgos, de modo que el dataset que reciben los modelos ya sale limpio de aquí.
+
+```{r libs}
+# install.packages(c("tidyverse", "readxl", "plotly", "htmltools", "htmlwidgets",
+#                    "jsonlite", "e1071", "knitr", "skimr"))   # dplyr >= 1.1 recomendado
+library(tidyverse)
+library(readxl)
+library(e1071)     # skewness() y kurtosis()
+library(knitr)
+
+# Paleta, tema Plotly y show_with_interpretation()
+# Funciona al compilar el libro (raíz) y al knitear el notebook solo (raíz del proyecto)
+BASE <- if (file.exists(file.path("R", "eda_widgets.R"))) "." else ".."
+source(file.path(BASE, "R", "eda_widgets.R"))
+source(file.path(BASE, "R", "portar_notebook.R"))
+
+# ---- Configuración (equivalente a src/config.py) ----
+RAW_DATA_PATH <- file.path(BASE, "data", "raw", "default_of_credit_card_clients.xls")
+target        <- "default_payment_next_month"
+```
+
+<!-- nb:md cell=2 -->
+## Tipo y descripción de las variables
+
+El conjunto de datos está compuesto por variables numéricas continuas y variables categóricas (algunas codificadas numéricamente).
+
+| Variable                                     | Tipo                        | Descripción                                                                                                                                                                                                                                                                                                                                   |
+| -------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **LIMIT_BAL**                                | Numérica continua           | Monto del crédito otorgado, incluyendo crédito individual y familiar/suplementario, en dólares taiwaneses (NT$).                                                                                                                                                                                                                              |
+| **SEX**                                      | Categórica                  | Género del cliente. `1` = hombre, `2` = mujer.                                                                                                                                                                                                                                                                                                |
+| **EDUCATION**                                | Categórica                  | Nivel educativo. `1` = posgrado, `2` = universidad, `3` = secundaria, `4` = otros. También existen los códigos `0`, `5` y `6`, no documentados oficialmente por la fuente.                                                                                                                                                                    |
+| **MARRIAGE**                                 | Categórica                  | Estado civil. `1` = casado, `2` = soltero, `3` = otros. También existe el código `0`, no documentado.                                                                                                                                                                                                                                         |
+| **AGE**                                      | Numérica discreta           | Edad del cliente en años.                                                                                                                                                                                                                                                                                                                     |
+| **PAY_0, PAY_2, PAY_3, PAY_4, PAY_5, PAY_6** | Numérica discreta / ordinal | Estado de pago mensual de septiembre a abril de 2005 (`PAY_0` = mes más reciente). `-1` = pago puntual, `1-8` = meses de atraso (el máximo observado es 8). Los valores `-2` y `0` aparecen en la documentación original sin una definición unívoca; se conservan como están (`0` es el valor más frecuente, 49-57% según el mes; `-2` es solo 9-16%), pero su interpretación exacta es una limitación conocida del dataset. |
+| **BILL_AMT1 a BILL_AMT6**                    | Numérica continua           | Monto facturado en el estado de cuenta de cada uno de los últimos 6 meses.                                                                                                                                                                                                                                                                    |
+| **PAY_AMT1 a PAY_AMT6**                      | Numérica continua           | Monto efectivamente pagado por el cliente en cada uno de los últimos 6 meses.                                                                                                                                                                                                                                                                 |
+| **default payment next month**               | Categórica binaria          | **Variable objetivo.** `1` = incurrió en incumplimiento al mes siguiente, `0` = no incurrió.                                                                                                                                                                                                                                                  |
+
+```{r carga}
+# header = 1 en pandas equivale a skip = 1 en readxl (la fila 0 del .xls es una fila de títulos)
+df <- read_excel(RAW_DATA_PATH, skip = 1) %>%
+  rename(default_payment_next_month = `default payment next month`)
+
+PAY_COLS    <- c("PAY_0", paste0("PAY_", 2:6))
+BILL_COLS   <- paste0("BILL_AMT", 1:6)
+PAYAMT_COLS <- paste0("PAY_AMT", 1:6)
+num_cols    <- c("LIMIT_BAL", "AGE", PAY_COLS, BILL_COLS, PAYAMT_COLS)
+cat_cols    <- c("SEX", "EDUCATION", "MARRIAGE")
+```
+
+<!-- nb:table cell=3 -->
+```{r dimensiones}
+# En pandas el ID es el índice y no cuenta como columna
+kable(data.frame(Filas = nrow(df), Columnas = ncol(df) - 1, row.names = "Dimensiones de los datos"),
+      format.args = list(big.mark = ","))
+```
+
+<!-- nb:table cell=3 -->
+```{r head-df}
+# df.head() de pandas (las primeras 5 filas, antes de eliminar duplicados)
+kable(head(df, 5), caption = "Primeras 5 filas del archivo original")
+```
+
+Vista general de las columnas (equivalente a `df.info()` de pandas y a `glimpse` de R, en formato de tabla; el `ID` se usa como índice y no se lista):
+
+<!-- nb:table cell=4 -->
+```{r glimpse-tabla}
+vars_df <- setdiff(names(df), "ID")
+glimpse_tabla <- tibble(
+  Columna = vars_df,
+  `No nulos` = vapply(df[vars_df], function(x) sum(!is.na(x)), numeric(1)),
+  Tipo = vapply(df[vars_df], function(x) class(x)[1], character(1)),
+  `Primeros valores` = vapply(df[vars_df], function(x) paste(head(x, 10), collapse = ", "), character(1))
+)
+kable(glimpse_tabla, align = "lrll", format.args = list(big.mark = ","))
+```
+
+<!-- nb:md cell=5 -->
+### Valores nulos y duplicados
+
+El `ID` es único por construcción, así que se **excluye** al buscar duplicados (igual que en Python, donde el ID es el índice).
+
+<!-- nb:table cell=6 -->
+```{r duplicados-revision}
+cols_sin_id <- select(df, -ID)
+
+dup_flag <- duplicated(cols_sin_id)                                  # TRUE desde la 2.ª aparición
+dup_all  <- dup_flag | duplicated(cols_sin_id, fromLast = TRUE)      # equivale a keep = False
+
+kable(data.frame(
+  Cantidad = c(sum(is.na(df)), sum(dup_flag)),
+  row.names = c("Valores nulos totales", "Filas completamente duplicadas (todas las variables, sin el ID)")
+), format.args = list(big.mark = ","))
+```
+
+<!-- nb:table cell=6 -->
+```{r duplicados-ejemplo}
+df %>%
+  filter(dup_all) %>%
+  arrange(across(all_of(num_cols))) %>%
+  head(6) %>%
+  kable(caption = "Ejemplo de filas duplicadas (primeras 6)")
+```
+
+<!-- nb:table cell=7 -->
+```{r duplicados-eliminar}
+n_antes <- nrow(df)
+df      <- df %>% filter(!dup_flag)       # conserva la primera aparición de cada grupo
+
+kable(data.frame(
+  Cantidad = c(n_antes, n_antes - nrow(df), nrow(df), sum(duplicated(select(df, -ID)))),
+  row.names = c("Filas antes", "Duplicadas eliminadas", "Filas ahora", "Duplicados restantes")
+), format.args = list(big.mark = ","))
+```
+
+<!-- nb:md cell=8 -->
+No hay valores nulos en ninguna variable: a diferencia del dataset *Give Me Some Credit*, aquí no se requiere imputación.
+
+Sí se detectan **35 copias excedentes**: filas con exactamente los mismos valores en todas las variables (excluyendo el `ID`, que es único por construcción) que los de otra fila ya presente. Es plausible que parte de ellas sean clientes distintos con el mismo perfil, porque hay varias variables categóricas/discretas con pocos valores posibles (`SEX`, `EDUCATION`, `MARRIAGE`, `PAY_x`). Aun así **se eliminan**: si una fila y su copia exacta quedan repartidas entre entrenamiento y validación, el modelo se evalúa sobre un caso que ya vio, lo que infla artificialmente la métrica (fuga de información). Eliminarlas solo cuesta 35 de 30,000 filas (0.12%). Se conserva la primera aparición de cada grupo, y todo el análisis posterior se hace sobre el dataset ya sin duplicados.
+
+<!-- nb:md cell=9 -->
+### Categorías no documentadas / valores centinela
+
+```{r categorias-funcion}
+conteo <- function(x, nombre) {
+  tb  <- table(x)
+  out <- data.frame(names(tb), as.integer(tb))
+  names(out) <- c(nombre, "Clientes")
+  out
+}
+```
+
+<!-- nb:table cell=10 -->
+```{r categorias-educacion}
+kable(conteo(df$EDUCATION, "EDUCATION"), format.args = list(big.mark = ","))
+```
+
+<!-- nb:table cell=10 -->
+```{r categorias-matrimonio}
+kable(conteo(df$MARRIAGE, "MARRIAGE"), format.args = list(big.mark = ","))
+```
+
+<!-- nb:table cell=10 -->
+```{r categorias-pay}
+codigos   <- sort(unique(unlist(df[PAY_COLS])))
+tabla_pay <- sapply(PAY_COLS, function(c) as.integer(table(factor(df[[c]], levels = codigos))))
+kable(cbind(`Código de estado de pago` = codigos, tabla_pay), format.args = list(big.mark = ","))
+```
+
+<!-- nb:md cell=11 -->
+`EDUCATION` trae tres códigos (**0, 5, 6**) que no forman parte de la documentación oficial (1=posgrado, 2=universidad, 3=secundaria, 4=otros); en conjunto representan **345 registros (1.2%)**. `MARRIAGE` trae un código **0** no documentado, con **54 registros (0.18%)**.
+
+En ambos casos se trata de una fracción pequeña de la muestra, así que en vez de eliminarlas (lo que descartaría información del resto de variables de esos clientes) se **reagrupan dentro de la categoría "Otros"** ya existente (`EDUCATION = 4`, `MARRIAGE = 3`). Es una decisión de modelado, no está respaldada semánticamente: la fuente no dice que esos códigos signifiquen "otros", y sus tasas de default son distintas. En `EDUCATION`: código 0 (14 filas, 0% de default), 5 (280 filas, 6.4%), 6 (51 filas, 15.7%) y 4 documentado (123 filas, 5.7%). En `MARRIAGE`: código 0 (54 filas, 9.3%) frente a 3 (323 filas, 26.0%), que baja a 23.6% al fusionarlos.
+
+Las variables `PAY_x` muestran una alta concentración en **0** (entre el 49% y el 57% de los casos según el mes) y en **-1** (18-20%), seguidos por **-2** (9-16%). Como se explicó arriba, la definición exacta de estos dos códigos no está estandarizada en la fuente original. Se conservan tal cual (no se recodifican ni se eliminan): el `0` representa a la mayoría de las observaciones y el `-2` a una minoría, y se desconoce si equivalen a clientes sin atraso. Se deja constancia de la ambigüedad para no sobre-interpretar resultados que dependan de la frontera exacta entre "0" y "-1".
+
+```{r categorias-reagrupar}
+df <- df %>%
+  mutate(
+    EDUCATION = if_else(EDUCATION %in% c(0, 5, 6), 4, EDUCATION),
+    MARRIAGE  = if_else(MARRIAGE == 0, 3, MARRIAGE)
+  )
+```
+
+<!-- nb:table cell=12 -->
+```{r categorias-reagrupar-educacion}
+kable(conteo(df$EDUCATION, "EDUCATION (reagrupada)"), format.args = list(big.mark = ","))
+```
+
+<!-- nb:table cell=12 -->
+```{r categorias-reagrupar-matrimonio}
+kable(conteo(df$MARRIAGE, "MARRIAGE (reagrupada)"), format.args = list(big.mark = ","))
+```
+
+<!-- nb:md cell=13 -->
+### Montos de facturación negativos
+
+<!-- nb:table cell=14 -->
+```{r bill-negativos}
+bill_neg_mat <- as.matrix(df[BILL_COLS]) < 0
+ids_bill_negativo <- df$ID[rowSums(bill_neg_mat) > 0]   # clientes identificados (no se eliminan)
+
+tabla_neg <- data.frame(
+  `Registros con saldo negativo` = c(colSums(bill_neg_mat), length(ids_bill_negativo)),
+  row.names = c(BILL_COLS, "Filas con al menos un BILL_AMT negativo"),
+  check.names = FALSE
+)
+kable(tabla_neg, format.args = list(big.mark = ","))
+```
+
+<!-- nb:md cell=15 -->
+Cada mes, entre el **2.0% y el 2.3%** de los registros tiene un monto de facturación (`BILL_AMT`) **negativo**, y en total **6.4% de los clientes** (1,930 filas) tiene al menos un mes negativo. Esto **no se trata como un error**: un saldo negativo en un estado de cuenta de tarjeta de crédito es económicamente válido y suele indicar que el cliente pagó de más el mes anterior (saldo a favor). No se elimina ni se corrige; en la Parte 5 queda resumido en la variable derivada `N_CREDIT_BALANCE_MONTHS` (número de meses con saldo a favor).
+
+Verificación en R de los datos hasta este punto, contra los valores reportados en el notebook de Python:
+
+```{r verificaciones}
+# Verificaciones del preprocesamiento (contra los valores reportados en el EDA de Python)
+verificaciones <- c(
+  "Sin valores nulos"                                = sum(is.na(df)) == 0,
+  "Sin filas duplicadas"                             = sum(duplicated(select(df, -ID))) == 0,
+  "29,965 filas tras eliminar 35 duplicados"         = nrow(df) == 29965,
+  "EDUCATION solo toma valores 1-4"                  = all(df$EDUCATION %in% 1:4),
+  "MARRIAGE solo toma valores 1-3"                   = all(df$MARRIAGE %in% 1:3),
+  "SEX solo toma valores 1-2"                        = all(df$SEX %in% 1:2),
+  "1,930 clientes con al menos un BILL_AMT negativo" = length(ids_bill_negativo) == 1930,
+  "Target binario (0/1)"                             = all(df[[target]] %in% 0:1)
+)
+kable(tibble(verificación = names(verificaciones),
+             resultado    = ifelse(verificaciones, "OK", "REVISAR")))
+```
+
+<!-- nb:md cell=16 -->
+## Análisis de la variable objetivo
+
+```{r target-calculo}
+tabla_target <- df %>%
+  count(clase = .data[[target]]) %>%
+  arrange(clase) %>%
+  mutate(prop = n / sum(n))
+
+fmt_int <- function(x) format(x, big.mark = ",", scientific = FALSE, trim = TRUE)
+etiquetas_barra <- sprintf("%s (%s)", fmt_int(tabla_target$n), scales::percent(tabla_target$prop, accuracy = 0.1))
+```
+
+<!-- nb:plotly cell=17 -->
+```{r target-grafico}
+fig_target <- plot_ly(
+  x = c("No default (0)", "Default (1)"),
+  y = tabla_target$n,
+  type = "bar",
+  marker = list(color = c(DEEP_NAVY, DEEP_NAVY)),
+  text = etiquetas_barra,
+  textposition = "outside",
+  hovertemplate = "%{x}<br>%{y:,} clientes<extra></extra>",
+  width = 650, height = 450
+) %>%
+  layout(
+    title = "Distribución de la variable objetivo (default payment next month)",
+    xaxis = list(title = "", categoryorder = "array", categoryarray = c("No default (0)", "Default (1)")),
+    yaxis = list(title = "Número de clientes", range = c(0, max(tabla_target$n) * 1.12), tickformat = ","),
+    showlegend = FALSE
+  ) %>%
+  ng_theme()
+
+# Interpretaciones (los números salen de `tabla_target`, así que siempre coinciden con el gráfico)
+p0 <- tabla_target$prop[1]; p1 <- tabla_target$prop[2]
+n0 <- tabla_target$n[1];    n1 <- tabla_target$n[2]
+
+interp_target_basica <- sprintf(
+  paste0("De cada 100 clientes, unos %.0f pagaron a tiempo y unos %.0f cayeron en default. ",
+         "Hay muchos más clientes que pagan que clientes que no pagan, y eso es un problema para los modelos: ",
+         "si no se ajustan, tienden a decir casi siempre «no caerá en default» y a acertar mucho sin detectar ",
+         "a los clientes que realmente fallan."),
+  100 * p0, 100 * p1
+)
+
+interp_target_tecnica <- sprintf(
+  paste0("Existe un desbalance de clases: %.1f%% de los clientes no incurrió en default (clase 0, n = %s) frente a %.1f%% ",
+         "que sí (clase 1, n = %s), una razón aproximada de %.1f:1. Un clasificador trivial que siempre prediga la clase 0 ",
+         "alcanzaría una exactitud de %.1f%% con recall nulo en la clase 1, por lo que accuracy no es una métrica adecuada. ",
+         "Conviene usar class_weight = \"balanced\", remuestreo (SMOTE/ADASYN) o umbrales de decisión ajustados, ",
+         "y evaluar con métricas robustas al desbalance (AUC-ROC, F1, recall de la clase 1)."),
+  100 * p0, fmt_int(n0), 100 * p1, fmt_int(n1), n0 / n1, 100 * p0
+)
+
+show_with_interpretation(fig_target, interp_target_basica, interp_target_tecnica)
+```
+
+<!-- nb:table cell=17 -->
+```{r target-proporcion}
+kable(data.frame(Proporción = formatC(tabla_target$prop, format = "f", digits = 4),
+                 row.names = tabla_target$clase), align = "r")
+```
+
+<!-- nb:md cell=18 -->
+Existe un **desbalance de clases**: aproximadamente **77.9% de los clientes no incurrieron en default (clase 0)** frente a **22.1% que sí (clase 1)**.Tener en cuenta que  cualquier modelo entrenado sin ajustes tenderá a favorecer la clase mayoritaria, por lo que conviene usar `class_weight="balanced"`, remuestreo  o umbrales de decisión ajustados, y evaluar con métricas robustas al desbalance (AUC-ROC, F1, recall de la clase 1) en vez de solo accuracy.
+
+<!-- nb:md cell=19 -->
+## Análisis Univariado
+
+<!-- nb:md cell=20 -->
+### 1.1 Estadísticos descriptivos completos
+
+Un valor $x$ se marca como atípico con el criterio de Tukey cuando cae fuera de las vallas
+
+$$
+x < Q_1 - 1.5\,\mathrm{IQR}
+\quad \text{o} \quad
+x > Q_3 + 1.5\,\mathrm{IQR},
+\qquad \mathrm{IQR} = Q_3 - Q_1 .
+$$
+
+La asimetría y la curtosis usan los estimadores **sesgados (momentos poblacionales)**, como `scipy.stats.skew` y `scipy.stats.kurtosis` (curtosis de Fisher, es decir, exceso). En `e1071` eso corresponde a `type = 1`; el valor por defecto de `e1071` es `type = 3`, que daría números distintos. Los cuantiles usan interpolación lineal (`type = 7`, igual que pandas) y la desviación estándar es muestral (ddof = 1).
+
+<!-- nb:table cell=21 -->
+```{r univariado-tabla}
+resumen_univariado <- function(x) {
+  x   <- x[!is.na(x)]
+  q   <- quantile(x, probs = c(0.25, 0.75), names = FALSE, type = 7)
+  iqr <- q[2] - q[1]
+  lim_inf <- q[1] - 1.5 * iqr
+  lim_sup <- q[2] + 1.5 * iqr
+  tibble(
+    n                    = length(x),
+    media                = mean(x),
+    mediana              = median(x),
+    desv_estandar        = sd(x),
+    min                  = min(x),
+    Q1                   = q[1],
+    Q3                   = q[2],
+    max                  = max(x),
+    IQR                  = iqr,
+    `asimetria (skew)`   = e1071::skewness(x, type = 1),
+    curtosis             = e1071::kurtosis(x, type = 1),
+    `% outliers (Tukey)` = mean(x < lim_inf | x > lim_sup) * 100
+  )
+}
+
+tabla_univariada <- map_dfr(set_names(num_cols), ~ resumen_univariado(df[[.x]]), .id = "variable") %>%
+  column_to_rownames("variable")
+
+kable(tabla_univariada, digits = 3, format.args = list(big.mark = ",", scientific = FALSE))
+```
+
+<!-- nb:table cell=22 -->
+```{r univariado-categorica}
+cats_idx <- sort(unique(unlist(lapply(cat_cols, function(c) df[[c]]))))
+tabla_categorica <- sapply(cat_cols, function(c) {
+  p <- prop.table(table(factor(df[[c]], levels = cats_idx)))
+  p[p == 0] <- NA
+  round(as.numeric(p), 4)
+})
+rownames(tabla_categorica) <- cats_idx
+
+kable(tabla_categorica, digits = 4, caption = "Proporción por categoría")
+```
+
+<!-- nb:md cell=23 -->
+### 1.2 Visualización interactiva
+
+Cada gráfico tiene un menú desplegable para elegir la variable; la tarjeta de interpretación cambia junto con él.
+
+```{r interpretaciones-numericas}
+# Los números se toman de `tabla_univariada` para que el texto siempre coincida con la tabla.
+fmt  <- function(x, d = 0) formatC(round(x, d), format = "f", digits = d, big.mark = ",")  # con separador de miles
+f0   <- function(x, d = 0) sprintf(paste0("%.", d, "f"), round(x, d))                      # sin separador de miles
+nt   <- function(x) if (x < 0) paste0("-NT$", fmt(abs(x))) else paste0("NT$", fmt(x))
+pct0 <- function(p) sprintf("%.0f%%", 100 * p)
+pct1 <- function(p) sprintf("%.1f%%", 100 * p)
+
+MESES_ANTES <- c(PAY_0 = 0,
+                 setNames(2:6 - 1, paste0("PAY_", 2:6)),
+                 setNames(1:6 - 1, BILL_COLS),
+                 setNames(1:6 - 1, PAYAMT_COLS))
+
+corresp <- function(col) {
+  n <- MESES_ANTES[[col]]
+  if (n == 0) "al mes más reciente"
+  else if (n == 1) "al mes anterior al más reciente"
+  else paste0("a ", n, " meses antes del más reciente")
+}
+
+U   <- tabla_univariada
+SK  <- "asimetria (skew)"; KU <- "curtosis"; OUT <- "% outliers (Tukey)"
+
+skew_max_global <- rownames(U)[which.max(U[[SK]])]
+out_pay   <- setNames(U[PAY_COLS,  OUT], PAY_COLS)
+skew_bill <- setNames(U[BILL_COLS, SK],  BILL_COLS)
+min_bill  <- setNames(U[BILL_COLS, "min"], BILL_COLS)
+
+NOTA_PAY0 <- "`PAY_0` (3,667 clientes con valor 1, frente a 28, 4, 2, 0 y 0 en `PAY_2` a `PAY_6`)"
+
+tecnica_uni <- function(col) {
+  s   <- U[col, ]
+  sk  <- s[[SK]]; ku <- s[[KU]]; out <- s[[OUT]]
+
+  if (col == "LIMIT_BAL") {
+    return(paste0(
+      "Histograma con asimetría moderada a la derecha (", f0(sk, 2), "); la mayoría de los clientes se concentra ",
+      "entre ", nt(s$Q1), " y ", nt(s$Q3), " (rango intercuartílico), con una cola larga hasta ", nt(s$max),
+      "; el boxplot marca pocos outliers Tukey (", f0(out, 2), "%) porque la asimetría es moderada y el rango intercuartílico es amplio respecto de la cola, no porque el criterio subestime el sesgo."))
+  }
+  if (col == "AGE") {
+    return(paste0(
+      "Distribución con asimetría moderada (", f0(sk, 2), ", del mismo orden que la de `LIMIT_BAL`), concentrada entre ", f0(s$Q1), " y ", f0(s$Q3), " años ",
+      "(mediana ", f0(s$mediana), "); cola derecha moderada hacia clientes mayores, con muy pocos outliers (", f0(out, 1), "%)."))
+  }
+  if (col %in% PAY_COLS) {
+    txt <- paste0(
+      "Variable discreta con la masa en 0 y -1 y una cola de atrasos de hasta ", f0(s$max), " meses; media ", f0(s$media, 2), ", ",
+      "mediana ", f0(s$mediana), ". El ", f0(out, 1), "% de los valores se marca como «outlier» bajo Tukey, un resultado artificial ",
+      "de ser una variable discreta muy concentrada")
+    if (col == names(which.max(out_pay))) {
+      txt <- paste0(txt, " (la mayor proporción del bloque `PAY_x`)")
+    } else if (col == names(which.min(out_pay))) {
+      txt <- paste0(txt, " (la menor proporción del bloque `PAY_x`)")
+    }
+    txt <- paste0(txt, ".")
+    if (col == "PAY_0") {
+      txt <- paste0(txt, " Es el mes más reciente del historial.")
+    } else {
+      prev <- PAY_COLS[match(col, PAY_COLS) - 1]
+      if (s$media < U[prev, "media"]) {
+        txt <- paste0(txt, " La media es más negativa que la de `", prev, "` (", f0(U[prev, "media"], 2),
+                      "): cuanto más atrás en el tiempo, más clientes figuran al día. ",
+                      "Esta tendencia está parcialmente confundida por la codificación inconsistente de ", NOTA_PAY0, ".")
+      }
+    }
+    return(txt)
+  }
+  if (col %in% BILL_COLS) {
+    txt <- paste0(
+      "Histograma extremadamente sesgado a la derecha (asimetría ", f0(sk, 2), ", curtosis ", f0(ku, 1), "); la mediana (", nt(s$mediana), ") queda ",
+      "muy por debajo de la media (", nt(s$media), "). Hay valores negativos (mínimo ", nt(s$min), ") que reflejan saldos a favor del ",
+      "cliente; ", f0(out, 1), "% de outliers Tukey.")
+    if (col == names(which.max(skew_bill))) {
+      txt <- paste0(txt, " Es la más asimétrica del bloque por un valor extremo de ", nt(s$max), " que estira la cola derecha.")
+    }
+    if (col == names(which.min(min_bill))) {
+      txt <- paste0(txt, " Incluye el valor negativo más extremo del dataset.")
+    }
+    return(txt)
+  }
+  txt <- paste0(
+    "Distribución muy concentrada en montos bajos (mediana ", nt(s$mediana), " frente a una media de ", nt(s$media), "), con asimetría ",
+    f0(sk, 1), " y curtosis ", fmt(ku, 0), " por unos pocos pagos muy grandes (máximo ", nt(s$max), ") que distorsionan el promedio.")
+  if (col == skew_max_global) txt <- paste0(txt, " Es la variable con mayor asimetría de todo el dataset.")
+  txt
+}
+
+basica_uni <- function(col) {
+  s <- U[col, ]
+  if (col == "LIMIT_BAL") {
+    return(paste0(
+      "Es el cupo de crédito que el banco le dio a cada cliente. La mayoría tiene entre ", nt(s$Q1), " y ", nt(s$Q3), ". ",
+      "Pocos clientes tienen cupos muy altos (hasta ", nt(s$max), "), por eso el gráfico se estira hacia la derecha."))
+  }
+  if (col == "AGE") {
+    return(paste0(
+      "Casi todos los clientes tienen entre ", f0(s$Q1), " y ", f0(s$Q3), " años y la edad típica es ", f0(s$mediana), ". ",
+      "A partir de ahí hay cada vez menos clientes a medida que aumenta la edad."))
+  }
+  if (col %in% PAY_COLS) {
+    base <- paste0(
+      "Indica qué tan al día estaba el cliente con sus pagos: de 1 en adelante son meses de atraso, -1 es pago puntual, y -2 y 0 ",
+      "(que la fuente no define con claridad; su significado exacto es incierto) probablemente corresponden a clientes sin atraso, pero es una suposición. ")
+    if (col == "PAY_0") {
+      return(paste0(base, "Corresponde al mes más reciente. La gran mayoría está al día; una minoría se atrasa y unos pocos llegan a 8 meses de atraso."))
+    }
+    return(paste0(
+      "Es el mismo dato que `PAY_0` (meses de atraso; -1 es pago puntual y -2 y 0 son ambiguos), pero correspondiente ", corresp(col), ". ",
+      "Tiene la misma forma: casi todos al día y pocos con atrasos largos. Cuanto más atrás en el tiempo, más clientes aparecen al día, aunque en parte es un efecto de codificación: ",
+      "`PAY_0` tiene 3,667 clientes con valor 1, frente a 28, 4, 2, 0 y 0 en `PAY_2` a `PAY_6`."))
+  }
+  if (col %in% BILL_COLS) {
+    return(paste0(
+      "Es lo que el cliente debía según su estado de cuenta correspondiente ", corresp(col), ". La mitad de los clientes debe menos de ", nt(s$mediana), ", ",
+      "pero unos pocos deben cifras enormes, por eso el gráfico se estira hacia la derecha. Algunos valores son negativos: ",
+      "son clientes que pagaron de más y tienen saldo a favor."))
+  }
+  paste0(
+    "Es lo que el cliente pagó, correspondiente ", corresp(col), ". La mitad de los clientes pagó menos de ", nt(s$mediana), "; ",
+    "unos pocos pagaron cifras enormes y por eso el promedio (", nt(s$media), ") engaña: es mucho más alto que lo habitual.")
+}
+
+# Vectores NOMBRADOS por etiqueta del botón del dropdown
+INTERP_UNI_NUM_BASICA  <- vapply(num_cols, basica_uni,  character(1))
+INTERP_UNI_NUM_TECNICA <- vapply(num_cols, tecnica_uni, character(1))
+```
+
+<!-- nb:plotly cell=26 -->
+```{r fig-hist-box}
+fig_hist_box <- function(dataframe, cols, height = 560, width = 850) {
+  n <- length(cols)
+  # Nota: se pasan vectores directamente (no fórmulas ~), así que se evalúan al instante dentro del bucle.
+  p_hist <- plot_ly(width = width, height = height)
+  p_box  <- plot_ly()
+  for (i in seq_along(cols)) {
+    x <- dataframe[[cols[i]]]
+    p_hist <- add_histogram(p_hist, x = x, marker = list(color = DEEP_NAVY),
+                            visible = (i == 1), showlegend = FALSE, name = cols[i])
+    p_box  <- add_boxplot(p_box, x = x, name = "", marker = list(color = WARM_GOLD),
+                          boxpoints = FALSE, visible = (i == 1), showlegend = FALSE)
+  }
+
+  # subplot() deja primero las n trazas del histograma y luego las n del boxplot
+  fig <- subplot(p_hist, p_box, nrows = 2, heights = c(0.72, 0.28), shareX = TRUE, titleX = FALSE)
+
+  botones <- lapply(seq_len(n), function(i) {
+    vis <- rep(FALSE, 2 * n)
+    vis[c(i, n + i)] <- TRUE
+    list(label = cols[i], method = "update",
+         args = list(list(visible = as.list(vis)),
+                     list(title = paste("Distribución de", cols[i]))))
+  })
+
+  fig %>%
+    layout(
+      title = paste("Distribución de", cols[1]),
+      updatemenus = list(list(type = "dropdown", buttons = botones, direction = "down",
+                              x = 1.15, y = 1.05, showactive = TRUE))
+    ) %>%
+    ng_theme(axes = c("xaxis", "yaxis", "xaxis2", "yaxis2"))
+}
+
+fig <- fig_hist_box(df, num_cols)
+show_with_interpretation(fig, INTERP_UNI_NUM_BASICA, INTERP_UNI_NUM_TECNICA)
+```
+
+```{r interpretaciones-categoricas}
+# Interpretaciones de variables categóricas, calculadas con `tabla_categorica`.
+P <- function(var, code) tabla_categorica[as.character(code), var]
+
+INTERP_UNI_CAT_BASICA <- c(
+  SEX = paste0("Hay más mujeres (", pct0(P("SEX", 2)), ") que hombres (", pct0(P("SEX", 1)), ") entre los clientes."),
+  EDUCATION = paste0(
+    "Casi la mitad de los clientes (", pct0(P("EDUCATION", 2)), ") tiene estudios universitarios, ", pct0(P("EDUCATION", 1)),
+    " llegó a posgrado y ", pct0(P("EDUCATION", 3)), " a secundaria. La categoría «otros» es muy pequeña (", pct1(P("EDUCATION", 4)), ")."),
+  MARRIAGE = paste0(
+    "Hay más solteros (", pct0(P("MARRIAGE", 2)), ") que casados (", pct0(P("MARRIAGE", 1)), "). Otros estados civiles son muy pocos (",
+    pct1(P("MARRIAGE", 3)), ").")
+)
+
+INTERP_UNI_CAT_TECNICA <- c(
+  SEX = paste0(
+    "El ", pct1(P("SEX", 2)), " de los clientes son mujeres (código 2) y el ", pct1(P("SEX", 1)),
+    " hombres (código 1); la muestra está desbalanceada hacia el género femenino."),
+  EDUCATION = paste0(
+    "Tras reagrupar las categorías no oficiales, «universidad» concentra el ", pct1(P("EDUCATION", 2)), " de los clientes, «posgrado» el ",
+    pct1(P("EDUCATION", 1)), ", «secundaria» el ", pct1(P("EDUCATION", 3)), " y «otros» apenas el ", pct1(P("EDUCATION", 4)), "."),
+  MARRIAGE = paste0(
+    "Distribución bastante pareja entre «soltero» (", pct1(P("MARRIAGE", 2)), ") y «casado» (", pct1(P("MARRIAGE", 1)),
+    "), con «otros» siendo marginal (", pct1(P("MARRIAGE", 3)), ").")
+)
+```
+
+<!-- nb:plotly cell=29 -->
+```{r fig-bar-categ}
+fig_bar_categ <- function(dataframe, cols, height = 460, width = 750) {
+  n <- length(cols)
+  fig <- plot_ly(width = width, height = height)
+  for (i in seq_along(cols)) {
+    vc <- table(dataframe[[cols[i]]])
+    fig <- add_bars(fig, x = names(vc), y = as.integer(vc), marker = list(color = NAVY),
+                    visible = (i == 1), showlegend = FALSE,
+                    hovertemplate = paste0(cols[i], ": %{x}<br>Frecuencia: %{y:,}<extra></extra>"))
+  }
+  botones <- lapply(seq_len(n), function(i) {
+    vis <- rep(FALSE, n); vis[i] <- TRUE
+    list(label = cols[i], method = "update",
+         args = list(list(visible = as.list(vis)),
+                     list(title = paste("Frecuencia de", cols[i]), "xaxis.title" = cols[i])))
+  })
+  fig %>%
+    layout(
+      title = paste("Frecuencia de", cols[1]),
+      xaxis = list(title = cols[1]), yaxis = list(title = "Frecuencia"),
+      updatemenus = list(list(type = "dropdown", buttons = botones, direction = "down",
+                              x = 1.2, y = 1.05, showactive = TRUE))
+    ) %>%
+    ng_theme()
+}
+
+fig <- fig_bar_categ(df, cat_cols)
+show_with_interpretation(fig, INTERP_UNI_CAT_BASICA, INTERP_UNI_CAT_TECNICA)
+```
+
+<!-- nb:md cell=30 -->
+## Análisis Bivariado
+
+<!-- nb:md cell=31 -->
+### 2.1 Pruebas de hipótesis y comparación de grupos
+
+Para cada variable numérica se compara el grupo sin *default* con el grupo con *default* mediante la U de Mann-Whitney, que no supone normalidad ($R_1$ es la suma de rangos del primer grupo y $n_1$ su tamaño), y la t de Welch, que admite varianzas distintas:
+
+$$
+U_1 = R_1 - \frac{n_1 (n_1 + 1)}{2},
+\qquad
+t = \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{\dfrac{s_1^2}{n_1} + \dfrac{s_2^2}{n_2}}} .
+$$
+
+Para las variables categóricas se usa la prueba $\chi^2$ de independencia y la V de Cramér, con $k$ el menor número de categorías entre las dos variables:
+
+$$
+V = \sqrt{\frac{\chi^2 / n}{k - 1}} .
+$$
+
+<!-- nb:table cell=32 -->
+```{r bivariado-tabla}
+resultados_bivariado <- map_dfr(num_cols, function(col) {
+  g0 <- df[[col]][df[[target]] == 0]
+  g1 <- df[[col]][df[[target]] == 1]
+  mw <- suppressWarnings(wilcox.test(g0, g1, alternative = "two.sided", exact = FALSE, correct = TRUE))
+  tt <- t.test(g0, g1, var.equal = FALSE)
+  tibble(
+    variable             = col,
+    media_no_default     = mean(g0),   media_default   = mean(g1),
+    mediana_no_default   = median(g0), mediana_default = median(g1),
+    `Mann-Whitney U`     = unname(mw$statistic), `p-value (MW)` = mw$p.value,
+    `t (Welch)`          = unname(tt$statistic), `p-value (t)`  = tt$p.value
+  )
+})
+tabla_bivariada <- column_to_rownames(as.data.frame(resultados_bivariado), "variable")
+
+kable(formato_pandas(tabla_bivariada, 4), align = "r")
+```
+
+<!-- nb:table cell=33 -->
+```{r bivariado-chi2}
+tabla_chi2 <- map_dfr(cat_cols, function(col) {
+  r <- suppressWarnings(chisq.test(table(df[[col]], df[[target]])))
+  tibble(variable = col, chi2 = unname(r$statistic), `p-value` = r$p.value,
+         grados_libertad = unname(r$parameter))
+})
+tabla_chi2 <- column_to_rownames(as.data.frame(tabla_chi2), "variable")
+
+kable(cbind(formato_pandas(tabla_chi2[, c("chi2", "p-value")], 4),
+            grados_libertad = as.character(tabla_chi2$grados_libertad)), align = "r")
+```
+
+<!-- nb:md cell=34 -->
+Con 30,000 observaciones, diferencias pequeñas resultan estadísticamente significativas: p cercano a 0 (Mann-Whitney p<0.001) solo en 14 de las 20 variables numéricas, y en las tres categóricas vía chi-cuadrado. No lo son `AGE` (p=0.40) ni `BILL_AMT2` a `BILL_AMT6` (p=0.006, 0.025, 0.137, 0.221 y 0.962). El p-value por sí solo aporta poco para priorizar variables, y estas pruebas no incluyen corrección por pruebas múltiples ni una medida de tamaño de efecto para las numéricas. En las categóricas, la V de Cramér es SEX 0.040, EDUCATION 0.073 y MARRIAGE 0.030: asociaciones muy débiles. Lo relevante es la **magnitud** de la diferencia entre medias/medianas y las tasas de default por categoría, que se exploran en los gráficos siguientes.
+
+<!-- nb:md cell=35 -->
+### 2.2 Visualizaciones segmentadas por default
+
+```{r fig-box-target}
+fig_box_target <- function(dataframe, cols, target_col, height = 520, width = 750) {
+  n  <- length(cols)
+  d0 <- dataframe[dataframe[[target_col]] == 0, ]
+  d1 <- dataframe[dataframe[[target_col]] == 1, ]
+  fig <- plot_ly(width = width, height = height)
+  for (i in seq_len(n)) {
+    fig <- add_boxplot(fig, y = d0[[cols[i]]], name = "No default", marker = list(color = DEEP_NAVY),
+                       visible = (i == 1), showlegend = (i == 1), boxpoints = FALSE, offsetgroup = "0")
+    fig <- add_boxplot(fig, y = d1[[cols[i]]], name = "Default", marker = list(color = WARM_GOLD),
+                       visible = (i == 1), showlegend = (i == 1), boxpoints = FALSE, offsetgroup = "1")
+  }
+  botones <- lapply(seq_len(n), function(i) {
+    vis <- rep(FALSE, 2 * n); vis[c(2 * i - 1, 2 * i)] <- TRUE
+    list(label = cols[i], method = "update",
+         args = list(list(visible = as.list(vis)),
+                     list(title = paste(cols[i], "según default"), "yaxis.title" = cols[i])))
+  })
+  fig %>%
+    layout(
+      title = paste(cols[1], "según default"), yaxis = list(title = cols[1]),
+      updatemenus = list(list(type = "dropdown", buttons = botones, direction = "down",
+                              x = 1.25, y = 1.05, showactive = TRUE)),
+      legend = list(title = list(text = ""))
+    ) %>%
+    ng_theme()
+}
+```
+
+```{r interpretaciones-bivariado-numerico}
+# Interpretaciones de la sección 2.2 (variables numéricas segmentadas por default), calculadas con `tabla_bivariada`.
+B <- tabla_bivariada
+
+sig <- function(p) if (p < 0.001) "p<0.001" else sprintf("p=%.3f", p)
+
+veredicto <- function(pmw, pt) {
+  if (max(pmw, pt) < 0.001) "diferencia pequeña pero estadísticamente significativa"
+  else if (max(pmw, pt) < 0.05) "diferencia pequeña, significativa con ambas pruebas"
+  else if (min(pmw, pt) < 0.05) "evidencia débil: solo una de las dos pruebas la detecta"
+  else "sin diferencia significativa entre grupos"
+}
+
+gap0 <- B["PAY_0", "media_default"] - B["PAY_0", "media_no_default"]
+ratio_pagos <- setNames(B[PAYAMT_COLS, "media_default"] / B[PAYAMT_COLS, "media_no_default"], PAYAMT_COLS)
+
+tecnica_biv <- function(col) {
+  r   <- B[col, ]
+  m0  <- r$media_no_default;   m1  <- r$media_default
+  md0 <- r$mediana_no_default; md1 <- r$mediana_default
+  pmw <- r[["p-value (MW)"]];  pt  <- r[["p-value (t)"]]
+  if (col == "LIMIT_BAL") {
+    return(paste0(
+      "Diferencia de negocio clara: media ", nt(m0), " en no-default vs ", nt(m1), " en default (mediana ", fmt(md0), " vs ", fmt(md1), "); ",
+      "diferencia altamente significativa (", sig(pmw), ", Mann-Whitney). El banco fija el límite según el riesgo que percibe en cada ",
+      "cliente, así que el resultado es en parte circular: el límite ya incorpora una evaluación previa de riesgo y no es una señal independiente."))
+  }
+  if (col == "AGE") {
+    txt <- paste0("Apenas difiere entre grupos (", f0(m0, 1), " vs ", f0(m1, 1), " años, medianas ", f0(md0), " y ", f0(md1), "); Mann-Whitney ", sig(pmw))
+    txt <- paste0(txt, if (pmw >= 0.05) ", no significativo" else ", significativo",
+                  " (Welch ", sig(pt), ": con cerca de 30,000 filas hasta diferencias mínimas pueden salir significativas; ")
+    txt <- paste0(txt, "la diferencia práctica es de ", f0(abs(m1 - m0), 1), " años). Por sí sola aporta poca capacidad discriminante.")
+    return(txt)
+  }
+  if (col %in% PAY_COLS) {
+    gap <- m1 - m0
+    txt <- paste0("Media ", f0(m0, 2), " (al día) en no-default vs ", f0(m1, 2), " (con atraso) en default; mediana ", f0(md0), " vs ", f0(md1), "; Mann-Whitney ", sig(pmw), ".")
+    if (col == "PAY_0") {
+      txt <- paste0(txt, " Es la variable con la separación más nítida entre grupos y el mejor predictor individual de default.")
+    } else if (gap < gap0) {
+      txt <- paste0(txt, " La brecha de medias (", f0(gap, 2), ") es menor que la de `PAY_0` (", f0(gap0, 2),
+                    "): la señal se atenúa cuanto más antiguo es el mes. Esa atenuación está parcialmente confundida por la codificación inconsistente de ", NOTA_PAY0, ".")
+    }
+    return(txt)
+  }
+  if (col %in% BILL_COLS) {
+    txt <- paste0("Media ", nt(m0), " en no-default vs ", nt(m1), " en default (mediana ", fmt(md0), " vs ", fmt(md1), "); Mann-Whitney ", sig(pmw),
+                  ", Welch ", sig(pt), ": ", veredicto(pmw, pt), ".")
+    if (m1 < m0 && min(pmw, pt) < 0.05) txt <- paste0(txt, " Los clientes que luego caen en default facturan algo menos.")
+    return(txt)
+  }
+  ratio <- m1 / m0
+  txt <- paste0("Media ", nt(m0), " en no-default vs ", nt(m1), " en default: los clientes que luego caen en default pagan, en promedio, solo el ", pct0(ratio),
+                " de lo que pagan los demás (mediana ", fmt(md0), " vs ", fmt(md1), "); diferencia altamente significativa (Mann-Whitney ", sig(pmw), ").")
+  if (col == names(which.min(ratio_pagos))) txt <- paste0(txt, " Es la mayor brecha relativa del bloque `PAY_AMT`.")
+  txt
+}
+
+basica_biv <- function(col) {
+  r   <- B[col, ]
+  m0  <- r$media_no_default; m1 <- r$media_default
+  pmw <- r[["p-value (MW)"]]; pt <- r[["p-value (t)"]]
+  if (col == "LIMIT_BAL") {
+    return(paste0(
+      "Los clientes que después no pagan tenían, en promedio, un cupo de crédito más bajo (cerca de NT$", fmt(m1 / 1000), " mil) que quienes sí ",
+      "pagan (cerca de NT$", fmt(m0 / 1000), " mil). Un cupo bajo se asocia a más default, aunque el banco ya fija el cupo según el riesgo que percibe."))
+  }
+  if (col == "AGE") {
+    return(paste0(
+      "La edad casi no ayuda a distinguir: quienes caen en default y quienes no tienen prácticamente la misma edad ",
+      "(promedio de ", f0(m0, 1), " años en no-default y ", f0(m1, 1), " en default; mediana cercana a 34)."))
+  }
+  if (col == "PAY_0") {
+    return(paste0("Es la señal más clara de todas: quienes terminan en default venían, por lo general, con atrasos en el último mes, ",
+                  "mientras que quienes no caen en default venían al día."))
+  }
+  if (col %in% PAY_COLS) {
+    return(paste0(
+      "Cuenta la misma historia que `PAY_0`, pero con el estado de pago correspondiente ", corresp(col), ": quienes caen en default ya venían con atrasos. ",
+      "La señal es un poco más débil cuanto más antiguo es el mes, aunque en parte se debe a que `PAY_0` está codificada distinto al resto."))
+  }
+  if (col %in% BILL_COLS) {
+    if (max(pmw, pt) < 0.05) return("Casi no ayuda a distinguir: quienes caen en default debían montos parecidos (algo menores) a los de quienes no caen.")
+    return("No ayuda a distinguir: ambos grupos debían montos parecidos en ese mes.")
+  }
+  ratio <- m1 / m0
+  paste0("Es una señal fuerte: por cada NT$100 que paga un cliente que no cae en default, quien termina en default paga unos NT$", f0(ratio * 100), ". ",
+         "Quienes después caen en default ya venían pagando mucho menos.")
+}
+
+INTERP_BIV_NUM_BASICA  <- vapply(num_cols, basica_biv,  character(1))
+INTERP_BIV_NUM_TECNICA <- vapply(num_cols, tecnica_biv, character(1))
+```
+
+<!-- nb:plotly cell=38 -->
+```{r fig-box-target-mostrar}
+fig <- fig_box_target(df, num_cols, target)
+show_with_interpretation(fig, INTERP_BIV_NUM_BASICA, INTERP_BIV_NUM_TECNICA)
+```
+
+```{r fig-rate-categ}
+fig_rate_by_categ <- function(dataframe, cols, target_col, height = 460, width = 750) {
+  n <- length(cols)
+  tasa_global <- mean(dataframe[[target_col]])
+  fig <- plot_ly(width = width, height = height)
+  for (i in seq_len(n)) {
+    tab <- tapply(dataframe[[target_col]], dataframe[[cols[i]]], mean)
+    fig <- add_bars(fig, x = names(tab), y = as.numeric(tab), marker = list(color = WARM_GOLD),
+                    visible = (i == 1), showlegend = FALSE,
+                    hovertemplate = paste0(cols[i], ": %{x}<br>Tasa de default: %{y:.1%}<extra></extra>"))
+  }
+  botones <- lapply(seq_len(n), function(i) {
+    vis <- rep(FALSE, n); vis[i] <- TRUE
+    list(label = cols[i], method = "update",
+         args = list(list(visible = as.list(vis)),
+                     list(title = paste("Tasa de default por", cols[i]), "xaxis.title" = cols[i])))
+  })
+  fig %>%
+    layout(
+      title = paste("Tasa de default por", cols[1]),
+      xaxis = list(title = cols[1]), yaxis = list(title = "Tasa de default", tickformat = ".0%"),
+      updatemenus = list(list(type = "dropdown", buttons = botones, direction = "down",
+                              x = 1.2, y = 1.05, showactive = TRUE)),
+      shapes = list(list(type = "line", xref = "paper", x0 = 0, x1 = 1, y0 = tasa_global, y1 = tasa_global,
+                         line = list(dash = "dash", color = NAVY))),
+      annotations = list(list(xref = "paper", x = 0, y = tasa_global, xanchor = "left", yanchor = "bottom",
+                              text = sprintf("Tasa global %.1f%%", 100 * tasa_global), showarrow = FALSE))
+    ) %>%
+    ng_theme()
+}
+```
+
+```{r interpretaciones-bivariado-categorico}
+# Interpretaciones de la sección 2.2 (tasa de default por categoría), calculadas con los datos y `tabla_chi2`.
+TASA  <- lapply(set_names(cat_cols), function(c) tapply(df[[target]], df[[c]], mean))
+share <- lapply(set_names(cat_cols), function(c) prop.table(table(df[[c]])))
+
+chi_txt <- function(c) {
+  r <- tabla_chi2[c, ]
+  paste0("χ²=", f0(r$chi2, 1), ", ", sig(r[["p-value"]]))
+}
+
+INTERP_BIV_CAT_BASICA <- c(
+  SEX = paste0("Los hombres caen en default un poco más que las mujeres: ", f0(TASA$SEX[["1"]] * 100), " de cada 100 hombres frente a ",
+               f0(TASA$SEX[["2"]] * 100), " de cada 100 mujeres."),
+  EDUCATION = paste0(
+    "Quienes llegaron a posgrado caen menos en default (", f0(TASA$EDUCATION[["1"]] * 100), " de cada 100) que quienes tienen universidad (",
+    f0(TASA$EDUCATION[["2"]] * 100), ") o secundaria (", f0(TASA$EDUCATION[["3"]] * 100), "). El grupo «otros» tiene la tasa más baja (",
+    f0(TASA$EDUCATION[["4"]] * 100), " de cada 100), pero son muy pocos clientes, así que no conviene sacar conclusiones fuertes de él."),
+  MARRIAGE = paste0(
+    "Los casados (", f0(TASA$MARRIAGE[["1"]] * 100), " de cada 100) y la categoría «otros» (", f0(TASA$MARRIAGE[["3"]] * 100),
+    ") caen en default un poco más que los solteros (", f0(TASA$MARRIAGE[["2"]] * 100), "). La diferencia existe, pero es pequeña.")
+)
+
+INTERP_BIV_CAT_TECNICA <- c(
+  SEX = paste0("Los hombres tienen una tasa de default de ", pct1(TASA$SEX[["1"]]), " frente a ", pct1(TASA$SEX[["2"]]),
+               " en mujeres; diferencia significativa (", chi_txt("SEX"), ")."),
+  EDUCATION = paste0(
+    "La tasa de default es más alta en clientes con secundaria (", pct1(TASA$EDUCATION[["3"]]), ") y universidad (", pct1(TASA$EDUCATION[["2"]]),
+    ") que en posgrado (", pct1(TASA$EDUCATION[["1"]]), "); la categoría «otros» muestra la tasa más baja de todas (", pct1(TASA$EDUCATION[["4"]]),
+    "), aunque representa solo el ", pct1(share$EDUCATION[["4"]]), " de la muestra; diferencia muy significativa (", chi_txt("EDUCATION"), ")."),
+  MARRIAGE = paste0(
+    "Diferencia más moderada: «casado» (", pct1(TASA$MARRIAGE[["1"]]), ") y «otros» (", pct1(TASA$MARRIAGE[["3"]]),
+    ") tienen tasas similares, algo por encima de «soltero» (", pct1(TASA$MARRIAGE[["2"]]), "); significativa (", chi_txt("MARRIAGE"),
+    ") pero de menor magnitud práctica que `EDUCATION` o `SEX`.")
+)
+```
+
+<!-- nb:plotly cell=41 -->
+```{r fig-rate-categ-mostrar}
+fig <- fig_rate_by_categ(df, cat_cols, target)
+show_with_interpretation(fig, INTERP_BIV_CAT_BASICA, INTERP_BIV_CAT_TECNICA)
+```
+
+<!-- nb:md cell=42 -->
+## Multicolinealidad
+
+<!-- nb:md cell=43 -->
+### 3.1 Matriz de correlación
+
+Antes de calcular la correlación se **capan (winsorizan) los percentiles 1 y 99** de cada variable numérica. Esto evita que un puñado de valores extremos (p. ej. `BILL_AMT` o `LIMIT_BAL` en la cola superior) distorsione el coeficiente de correlación. La winsorización se aplica a todas las numéricas, incluidas las `PAY_x` ordinales (y, en la sección 5.2, `N_CREDIT_BALANCE_MONTHS`), y solo para correlación y VIF: el modelo no ve datos winsorizados.
+
+
+La medida principal es la correlación de Spearman, que es la correlación de Pearson aplicada a los rangos y por eso mide asociación monótona, no exige linealidad ni normalidad y resiste valores extremos:
+
+$$
+\rho_s = \rho\!\left(\operatorname{rango}(X),\, \operatorname{rango}(Y)\right).
+$$
+
+La matriz se muestra con Spearman por defecto; el botón permite contrastar con Pearson. Como Spearman solo depende del orden de los datos, la winsorización casi no la altera: los rangos de las correlaciones principales (por ejemplo, entre las `BILL_AMT`) coinciden con los de los datos originales.
+
+```{r winsorizacion}
+# Spearman es la medida principal; Pearson se deja como botón de contraste.
+# Winsorización P1/P99 solo para correlación y VIF; incluye las PAY_x ordinales. El modelo no ve datos winsorizados.
+winsorize <- function(x, lower = 0.01, upper = 0.99) {
+  q <- quantile(x, probs = c(lower, upper), names = FALSE, type = 7)
+  pmin(pmax(x, q[1]), q[2])
+}
+
+df_w <- as.data.frame(lapply(df[num_cols], winsorize))
+
+corr_pearson  <- cor(df_w, method = "pearson")
+corr_spearman <- cor(df_w, method = "spearman")
+```
+
+<!-- nb:plotly cell=44 -->
+```{r fig-correlacion}
+fig_corr <- plot_ly(
+  x = colnames(corr_spearman), y = colnames(corr_spearman), z = corr_spearman, type = "heatmap",
+  colorscale = DIVERGING_NG, zmid = 0, zmin = -1, zmax = 1,
+  text = round(corr_spearman, 2), texttemplate = "%{text}", textfont = list(size = 8),
+  hovertemplate = "%{y} vs %{x}<br>correlación: %{z:.3f}<extra></extra>",
+  width = 820, height = 700
+) %>%
+  layout(
+    title = "Matriz de correlación entre variables independientes (Spearman, winsorizada)",
+    updatemenus = list(list(
+      type = "buttons", direction = "right", x = 0.5, y = 1.1, showactive = TRUE,
+      buttons = list(
+        list(label = "Spearman", method = "update",
+             args = list(list(z = list(corr_spearman), text = list(round(corr_spearman, 2))),
+                         list(title = "Matriz de correlación (Spearman, winsorizada)"))),
+        list(label = "Pearson", method = "update",
+             args = list(list(z = list(corr_pearson), text = list(round(corr_pearson, 2))),
+                         list(title = "Matriz de correlación (Pearson, winsorizada)")))
+      )
+    ))
+  ) %>%
+  ng_theme()
+fig_corr
+```
+
+<!-- nb:md cell=45 -->
+Las seis variables de facturación (**`BILL_AMT1` a `BILL_AMT6`**) están **muy correlacionadas entre sí** (Spearman entre 0.73 y 0.91): tiene sentido, ya que el saldo de un mes está fuertemente relacionado con el saldo del mes siguiente si el cliente no paga el total. Las variables `PAY_0` a `PAY_6` también muestran correlación moderada-alta entre sí (miden el mismo fenómeno atraso en el pago en distintos meses). En cambio, los montos efectivamente pagados (`PAY_AMT*`) tienen una correlación moderada entre sí (Spearman entre 0.45 y 0.55) y más baja con las demás variables (hasta 0.32), salvo con las facturas de los meses cercanos (hasta 0.67). Esto ya anticipa un problema de multicolinealidad entre las variables de facturación, que se confirma con el VIF a continuación.
+
+<!-- nb:md cell=46 -->
+### 3.2 Factor de Inflación de la Varianza (VIF)
+
+Para cada variable $j$, el VIF mide cuánto se infla la varianza de su coeficiente por la redundancia con las demás predictoras, donde $R_j^2$ es el coeficiente de determinación al regresar la variable $j$ sobre las otras:
+
+$$
+\mathrm{VIF}_j = \frac{1}{1 - R_j^2} .
+$$
+
+```{r vif-calculo}
+# VIF_j = 1 / (1 - R2_j), con R2_j de regresar la variable j sobre todas las demás (con intercepto).
+# Es lo mismo que variance_inflation_factor() de statsmodels sobre los datos estandarizados con constante.
+vif_de <- function(X) {
+  vapply(seq_along(X), function(j) {
+    y  <- X[[j]]
+    r2 <- summary(lm(y ~ ., data = X[-j]))$r.squared
+    1 / (1 - r2)
+  }, numeric(1))
+}
+
+vif_data <- tibble(variable = num_cols, VIF = vif_de(df_w[num_cols])) %>%
+  arrange(desc(VIF))
+```
+
+<!-- nb:plotly cell=47 -->
+```{r fig-vif}
+linea_vif <- function(x, color) list(type = "line", xref = "x", yref = "paper", x0 = x, x1 = x, y0 = 0, y1 = 1,
+                                     line = list(dash = "dash", color = color))
+nota_vif  <- function(x, texto) list(xref = "x", yref = "paper", x = x, y = 1, text = texto, showarrow = FALSE,
+                                     xanchor = "left", yanchor = "bottom")
+
+fig_vif <- plot_ly(
+  x = vif_data$VIF, y = vif_data$variable, type = "bar", orientation = "h",
+  marker = list(color = vif_data$VIF, colorscale = list(c(0, NAVY), c(0.5, PALE_GOLD), c(1, WARM_GOLD))),
+  hovertemplate = "VIF=%{x:.2f}<br>variable=%{y}<extra></extra>",
+  width = 850, height = 550
+) %>%
+  layout(
+    title = "Factor de Inflación de la Varianza (VIF) por variable (datos winsorizados)",
+    xaxis = list(title = "VIF"),
+    yaxis = list(title = "", categoryorder = "array", categoryarray = vif_data$variable),
+    shapes = list(linea_vif(5, NAVY), linea_vif(10, WARM_GOLD)),
+    annotations = list(nota_vif(5, "VIF = 5"), nota_vif(10, "VIF = 10"))
+  ) %>%
+  ng_theme()
+fig_vif
+```
+
+<!-- nb:table cell=47 -->
+```{r vif-tabla}
+kable(data.frame(variable = vif_data$variable, VIF = formatC(vif_data$VIF, format = "f", digits = 2, big.mark = ",")),
+      align = "lr")
+```
+
+<!-- nb:md cell=48 -->
+El VIF confirma lo que insinuaba la matriz de correlación: **`BILL_AMT2` a `BILL_AMT5` superan un VIF de 20**, muy por encima del umbral habitual de 10, y `BILL_AMT1`/`BILL_AMT6` rondan 13-15, evidencia fuerte de multicolinealidad severa entre las seis variables de facturación. Las variables `PAY_x` tienen un VIF moderado (3-4.5), por debajo del umbral de alerta pero mostrando cierta redundancia entre sí. El resto de variables (`LIMIT_BAL`, `AGE`, `PAY_AMT*`) tiene VIF cercano a 1-2, sin problema relevante.
+
+Para un modelo lineal (regresión logística), conviene **no usar las seis `BILL_AMT` por separado**: alternativas razonables son quedarse solo con `BILL_AMT1` (el más reciente), construir un promedio o una pendiente/tendencia de los 6 meses, o aplicar una reducción de dimensionalidad (PCA) sobre ese bloque de variables. Para modelos basados en árboles (como el Random Forest usado en la Parte 4), la multicolinealidad afecta menos la performance predictiva, aunque sigue diluyendo la importancia atribuida a cada variable individual.
+
+<!-- nb:md cell=49 -->
+### 3.3 Coordenadas paralelas: interacción conjunta entre las variables de facturación
+
+<!-- nb:code cell=50 -->
+<details><summary>Código de Python (16 líneas)</summary>
+
+```{python nb00_c50, eval=FALSE}
+bill_cols = [c for c in num_cols if c.startswith("BILL_AMT")]
+muestra_pc = df_w.sample(n=2000, random_state=42)
+
+fig = go.Figure(data=go.Parcoords(
+    line=dict(
+        color=df.loc[muestra_pc.index, target],
+        colorscale=[[0, DEEP_NAVY], [1, WARM_GOLD]],
+        showscale=True,
+        colorbar=dict(title="Default", tickvals=[0, 1], ticktext=["No", "Sí"]),
+    ),
+    dimensions=[dict(label=c, values=muestra_pc[c]) for c in bill_cols],
+))
+fig.update_layout(title="Coordenadas paralelas: montos de facturación (BILL_AMT), coloreado por default",
+                   height=480, width=900)
+fig.show()
+```
+
+</details>
+
+
+<!-- nb:plotly cell=50 -->
+```{r nb00_cell50, echo=FALSE}
+mostrar_plotly_json("cell50_plotly.json")
+```
+
+<!-- nb:md cell=51 -->
+El gráfico de coordenadas paralelas confirma visualmente el hallazgo del VIF: las líneas se mueven de forma casi paralela entre `BILL_AMT1` y `BILL_AMT6`, es decir, un cliente con saldo alto en un mes casi siempre lo tiene alto en los meses adyacentes. No se observa un patrón de color (default vs no default) claramente diferenciado a lo largo de estas seis variables, lo que refuerza el insight bivariado de que el **monto adeudado por sí solo discrimina poco** entre clientes que caen en default y los que no; lo que sí discrimina, como se vio en la Parte 2, es el estado de pago (`PAY_x`).
+
+<!-- nb:md cell=52 -->
+## PARTE 4: Interpretabilidad Avanzada con SHAP
+
+Las secciones 4.1 a 4.3 se calculan en Python (SHAP con `TreeExplainer` sobre un Random Forest de 200 árboles): no hay en R un equivalente con los paquetes del proyecto. El código de Python se muestra plegado y los gráficos interactivos son los de la salida del notebook, con los mismos datos.
+
+<!-- nb:code cell=53 -->
+<details><summary>Código de Python (30 líneas)</summary>
+
+```{python nb00_c53, eval=FALSE}
+feature_cols = num_cols + cat_cols
+X = df[feature_cols].copy()
+y = df[target].copy()
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+modelo_rf = RandomForestClassifier(
+    n_estimators=200, max_depth=6, min_samples_leaf=50,
+    class_weight="balanced", random_state=42, n_jobs=-1,
+)
+modelo_rf.fit(X_train, y_train)
+
+# Muestra para SHAP (el cálculo exacto sobre 30,000 filas es costoso; una muestra representativa basta para el EDA)
+X_shap = X_test.sample(n=2000, random_state=42)
+
+explainer = shap.TreeExplainer(modelo_rf)
+shap_values = explainer.shap_values(X_shap)
+
+# shap_values puede venir como lista [clase0, clase1] o como array 3D según la versión de shap/sklearn
+if isinstance(shap_values, list):
+    sv_clase1 = shap_values[1]
+elif shap_values.ndim == 3:
+    sv_clase1 = shap_values[:, :, 1]
+else:
+    sv_clase1 = shap_values
+
+sv_df = pd.DataFrame(sv_clase1, columns=feature_cols, index=X_shap.index)
+pd.DataFrame({"Filas explicadas": [sv_df.shape[0]], "Variables": [sv_df.shape[1]]}, index=["Valores SHAP (clase default)"])
+```
+
+</details>
+
+
+<!-- nb:table cell=53 -->
+```{r nb00_tcell53_1, echo=FALSE}
+mostrar_tabla("00_eda", "cell53_1.csv")
+```
+
+<!-- nb:md cell=54 -->
+### 4.1 Importancia global (mean |SHAP|)
+
+<!-- nb:code cell=55 -->
+<details><summary>Código de Python (13 líneas)</summary>
+
+```{python nb00_c55, eval=FALSE}
+importancia = sv_df.abs().mean().sort_values(ascending=True)
+
+fig = go.Figure(go.Bar(
+    x=importancia.values, y=importancia.index, orientation="h",
+    marker_color=DEEP_NAVY,
+    hovertemplate="%{y}<br>|SHAP| medio: %{x:.4f}<extra></extra>",
+))
+fig.update_layout(
+    title="Importancia global de variables (media de |SHAP|)",
+    height=650, width=800, xaxis_title="Media de |Valor SHAP|", yaxis_title="",
+)
+fig.show()
+```
+
+</details>
+
+
+<!-- nb:plotly cell=55 -->
+```{r nb00_cell55, echo=FALSE}
+mostrar_plotly_json("cell55_plotly.json")
+```
+
+<!-- nb:md cell=56 -->
+`PAY_0` (estado de pago del mes más reciente) domina claramente el ranking de importancia, muy por encima de cualquier otra variable, coherente con lo observado en el análisis bivariado. Le siguen a distancia `PAY_2`, `PAY_3`, `PAY_4` (estado de pago de meses anteriores) y `LIMIT_BAL`. Las variables de facturación (`BILL_AMT*`) y las demográficas (`AGE`, `SEX`, `EDUCATION`, `MARRIAGE`) aportan comparativamente poco al modelo. Esto sugiere que, si se buscara un modelo más simple, priorizar las variables `PAY_x` y `LIMIT_BAL` capturaría la mayor parte de la señal predictiva.
+
+<!-- nb:md cell=57 -->
+### 4.2 Beeswarm interactivo (todas las variables)
+
+<!-- nb:code cell=58 -->
+<details><summary>Código de Python (34 líneas)</summary>
+
+```{python nb00_c58, eval=FALSE}
+orden = importancia.index[::-1]  # de mayor a menor importancia
+
+rng = np.random.default_rng(42)
+fig = go.Figure()
+for i, col in enumerate(orden):
+    vals = X_shap[col].values.astype(float)
+    if np.nanstd(vals) > 0:
+        percentil = pd.Series(vals).rank(pct=True).values
+    else:
+        percentil = np.full(len(vals), 0.5)
+    y_base = len(orden) - i
+    jitter = (rng.random(len(vals)) - 0.5) * 0.7
+    fig.add_trace(go.Scatter(
+        x=sv_df[col].values, y=y_base + jitter,
+        mode="markers",
+        marker=dict(
+            size=4, color=percentil, colorscale=[[0, NAVY], [1, WARM_GOLD]],
+            showscale=(i == 0),
+            colorbar=dict(title="Valor de la<br>variable (percentil)", x=1.02) if i == 0 else None,
+            opacity=0.65, line=dict(width=0),
+        ),
+        name=col, showlegend=False,
+        hovertemplate=col + "<br>SHAP: %{x:.4f}<extra></extra>",
+    ))
+
+fig.update_layout(
+    title="Beeswarm SHAP: importancia y dirección del efecto por variable",
+    height=750, width=900,
+    yaxis=dict(tickvals=list(range(len(orden), 0, -1)), ticktext=list(orden), title=""),
+    xaxis_title="Valor SHAP (impacto en la probabilidad de default)",
+)
+fig.add_vline(x=0, line_dash="dash", line_color="gray")
+fig.show()
+```
+
+</details>
+
+
+<!-- nb:plotly cell=58 -->
+```{r nb00_cell58, echo=FALSE}
+mostrar_plotly_json("cell58_plotly.json")
+```
+
+<!-- nb:md cell=59 -->
+El beeswarm añade la *dirección* del efecto al ranking de importancia: los puntos dorados (valores altos de la variable) de `PAY_0`, `PAY_2` y `PAY_3` se concentran del lado derecho (SHAP positivo: empujan hacia default), mientras que los puntos azul marino (valores bajos/negativos, es decir, pagos al día) se concentran del lado izquierdo (SHAP negativo: empujan hacia no-default). En `LIMIT_BAL` el patrón es inverso: valores altos (dorado) empujan hacia SHAP negativo (menor riesgo), consistente con el insight de negocio de la sección bivariada. Para las variables de facturación y las demográficas, la nube de puntos está mucho más concentrada cerca de cero y sin un patrón de color claro, confirmando su bajo poder predictivo individual.
+
+<!-- nb:md cell=60 -->
+### 4.3 Gráfico de dependencia
+
+<!-- nb:code cell=61 -->
+<details><summary>Código de Python (32 líneas)</summary>
+
+```{python nb00_c61, eval=FALSE}
+fig = go.Figure()
+n_vars = len(num_cols)
+
+for i, col in enumerate(num_cols):
+    corrs = corr_pearson[col].drop(col).abs()
+    col_interaccion = corrs.idxmax()
+    fig.add_trace(go.Scatter(
+        x=X_shap[col], y=sv_df[col],
+        mode="markers",
+        marker=dict(size=6, color=X_shap[col_interaccion], colorscale=[[0, NAVY], [1, WARM_GOLD]],
+                    showscale=True, colorbar=dict(title=col_interaccion)),
+        customdata=X_shap[col_interaccion],
+        hovertemplate=(col + ": %{x:.2f}<br>SHAP: %{y:.4f}<br>" +
+                        col_interaccion + ": %{customdata:.2f}<extra></extra>"),
+        visible=(i == 0), name=col,
+    ))
+
+botones = []
+for i, col in enumerate(num_cols):
+    vis = [False] * n_vars
+    vis[i] = True
+    botones.append(dict(label=col, method="update", args=[{"visible": vis}, {"xaxis.title": col}]))
+
+fig.update_layout(
+    title=f"SHAP dependence plot: {num_cols[0]}",
+    height=550, width=950,
+    xaxis_title=num_cols[0], yaxis_title="Valor SHAP",
+    updatemenus=[dict(buttons=botones, direction="down", x=1.2, y=1.0, showactive=True)],
+)
+fig.add_hline(y=0, line_dash="dash", line_color="gray")
+fig.show()
+```
+
+</details>
+
+
+<!-- nb:plotly cell=61 -->
+```{r nb00_cell61, echo=FALSE}
+mostrar_plotly_json("cell61_plotly.json")
+```
+
+<!-- nb:md cell=62 -->
+### 4.4 Interpretabilidad
+
+- El ranking de importancia SHAP confirma lo observado en el análisis bivariado: el **estado de pago más reciente (`PAY_0`)** y sus rezagos (`PAY_2`, `PAY_3`, `PAY_4`) son, con diferencia, las variables que más empujan la predicción de default, seguidas de `LIMIT_BAL`.
+- El beeswarm permite ver la *dirección* del efecto: atrasos (valores altos, en dorado) en las variables `PAY_x` empujan el SHAP hacia la derecha (mayor probabilidad de default), mientras que valores altos de `LIMIT_BAL` lo empujan hacia la izquierda (menor riesgo).
+- Los gráficos de dependencia permiten detectar **no linealidades**: el efecto marginal de pasar de "al día" (0 o -1) a "1 mes de atraso" en `PAY_0` es mucho mayor que el de pasar de 4 a 5 meses de atraso, información que un coeficiente lineal único (como en una regresión logística simple sobre la variable sin transformar) no podría capturar, y que justifica tratar `PAY_x` como variable categórica/ordinal con dummies, o usar modelos no lineales.
+- Las variables de facturación (`BILL_AMT*`) muestran valores SHAP cercanos a cero en casi todo su rango, reforzando la recomendación de la Parte 3 de no usarlas todas por separado en un modelo lineal: aportan poca señal individual y además están fuertemente correlacionadas entre sí.
+
+<!-- nb:md cell=63 -->
+## PARTE 5: Preprocesamiento: resolución de los hallazgos
+
+Cada hallazgo de las partes anteriores se resuelve aquí con una decisión explícita. El resultado es el conjunto de datos final que reciben los capítulos de modelado.
+
+| # | Hallazgo del EDA | Resolución |
+|---|---|---|
+| 1 | 35 copias excedentes (filas duplicadas) | Se eliminan (una sola vez, antes de cualquier partición) |
+| 2 | Códigos no documentados en `EDUCATION` (0, 5, 6) y `MARRIAGE` (0) | Se reagrupan en «Otros» |
+| 3 | Saldos de facturación negativos (1,930 clientes) | Se conservan por ser válidos y se resumen en `N_CREDIT_BALANCE_MONTHS` |
+| 4 | Asimetría extrema y outliers en `PAY_AMT1-6` (asimetría de hasta 30; pagos de más de NT$1.6 millones) y asimetría moderada en `LIMIT_BAL` (0.99) | Log con signo; las columnas quedan con sufijo `_LOG` |
+| 5 | Multicolinealidad severa en `BILL_AMT1-6` (VIF hasta aprox. 25) | Se reemplazan por `BILL_AMT_MEAN_6M_LOG` (nivel) y `BILL_AMT_TREND_6M_LOG` (tendencia) |
+| 6 | Desbalance de clases (77.9% / 22.1%) | No se toca el dataset: se maneja dentro de la validación cruzada (`class_weight`, SMOTE, ADASYN) y se evalúa con F1 y AUC-ROC |
+| 7 | Variables categóricas sin codificar (`SEX`, `EDUCATION`, `MARRIAGE`) y escalas muy distintas | One-hot y `StandardScaler` (solo para KNN, SVM y regresión logística), ajustados únicamente con el fold de entrenamiento |
+| 8 | Códigos -2 y 0 de `PAY_x` con definición ambigua en la fuente | Se conservan tal cual (decisión del EDA); queda documentado como limitación |
+| 9 | Relación no lineal entre `PAY_x` y el riesgo | `PAY_x` se mantiene como variable ordinal y se compara con modelos que capturan no linealidad (árboles, Random Forest, XGBoost, SVM, KNN) |
+| 10 | Grupos de filas con las mismas variables pero distinto resultado | 21 grupos (42 filas, 0.14%), lo que queda tras quitar ya las copias idénticas: se cuantifica y se documenta, no se corrige; no es un techo natural del desempeño |
+| 11 | Sin valores nulos | No se requiere imputación |
+
+Los puntos 1 a 5 se transforman en el dataset. Limitación del punto 4: `BILL_AMT_MEAN_6M_LOG` queda con asimetría -2.47 (mínimo -10.9) tras el log con signo, y la verificación de la sección 5.3 no la cubre (solo revisa `LIMIT_BAL_LOG` y `PAY_AMT*_LOG`). El 6 y el 7 deben ir dentro del pipeline de validación porque aprenden de los datos y, si se aplicaran antes de partir, filtrarían información del fold de validación.
+
+<!-- nb:md cell=64 -->
+### 5.1 Construcción del dataset final
+
+Las secciones 5.1 a 5.3 usan `src/preprocessing.py` (`build_final_dataset`), que no está en este proyecto, así que sus resultados (tablas y gráfico) son las salidas del notebook de Python, con el código plegado.
+
+<!-- nb:code cell=65 -->
+<details><summary>Código de Python (17 líneas)</summary>
+
+```{python nb00_c65, eval=FALSE}
+from src import preprocessing as pp
+from src.data_loader import load_processed_dataset
+
+raw = pp.load_raw_dataset()
+final, reporte = pp.build_final_dataset(raw)
+
+resumen = pd.Series({
+    "Filas en el archivo original": reporte["filas_entrada"],
+    "Duplicados exactos eliminados": reporte["filas_duplicadas_eliminadas"],
+    "Filas en el dataset final": reporte["filas_salida"],
+    "Filas con códigos EDUCATION no documentados reagrupados": reporte["filas_reasignadas_a_otros"]["EDUCATION"],
+    "Filas con código MARRIAGE no documentado reagrupadas": reporte["filas_reasignadas_a_otros"]["MARRIAGE"],
+    "Clientes con al menos un saldo de facturación negativo": reporte["filas_con_factura_negativa"],
+    "Grupos con las mismas variables pero distinto resultado": reporte["grupos_con_etiqueta_conflictiva"],
+    "Columnas en el dataset final (incluye el target)": final.shape[1],
+}, name="valor")
+resumen.to_frame()
+```
+
+</details>
+
+
+<!-- nb:table cell=65 -->
+```{r nb00_tcell65_1, echo=FALSE}
+mostrar_tabla("00_eda", "cell65_1.csv")
+```
+
+<!-- nb:md cell=66 -->
+### 5.2 Efecto de las transformaciones
+
+<!-- nb:code cell=67 -->
+<details><summary>Código de Python (11 líneas)</summary>
+
+```{python nb00_c67, eval=FALSE}
+transformadas = {"LIMIT_BAL": "LIMIT_BAL_LOG", **{f"PAY_AMT{i}": f"PAY_AMT{i}_LOG" for i in range(1, 7)}}
+filas = []
+for antes, despues in transformadas.items():
+    filas.append({
+        "variable original": antes, "variable final": despues,
+        "asimetría antes": stats.skew(df[antes]), "asimetría después": stats.skew(final[despues]),
+        "máximo / mediana antes": df[antes].max() / df[antes].median(),
+        "máximo / mediana después": final[despues].max() / final[despues].median(),
+    })
+tabla_transformacion = pd.DataFrame(filas).set_index("variable original")
+tabla_transformacion.round(2)
+```
+
+</details>
+
+
+<!-- nb:table cell=67 -->
+```{r nb00_tcell67_1, echo=FALSE}
+mostrar_tabla("00_eda", "cell67_1.csv")
+```
+
+<!-- nb:code cell=68 -->
+<details><summary>Código de Python (3 líneas)</summary>
+
+```{python nb00_c68, eval=FALSE}
+derivadas_bill = [pp.BILL_MEAN_COLUMN, pp.BILL_TREND_COLUMN, pp.CREDIT_BALANCE_COLUMN]
+display(final[derivadas_bill].describe().round(2).style.format("{:,.2f}").set_caption("Variables derivadas del bloque BILL_AMT (reemplazan a BILL_AMT1-6)"))
+final[derivadas_bill].corr().round(2).style.format("{:.2f}").set_caption("Correlación de Pearson entre las variables derivadas")
+```
+
+</details>
+
+
+<!-- nb:table cell=68 -->
+```{r nb00_tcell68_1, echo=FALSE}
+mostrar_tabla("00_eda", "cell68_1.csv")
+```
+
+<!-- nb:table cell=68 -->
+```{r nb00_tcell68_2, echo=FALSE}
+mostrar_tabla("00_eda", "cell68_2.csv")
+```
+
+<!-- nb:code cell=69 -->
+<details><summary>Código de Python (23 líneas)</summary>
+
+```{python nb00_c69, eval=FALSE}
+# Winsorización P1/P99 también sobre PAY_x ordinales y N_CREDIT_BALANCE_MONTHS, solo para este VIF; el modelo no ve datos winsorizados.
+num_final = [c for c in final.columns if c not in cat_cols + [target]]
+X_vif_final = final[num_final].apply(winsorize)
+X_vif_final = (X_vif_final - X_vif_final.mean()) / X_vif_final.std()
+X_vif_final = X_vif_final.assign(const=1.0)
+
+vif_final = pd.DataFrame({
+    "variable": num_final,
+    "VIF": [variance_inflation_factor(X_vif_final.values, i) for i in range(len(num_final))],
+}).sort_values("VIF", ascending=False)
+
+fig = px.bar(
+    vif_final, x="VIF", y="variable", orientation="h",
+    color="VIF", color_continuous_scale=[NAVY, PALE_GOLD, WARM_GOLD],
+    title="VIF por variable tras el preprocesamiento (mismo método que la sección 3.2)",
+)
+fig.add_vline(x=5, line_dash="dash", line_color=NAVY, annotation_text="VIF = 5")
+fig.add_vline(x=10, line_dash="dash", line_color=WARM_GOLD, annotation_text="VIF = 10")
+fig.update_layout(height=550, width=850, yaxis_title="", xaxis_title="VIF", coloraxis_showscale=False)
+fig.show()
+
+pd.DataFrame({"Variable con mayor VIF": [vif_data.iloc[0]["variable"], vif_final.iloc[0]["variable"]], "VIF máximo": [round(vif_data["VIF"].max(), 1), round(vif_final["VIF"].max(), 1)]},
+             index=["Antes del preprocesamiento", "Después del preprocesamiento"])
+```
+
+</details>
+
+
+<!-- nb:plotly cell=69 -->
+```{r nb00_cell69, echo=FALSE}
+mostrar_plotly_json("cell69_plotly.json")
+```
+
+<!-- nb:table cell=69 -->
+```{r nb00_tcell69_2, echo=FALSE}
+mostrar_tabla("00_eda", "cell69_2.csv")
+```
+
+<!-- nb:md cell=70 -->
+### 5.3 Verificación de que cada hallazgo quedó resuelto
+
+<!-- nb:code cell=71 -->
+<details><summary>Código de Python (29 líneas)</summary>
+
+```{python nb00_c71, eval=FALSE}
+# Nota: la verificación de asimetría solo cubre LIMIT_BAL_LOG y PAY_AMT*_LOG (tabla_transformacion); BILL_AMT_MEAN_6M_LOG queda con asimetría -2.47 (mín -10.9) y no se verifica.
+# Cada fila verifica que un hallazgo quedó resuelto. Si alguna falla, la celda lanza un error.
+feature_cols_final = [c for c in final.columns if c != target]
+comparables = cat_cols + ["AGE"] + PAY_COLS
+verificaciones = {
+    "Sin valores nulos": int(final.isnull().sum().sum()) == 0,
+    "Sin filas duplicadas (hallazgo 1)": int(final.duplicated().sum()) == 0,
+    "Mismas filas que el EDA tras eliminar duplicados": len(final) == len(df),
+    "Variables sin transformar idénticas a las del EDA, fila por fila":
+        bool((final[comparables + [target]].to_numpy() == df[comparables + [target]].to_numpy()).all()),
+    "EDUCATION solo toma valores 1-4 (hallazgo 2)": set(final["EDUCATION"].unique()) <= {1, 2, 3, 4},
+    "MARRIAGE solo toma valores 1-3 (hallazgo 2)": set(final["MARRIAGE"].unique()) <= {1, 2, 3},
+    "SEX solo toma valores 1-2": set(final["SEX"].unique()) <= {1, 2},
+    "Saldos negativos resumidos en una variable derivada (hallazgo 3)":
+        int((final[pp.CREDIT_BALANCE_COLUMN] > 0).sum()) == reporte["filas_con_factura_negativa"],
+    "|asimetría| de las variables con log menor a 1.5 (hallazgo 4)":
+        bool((tabla_transformacion["asimetría después"].abs() < 1.5).all()),
+    "BILL_AMT1-6 originales reemplazadas (hallazgo 5)": not any(c in final.columns for c in pp.BILL_COLUMNS),
+    "VIF máximo menor a 10 (hallazgo 5)": bool(vif_final["VIF"].max() < 10),
+    "Sin columna ID": "ID" not in final.columns,
+    "Target binario y con la misma proporción de default":
+        set(final[target].unique()) == {0, 1} and abs(final[target].mean() - df[target].mean()) < 1e-12,
+    "Target es la última columna": final.columns[-1] == target,
+    "Las categóricas del pipeline existen en el dataset (config.CATEGORICAL_COLUMNS)": set(config.CATEGORICAL_COLUMNS) <= set(final.columns),
+}
+tabla_verificacion = pd.DataFrame({"verificación": list(verificaciones), "resultado": ["OK" if v else "FALLA" for v in verificaciones.values()]}).set_index("verificación")
+fallas = [k for k, v in verificaciones.items() if not v]
+assert not fallas, f"Hallazgos sin resolver: {fallas}"
+tabla_verificacion
+```
+
+</details>
+
+
+<!-- nb:table cell=71 -->
+```{r nb00_tcell71_1, echo=FALSE}
+mostrar_tabla("00_eda", "cell71_1.csv")
+```
+
+<!-- nb:md cell=72 -->
+Las verificaciones no revisan la asimetría de `BILL_AMT_MEAN_6M_LOG` (-2.47, mínimo -10.9). Con las verificaciones aprobadas, el dataset queda listo para el modelado.
+
+<!-- nb:code cell=73 -->
+<details><summary>Código de Python (8 líneas)</summary>
+
+```{python nb00_c73, eval=FALSE}
+config.PROCESSED_DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+final.to_csv(config.PROCESSED_DATA_PATH, index=False)
+
+# Releer lo guardado, tal como lo hacen los notebooks de modelado, y comprobar que es idéntico
+recargado = load_processed_dataset()
+pd.testing.assert_frame_equal(recargado, final, check_dtype=False)
+display(pd.DataFrame({"Filas": [recargado.shape[0]], "Columnas": [recargado.shape[1]], "Variable objetivo": [config.TARGET_COLUMN], "Proporción de default": [recargado[config.TARGET_COLUMN].mean()]}, index=["Conjunto de datos final"]))
+recargado.head()
+```
+
+</details>
+
+
+<!-- nb:table cell=73 -->
+```{r nb00_tcell73_1, echo=FALSE}
+mostrar_tabla("00_eda", "cell73_1.csv")
+```
+
+<!-- nb:table cell=73 -->
+```{r nb00_tcell73_2, echo=FALSE}
+mostrar_tabla("00_eda", "cell73_2.csv")
+```
+
+<!-- nb:md cell=74 -->
+### 5.4 Qué recibe el modelado
+
+El dataset final tiene **29,965 filas y 21 columnas**: 20 variables predictoras y el target (`default_payment_next_month`, siempre la última columna).
+
+Conviene no confundir esta cifra con las 24 columnas del dataset limpio de las partes 1 a 4 (23 variables predictoras y el target, con `ID` como índice). La diferencia sale de la sección 5.1: las seis columnas `BILL_AMT1` a `BILL_AMT6` se reemplazan por tres variables derivadas, así que 23 - 6 + 3 = 20 predictoras, más el target.
+
+- **Categóricas** (`SEX`, `EDUCATION`, `MARRIAGE`): se mantienen como enteros y el pipeline las convierte a one-hot dentro de la validación cruzada.
+- **Numéricas originales sin cambios**: `AGE` y `PAY_0`, `PAY_2` a `PAY_6`.
+- **Numéricas transformadas**: `LIMIT_BAL_LOG` y `PAY_AMT1_LOG` a `PAY_AMT6_LOG`.
+- **Derivadas del bloque de facturación**: `BILL_AMT_MEAN_6M_LOG`, `BILL_AMT_TREND_6M_LOG` y `N_CREDIT_BALANCE_MONTHS`.
+
+Dos cosas que conviene tener presentes al modelar: (1) los códigos -2 y 0 de `PAY_x` siguen siendo ambiguos en la fuente, así que cualquier conclusión que dependa de la frontera exacta entre ellos debe leerse con cautela; (2) hay 21 grupos de clientes con las mismas variables pero distinto resultado (42 filas, 0.14% del dataset): es el efecto de haber quitado antes las copias idénticas y, por su tamaño, no representa un techo natural del desempeño alcanzable.
+
+<!-- nb:md cell=75 -->
+## Conclusiones generales del EDA
+
+- **Calidad de datos**: el dataset no tiene valores nulos. Las 35 copias excedentes se eliminan y las categorías no oficiales de `EDUCATION` y `MARRIAGE` se reagrupan en "Otros" (decisión de modelado, no respaldada semánticamente). Los códigos -2 y 0 de las variables `PAY_x` tienen una definición ambigua en la fuente original, una limitación a tener en cuenta al comunicar resultados.
+- **Desbalance de clases**: aprox. 78% no-default vs aprox. 22% default. Se aborda en el modelamiento, dentro de la validación cruzada (`class_weight`, remuestreo), con métricas robustas al desbalance.
+- **Mejor variable predictora, por lejos**: el estado de pago del mes más reciente (`PAY_0`), seguido de los meses anteriores y del límite de crédito (`LIMIT_BAL`). Las variables demográficas (`AGE`, `SEX`, `EDUCATION`, `MARRIAGE`) aportan señal, pero mucho más débil.
+- **Multicolinealidad severa** entre las seis variables de facturación (`BILL_AMT1`-`BILL_AMT6`, VIF hasta aprox. 25): se resuelven reemplazándolas por su nivel medio y su tendencia, con lo que el VIF máximo del dataset final queda por debajo de 10 (Parte 5).
+- **Variables asimétricas**: `PAY_AMT*` (muy asimétricas) y `LIMIT_BAL` (moderada, 0.99, que pasa a -0.51) se transforman con log con signo (Parte 5). `BILL_AMT_MEAN_6M_LOG` queda con asimetría -2.47 (mínimo -10.9) y la verificación de la sección 5.3 no la cubre.
+- **Recomendación para el modelamiento**: dada la relación no lineal entre atrasos y riesgo (vista en los dependence plots), un modelo basado en árboles (Random Forest, Gradient Boosting) es una opción natural, como ya lo sugiere el buen desempeño del Random Forest usado para SHAP (AUC aprox. 0.77 en test). Si se prefiere un modelo lineal por interpretabilidad, conviene categorizar/discretizar `PAY_x`.
+- **Resultado final**: el dataset preprocesado queda listo para el modelado y todas las verificaciones de la sección 5.3 pasan.
+
+---
+
+*Reproducibilidad:* `sessionInfo()` al final del documento.
+
+```{r session-info}
+sessionInfo()
+```

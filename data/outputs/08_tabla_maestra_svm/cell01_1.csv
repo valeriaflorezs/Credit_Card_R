@@ -1,0 +1,8 @@
+source / model,colab_gpu_cuml,local_cpu_sklearn
+decision_tree,0,16
+knn,16,0
+logistic_regression,0,16
+naive_bayes,0,16
+random_forest,0,16
+svm,16,0
+xgboost,0,16

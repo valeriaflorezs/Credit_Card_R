@@ -18,13 +18,28 @@ El proyecto también cuenta con un tablero interactivo: [dash-credit-kv.onrender
 
 Anticipar qué clientes de tarjeta de crédito dejarán de pagar es uno de los problemas más relevantes de la gestión de riesgo crediticio. Una entidad que concede cupos altos a clientes que luego incumplen deteriora su cartera, y una que restringe el crédito en exceso pierde ingresos. Además, métricas como el *accuracy* pueden ocultar que el modelo no detecta a los clientes realmente en riesgo.
 
-El proyecto usa el conjunto *Default of Credit Card Clients* (30,000 clientes de un banco de Taiwán, 2005) y desarrolla el flujo completo: ETL, análisis exploratorio, modelo base de regresión logística y comparación sistemática de 112 configuraciones de modelos. Este repositorio contiene el libro en R bookdown con la portada, el marco del proyecto y el EDA interactivo con gráficos Plotly.
+El proyecto usa el conjunto *Default of Credit Card Clients* (30,000 clientes de un banco de Taiwán, 2005) y desarrolla el flujo completo: ETL, análisis exploratorio, modelo base de regresión logística y comparación sistemática de 112 configuraciones de modelos. Este repositorio contiene el libro en R bookdown con la portada, el marco del proyecto y los doce notebooks del proyecto, incluido el EDA interactivo con gráficos Plotly.
 
-El libro incluye:
-- Portada con el resumen del proyecto y sus autoras.
-- Marco del proyecto: introducción, planteamiento del problema, hipótesis, objetivos, marco teórico y metodología.
-- Análisis Exploratorio de Datos (EDA) con gráficos interactivos y su interpretación en versión básica y técnica.
-- Pruebas estadísticas (Mann-Whitney, t de Welch, chi-cuadrado) y análisis de multicolinealidad (correlación y VIF).
+El libro reproduce completo el [Jupyter Book del proyecto](https://github.com/valeriaflorezs/Credit_Card_Project) (fuente de verdad) y tiene estos capítulos, en orden:
+
+| Archivo | Capítulo |
+|---|---|
+| `index.Rmd` | Portada: resumen, cifras clave, resultados principales y contenido |
+| `01_marco.Rmd` | Marco del proyecto (con las referencias de `references.bib`) |
+| `02_nb00_eda.Rmd` | Notebook 00: EDA (en R, con gráficos interactivos de Plotly) |
+| `03_nb01_baseline_logistic.Rmd` | Notebook 01: modelo base de regresión logística |
+| `04_nb02_setup_check.Rmd` | Notebook 02: verificación del protocolo |
+| `05_nb03_pipeline_dev.Rmd` | Notebook 03: desarrollo del pipeline |
+| `06_nb04_run_experiments.Rmd` | Notebook 04: corrida de experimentos |
+| `07_nb05_results_analysis.Rmd` | Notebook 05: análisis de resultados |
+| `08_nb06_interpretability.Rmd` | Notebook 06: interpretabilidad (SHAP y LIME) |
+| `09_nb07_svm_gpu_colab.Rmd` | Notebook 07: SVM en GPU (Colab) |
+| `10_nb08_tabla_maestra_svm.Rmd` | Notebook 08: tabla maestra y comparabilidad del SVM |
+| `11_nb09_anytime_multifidelidad.Rmd` | Notebook 09: curvas anytime y multi-fidelidad |
+| `12_nb10_modelo_original_cs_fof.Rmd` | Notebook 10: modelo original (CS-FOF), LightGBM y CatBoost |
+| `13_nb12_colab_5x5.Rmd` | Notebook 12: corrida 5 x 5 en Colab |
+
+Los notebooks 01 a 12 se escribieron en Python y su experimento (GPU, Colab) fue muy largo, así que **no se reejecutan**: cada capítulo muestra el texto, el código de Python (plegado, sin ejecutar) y los resultados guardados en el notebook (tablas y gráficos). El EDA (notebook 00) sí se recalcula en R a partir de `data/raw/`; solo las secciones de SHAP y de preprocesamiento final (que dependen de `src/` y del modelo de Python) muestran las salidas del notebook.
 
 ---
 
@@ -43,16 +58,22 @@ Credit_Card_R/
 ├── Credit_Card_R.Rproj      # Proyecto de RStudio (abrir este archivo)
 ├── index.Rmd                # Portada y resumen del proyecto
 ├── 01_marco.Rmd             # Introducción, problema, objetivos y metodología
+├── 02_nb00_eda.Rmd          # Notebook 00: EDA (R + Plotly)
+├── 03_nb01_...Rmd a 13_nb12_...Rmd   # Notebooks 01 a 12 (ver tabla de capítulos)
+├── references.bib           # Referencias bibliográficas
 ├── _bookdown.yml            # Orden de los capítulos y carpeta de salida
-├── _output.yml              # Formato y estilo del libro
+├── _output.yml              # Formato y estilo del libro (menú lateral)
 ├── style.css                # Estilos personalizados
 ├── R/
-│   └── eda_widgets.R        # Paleta y funciones para los gráficos interactivos
-├── notebooks/
-│   └── 00_eda.Rmd           # Capítulo del análisis exploratorio
+│   ├── eda_widgets.R        # Paleta y funciones para los gráficos interactivos
+│   └── portar_notebook.R    # Funciones para mostrar tablas y gráficos de los notebooks
 ├── data/
-│   └── raw/
-│       └── default_of_credit_card_clients.xls
+│   ├── raw/                 # default_of_credit_card_clients.xls
+│   ├── results/             # CSV de results/ del Jupyter Book (anytime/, interpretability/, legacy_3x3/)
+│   └── outputs/<notebook>/  # Tablas de las salidas de cada notebook (CSV)
+├── figures/
+│   ├── <notebook>/          # Gráficos incrustados en las salidas de cada notebook (celdaNN_k.png) y JSON de Plotly
+│   └── results/             # Imágenes de results/figures/
 └── docs/                    # Libro compilado (HTML), publicado en GitHub Pages
 ```
 
@@ -105,9 +126,11 @@ El resultado se genera en la carpeta `docs/`. Abre el archivo `docs/index.html` 
 browseURL("docs/index.html")
 ```
 
-### Ejecutar solo el capítulo del EDA
+Antes de compilar por primera vez tras esta actualización, borra los `.html` viejos de `docs/` (conserva `.nojekyll`), porque los capítulos cambiaron de nombre.
 
-Para trabajar un capítulo sin compilar todo el libro, abre `notebooks/00_eda.Rmd` y usa el botón *Knit*. El notebook detecta automáticamente si se ejecuta desde la raíz del proyecto o desde su propia carpeta.
+### Ejecutar solo un capítulo
+
+El libro completo pesa bastante (el capítulo del EDA genera una página de cerca de 19 MB por los gráficos interactivos) y puede tardar varios minutos. Para trabajar un capítulo sin compilar todo, ábrelo (por ejemplo `02_nb00_eda.Rmd`) y usa el botón *Knit*. Cada capítulo detecta automáticamente si se ejecuta desde la raíz del proyecto o desde una subcarpeta.
 
 ---
 

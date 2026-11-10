@@ -1,0 +1,163 @@
+# 12. Corrida 5 x 5 en Colab (todos los modelos con el mismo código) {#nb12}
+
+```{r setup-nb12, include=FALSE}
+knitr::opts_chunk$set(python.reticulate = FALSE)
+BASE <- if (file.exists(file.path("R", "portar_notebook.R"))) "." else ".."
+source(file.path(BASE, "R", "portar_notebook.R"))
+```
+
+<!-- nb:md cell=0 -->
+
+Este notebook repite las combinaciones con validación cruzada anidada de **5 folds externos y 5 internos** usando exactamente el código de `src/` del proyecto (`experiment_runner.run_experiments`), no una copia. Así todos los modelos, incluido SVM con `sklearn.svm.SVC`, se evalúan con el mismo solver y las mismas librerías.
+
+**Cómo repartir el trabajo.** Todas las sesiones corren las **4 técnicas de balanceo** (`none`, `smote`, `adasyn`, `class_weight`), como pide el diseño del entregable. Lo que se reparte entre sesiones son los modelos y los métodos de optimización (`MODELS` y `METHODS`, celda 1). Cada sesión guarda su propio CSV en Drive, así varias sesiones en paralelo no se pisan. El costo medido de la corrida 3 x 3 era KNN 8.6 h, Random Forest 3.3 h, XGBoost 1.1 h, regresión logística 0.5 h, árbol 0.1 h y Naive Bayes 0.1 h, y con 5 x 5 se espera unas 4 veces más. En la corrida real, Colab (T4 con cuML) solo ejecutó KNN y SVM (32 combinaciones); las otras 80 se corrieron en la PC.
+
+| Sesión | `MODELS` | `METHODS` |
+|---|---|---|
+| 1 | `naive_bayes`, `logistic_regression`, `decision_tree`, `xgboost` | los 4 (en la corrida real XGBoost y Random Forest terminaron corriéndose en la PC, porque en la T4 de 2 vCPU no salían en tiempo razonable) |
+| 2 a 5 | `knn` | uno por sesión: `grid_search`, `random_search`, `bayesian_optuna`, `genetic_deap` |
+| 6 a 9 | `random_forest` | uno por sesión, igual que KNN |
+
+Es seguro volver a ejecutar una sesión que se cortó: `resume=True` salta lo ya guardado.
+
+**SVM.** Con CPU de Colab no es viable (en la corrida local de 3 x 3 una sola combinación tardó más de 4 horas). Para SVM se usa `07_svm_gpu_colab.ipynb` (cuML en GPU), ya ajustado a 5 x 5, y después se mide su diferencia con scikit-learn con `python -m src.svm_comparability`.
+
+**Antes de empezar.** En Drive, carpeta `MyDrive/credit_card/`, subir `colab_package.zip` (contiene `src/`, `requirements.txt` y `data/processed/dataset_final.csv`).
+
+<!-- nb:code cell=1 -->
+<details><summary>Código (6 líneas)</summary>
+
+```{python nb12_c01, eval=FALSE}
+# Parámetros de ESTA sesión: cambiar solo MODELS y METHODS (ver la tabla de arriba).
+MODELS = ["naive_bayes", "logistic_regression", "decision_tree", "xgboost"]
+# Las 4 técnicas de balanceo, SIEMPRE completas. "none" es la técnica sin balanceo.
+TECHNIQUES = ["none", "smote", "adasyn", "class_weight"]
+# Métodos de optimización de esta sesión (uno por sesión para KNN y Random Forest).
+METHODS = ["grid_search", "random_search", "bayesian_optuna", "genetic_deap"]
+```
+
+</details>
+
+<!-- nb:code cell=2 -->
+<details><summary>Código (16 líneas)</summary>
+
+```{python nb12_c02, eval=FALSE}
+import os, sys, zipfile
+from pathlib import Path
+
+from google.colab import drive
+drive.mount("/content/drive")
+DRIVE_DIR = Path("/content/drive/MyDrive/credit_card")
+OUT_DIR = DRIVE_DIR / "resultados_5x5"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+WORK = Path("/content/credit_card")
+if not (WORK / "src").exists():
+    with zipfile.ZipFile(DRIVE_DIR / "colab_package.zip") as z:
+        z.extractall(WORK)
+os.chdir(WORK)
+sys.path.insert(0, str(WORK))
+print("Paquete listo en", WORK, "| núcleos:", os.cpu_count())
+```
+
+</details>
+
+<!-- nb:code cell=3 -->
+<details><summary>Código (5 líneas)</summary>
+
+```{python nb12_c03, eval=FALSE}
+!pip install -q -r requirements.txt 2>&1 | tail -3
+import sklearn, imblearn, xgboost, optuna, deap, numpy, pandas
+print("scikit-learn", sklearn.__version__, "| imblearn", imblearn.__version__, "| xgboost", xgboost.__version__,
+      "| optuna", optuna.__version__, "| deap", deap.__version__, "| numpy", numpy.__version__, "| pandas", pandas.__version__)
+print("Local (requirements.txt): scikit-learn 1.9.1, imbalanced-learn 0.14.2, xgboost 3.4.1, optuna 5.0.0, deap 1.4.3")
+```
+
+</details>
+
+<!-- nb:code cell=4 -->
+<details><summary>Código (17 líneas)</summary>
+
+```{python nb12_c04, eval=FALSE}
+import numpy as np
+from src import config
+from src.data_loader import load_processed_dataset, split_features_target
+from src.preprocessing import remove_duplicate_rows, check_label_conflicts
+from src.models import MODEL_REGISTRY
+from src.experiment_runner import run_experiments, get_all_combinations
+
+df, n_removed = remove_duplicate_rows(load_processed_dataset())
+assert df.shape == (29965, 21), f"forma inesperada {df.shape}: ¿es el mismo dataset_final.csv?"
+assert n_removed == 0
+X, y = split_features_target(df)
+np.random.seed(config.RANDOM_STATE)
+
+assert (config.N_OUTER_FOLDS, config.N_INNER_FOLDS) == (5, 5), "src/config.py no está en 5 x 5"
+# Paralelismo: todos los núcleos de esta máquina virtual, en el eje de evaluaciones de cada método.
+config.OPTIMIZATION_N_JOBS = os.cpu_count()
+print(f"X: {X.shape}, folds externos/internos: {config.N_OUTER_FOLDS}/{config.N_INNER_FOLDS}, n_jobs: {config.OPTIMIZATION_N_JOBS}")
+```
+
+</details>
+
+<!-- nb:code cell=5 -->
+<details><summary>Código (14 líneas)</summary>
+
+```{python nb12_c05, eval=FALSE}
+models = [MODEL_REGISTRY[m] for m in MODELS]
+tag = "-".join(MODELS) + "__" + "-".join(METHODS)
+CHECKPOINT = OUT_DIR / f"experiments_5x5__{tag}.csv"
+
+nj = config.OPTIMIZATION_N_JOBS
+optimizer_kwargs_by_method = {
+    "grid_search": {"n_jobs": nj},
+    "random_search": {"n_iter": config.RANDOM_SEARCH_ITER, "n_jobs": nj},
+    "bayesian_optuna": {"n_trials": config.OPTUNA_N_TRIALS, "n_jobs": nj},
+    "genetic_deap": {"population_size": config.GA_POPULATION_SIZE, "n_generations": config.GA_N_GENERATIONS, "n_jobs": nj},
+}
+combos = get_all_combinations(models, TECHNIQUES, METHODS)
+assert set(TECHNIQUES) == {"none", "smote", "adasyn", "class_weight"}, "cada sesión debe usar las 4 técnicas"
+print(f"{len(combos)} combinaciones en esta sesión -> {CHECKPOINT}")
+```
+
+</details>
+
+<!-- nb:code cell=6 -->
+<details><summary>Código (8 líneas)</summary>
+
+```{python nb12_c06, eval=FALSE}
+table, results = run_experiments(
+    X, y,
+    models=models, techniques=TECHNIQUES, methods=METHODS,
+    n_outer_folds=config.N_OUTER_FOLDS, n_inner_folds=config.N_INNER_FOLDS,
+    optimizer_kwargs_by_method=optimizer_kwargs_by_method,
+    checkpoint_path=CHECKPOINT, resume=True, n_jobs=1,
+)
+print(f"{len(results)} combinaciones nuevas en esta sesión; {len(table)} filas en {CHECKPOINT.name}")
+```
+
+</details>
+
+<!-- nb:md cell=7 -->
+## Resultado de esta sesión
+
+<!-- nb:code cell=8 -->
+<details><summary>Código (4 líneas)</summary>
+
+```{python nb12_c08, eval=FALSE}
+import pandas as pd
+t = pd.read_csv(CHECKPOINT)
+assert (t["n_outer_folds"] == 5).all() and (t["n_inner_folds"] == 5).all()
+t[["model", "technique", "method", "f1_mean", "f1_std", "roc_auc_mean", "total_time_seconds"]].sort_values("f1_mean", ascending=False).round(4)
+```
+
+</details>
+
+<!-- nb:md cell=9 -->
+## Después de que terminen todas las sesiones
+
+Descargar los CSV de `MyDrive/credit_card/resultados_5x5/` a `results/` del proyecto local y unirlos en `results/experiments_master_5x5.csv` (es la ruta que usa `src/config.py`):
+
+```bash
+python -m src.merge_session_results
+```

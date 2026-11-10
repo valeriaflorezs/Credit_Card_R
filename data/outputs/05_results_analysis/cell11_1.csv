@@ -1,0 +1,12 @@
+,model,technique,method,f1_mean,estado
+58,decision_tree,adasyn,bayesian_optuna,0.516849,Corrida
+59,decision_tree,adasyn,genetic_deap,0.516932,Corrida
+56,decision_tree,adasyn,grid_search,0.510051,Corrida
+57,decision_tree,adasyn,random_search,0.518904,Corrida
+62,decision_tree,class_weight,bayesian_optuna,0.525433,Corrida
+...,...,...,...,...,...
+81,xgboost,none,random_search,0.477289,Corrida
+86,xgboost,smote,bayesian_optuna,0.529489,Corrida
+87,xgboost,smote,genetic_deap,0.534081,Corrida
+84,xgboost,smote,grid_search,0.536973,Corrida
+85,xgboost,smote,random_search,0.530435,Corrida

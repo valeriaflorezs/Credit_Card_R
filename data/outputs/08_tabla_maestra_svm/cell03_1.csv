@@ -1,0 +1,16 @@
+,model,technique,method,source,random_state,total_time_seconds,time_comparable,f1_mean,f1_std,precision_mean,recall_mean,roc_auc_mean,roc_auc_std,pr_auc_mean,f1_avg_rank,within_nemenyi_cd_of_best
+0,xgboost,class_weight,bayesian_optuna,local_cpu_sklearn,42,309.6490,True,0.5466,0.0091,0.4927,0.6149,0.7828,0.0089,0.5567,2.4,True
+1,random_forest,class_weight,random_search,local_cpu_sklearn,42,657.6279,True,0.5452,0.0077,0.4974,0.6041,0.7831,0.0095,0.5606,3.8,True
+2,random_forest,class_weight,grid_search,local_cpu_sklearn,42,717.8981,True,0.5448,0.0095,0.4962,0.6039,0.7846,0.0089,0.5621,4.2,True
+3,random_forest,class_weight,bayesian_optuna,local_cpu_sklearn,42,1689.4361,True,0.5441,0.0080,0.4944,0.6053,0.7825,0.0092,0.5602,5.4,True
+4,xgboost,class_weight,grid_search,local_cpu_sklearn,42,774.9741,True,0.5429,0.0086,0.4783,0.6278,0.7823,0.0093,0.5483,6.2,True
+5,random_forest,class_weight,genetic_deap,local_cpu_sklearn,42,8300.8405,True,0.5434,0.0105,0.4971,0.5995,0.7822,0.0087,0.5606,6.4,True
+6,xgboost,class_weight,genetic_deap,local_cpu_sklearn,42,1181.0180,True,0.5422,0.0111,0.4853,0.6148,0.7830,0.0091,0.5616,8.9,True
+7,xgboost,class_weight,random_search,local_cpu_sklearn,42,246.1009,True,0.5414,0.0107,0.4959,0.5968,0.7801,0.0095,0.5533,9.6,True
+8,svm,smote,random_search,colab_gpu_cuml,42,1434.8477,False,0.5387,0.0048,0.4795,0.6148,0.7638,0.0096,0.5132,12.0,True
+9,svm,class_weight,bayesian_optuna,colab_gpu_cuml,42,1557.0969,False,0.5385,0.0077,0.4765,0.6192,0.7649,0.0096,0.5044,13.2,True
+10,svm,class_weight,genetic_deap,colab_gpu_cuml,42,7402.4648,False,0.5386,0.0081,0.4769,0.6192,0.7647,0.0105,0.5068,13.4,True
+11,svm,smote,bayesian_optuna,colab_gpu_cuml,42,2046.5623,False,0.5376,0.0058,0.4765,0.6170,0.7649,0.0092,0.5124,13.4,True
+12,svm,class_weight,random_search,colab_gpu_cuml,42,969.2329,False,0.5385,0.0079,0.4779,0.6169,0.7646,0.0101,0.5078,13.9,True
+13,xgboost,smote,grid_search,local_cpu_sklearn,42,1496.5091,True,0.5370,0.0077,0.5671,0.5100,0.7764,0.0103,0.5430,14.8,True
+14,svm,smote,genetic_deap,colab_gpu_cuml,42,6912.2106,False,0.5378,0.0075,0.4728,0.6237,0.7680,0.0094,0.5145,14.8,True

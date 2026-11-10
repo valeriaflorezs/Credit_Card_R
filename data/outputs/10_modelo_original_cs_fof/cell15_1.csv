@@ -1,0 +1,5 @@
+,rival,auc_cs_fof,auc_rival,delong_p,mcnemar_solo_cs_fof_falla,mcnemar_solo_rival_falla,f1_oof_cs_fof,f1_oof_rival
+0,catboost,0.7833,0.7843,0.2727,429,936,0.5484,0.5470
+1,xgboost,0.7833,0.7827,0.5606,434,827,0.5484,0.5448
+2,lightgbm,0.7833,0.7725,0.0000,345,782,0.5484,0.5459
+3,random_forest,0.7833,0.7822,0.1714,313,615,0.5484,0.5434

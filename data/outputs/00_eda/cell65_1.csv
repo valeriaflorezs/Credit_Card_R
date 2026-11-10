@@ -1,0 +1,9 @@
+,valor
+Filas en el archivo original,30000
+Duplicados exactos eliminados,35
+Filas en el dataset final,29965
+Filas con códigos EDUCATION no documentados reagrupados,345
+Filas con código MARRIAGE no documentado reagrupadas,54
+Clientes con al menos un saldo de facturación negativo,1930
+Grupos con las mismas variables pero distinto resultado,21
+Columnas en el dataset final (incluye el target),21

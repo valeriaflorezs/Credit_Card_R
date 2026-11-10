@@ -1,0 +1,1210 @@
+# SVM + RBF acelerado por GPU (cuML/RAPIDS) {#nb07}
+
+```{r setup-nb07, include=FALSE}
+knitr::opts_chunk$set(python.reticulate = FALSE)
+BASE <- if (file.exists(file.path("R", "portar_notebook.R"))) "." else ".."
+source(file.path(BASE, "R", "portar_notebook.R"))
+```
+
+<!-- nb:md cell=0 -->
+> **Nota (corrida vigente 5 x 5).** Este notebook se ajustó a 5 x 5 y se usó también para KNN en GPU; las salidas guardadas que se ven abajo pueden ser de la corrida 3 x 3 inicial. Las referencias a GPU A100 corresponden a esa corrida; la 5 x 5 se hizo en una T4 (RAPIDS 26.06). La corrida vigente es 5 x 5 con los siete modelos: cinco (80 combinaciones) corrieron en la CPU local con `python -m src.run_local_5x5` (resultado en `results/experiments_5x5__local.csv`), y SVM y KNN (32 combinaciones) en Colab con GPU T4 (`12_colab_5x5.ipynb`, `07_svm_gpu_colab.ipynb`). Todo se unió con `src/merge_session_results.py` en `results/experiments_master_5x5.csv` y `results/svm_gpu_results_colab_5x5.csv`; los resultados 3 x 3 están en `results/legacy_3x3/`. Si hay cifras con 3 folds en las celdas guardadas, no son las vigentes.
+
+Este notebook implementa un clasificador SVM con kernel RBF utilizando cuML de RAPIDS para aprovechar la aceleración por GPU. El kernel RBF permite modelar relaciones no lineales entre las variables y aplicar el modelo al problema de clasificación de tarjetas de crédito.
+
+**Diferencias con la corrida local** (relevantes al comparar con `results/experiments_master.csv`):
+- Se usa `cuml.svm.SVC` en GPU (NVIDIA A100-40GB), no `sklearn.svm.SVC` (libsvm). El solver y la calibración de probabilidades (Platt) no son idénticos.
+- `cache_size` es 2048 MiB aquí frente a 500 en local.
+- Versiones: scikit-learn 1.6.1, numpy 2.0.2 y pandas 2.2.2 en Colab, frente a 1.9.1, 2.5.3 y 3.0.6 en local.
+- No se guardan los índices de los folds. Con el mismo `random_state=42` y el mismo `dataset_final.csv` (misma forma y tamaño de archivo) los folds deberían coincidir, pero no se puede verificar fila a fila.
+- Los tiempos (GPU) no son comparables con los de CPU.
+- Las desviaciones estándar usan `np.std` (ddof=0); con 3 folds subestiman la dispersión.
+
+**Validación anidada 5 x 5** (5 folds externos y 5 internos), igual que el resto de los modelos en `12_colab_5x5.ipynb`.
+
+<!-- nb:md cell=1 -->
+## 1. Verificar GPU asignada
+
+<!-- nb:code cell=2 -->
+<details><summary>Código (1 líneas)</summary>
+
+```{python nb07_c02, eval=FALSE}
+!nvidia-smi
+```
+
+</details>
+
+<!-- nb:text cell=2 -->
+```text
+Sat Oct  3 14:46:00 2026
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.82.07              Driver Version: 580.82.07      CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          Off |   00000000:00:04.0 Off |                    0 |
+| N/A   34C    P0             50W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+```
+
+<!-- nb:md cell=3 -->
+## 2. Instalar RAPIDS cuML
+
+<!-- nb:code cell=4 -->
+<details><summary>Código (2 líneas)</summary>
+
+```{python nb07_c04, eval=FALSE}
+!git clone --depth 1 https://github.com/rapidsai/rapidsai-csp-utils.git
+!python rapidsai-csp-utils/colab/pip-install.py
+```
+
+</details>
+
+<!-- nb:text cell=4 -->
+<details><summary>Salida (126 líneas)</summary>
+
+```text
+Cloning into 'rapidsai-csp-utils'...
+remote: Enumerating objects: 21, done.
+remote: Counting objects: 100% (21/21), done.
+remote: Compressing objects: 100% (19/19), done.
+remote: Total 21 (delta 1), reused 16 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (21/21), 32.99 KiB | 16.49 MiB/s, done.
+Resolving deltas: 100% (1/1), done.
+Installing RAPIDS remaining 26.02 libraries
+Using Python 3.12.12 environment at: /usr
+Resolved 183 packages in 15.00s
+Prepared 58 packages in 1m 03s
+Uninstalled 43 packages in 4.36s
+Installed 58 packages in 132ms
+ - bokeh==3.7.3
+ + bokeh==3.6.3
+ + cucim-cu12==26.2.1
+ + cuda-bindings==12.9.9
+ + cuda-core==0.3.2
+ + cuda-pathfinder==1.8.3
+ - cuda-python==12.6.2.post1
+ + cuda-python==12.9.7
+ + cuda-toolkit==12.9.2.0
+ - cudf-cu12==25.6.0 (from https://pypi.nvidia.com/cudf-cu12/cudf_cu12-25.6.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl)
+ + cudf-cu12==26.2.1
+ - cudf-polars-cu12==25.6.0
+ + cudf-polars-cu12==26.2.1
+ + cugraph-cu12==26.2.0
+ - cuml-cu12==25.6.0
+ + cuml-cu12==26.2.0
+ - cupy-cuda12x==13.3.0
+ + cupy-cuda12x==14.2.0
+ - cuvs-cu12==25.6.1
+ + cuvs-cu12==26.2.0
+ + cuxfilter-cu12==26.2.0
+ - dask==2025.5.0
+ + dask==2026.1.1
+ - dask-cuda==25.6.0
+ + dask-cuda==26.2.0
+ - dask-cudf-cu12==25.6.0
+ + dask-cudf-cu12==26.2.1
+ + datashader==0.19.1
+ - distributed==2025.5.0
+ + distributed==2026.1.1
+ - distributed-ucxx-cu12==0.44.0
+ + distributed-ucxx-cu12==0.48.0
+ - holoviews==1.21.0
+ + holoviews==1.20.2
+ + jupyter-server-proxy==4.6.0
+ - libcudf-cu12==25.6.0 (from https://pypi.nvidia.com/libcudf-cu12/libcudf_cu12-25.6.0-py3-none-manylinux_2_28_x86_64.whl)
+ + libcudf-cu12==26.2.1
+ - libcugraph-cu12==25.6.0
+ + libcugraph-cu12==26.2.0
+ - libcuml-cu12==25.6.0
+ + libcuml-cu12==26.2.0
+ - libcuvs-cu12==25.6.1
+ + libcuvs-cu12==26.2.0
+ - libkvikio-cu12==25.6.0
+ + libkvikio-cu12==26.2.0
+ - libraft-cu12==25.6.0
+ + libraft-cu12==26.2.0
+ - librmm-cu12==25.6.0
+ + librmm-cu12==26.2.0
+ - libucxx-cu12==0.44.0
+ + libucxx-cu12==0.48.0
+ - numba-cuda==0.11.0
+ + numba-cuda==0.22.2
+ - nvidia-cublas-cu12==12.6.4.1
+ + nvidia-cublas-cu12==12.9.2.10
+ + nvidia-cuda-cccl-cu12==12.9.27
+ - nvidia-cuda-nvcc-cu12==12.5.82
+ + nvidia-cuda-nvcc-cu12==12.9.86
+ - nvidia-cuda-nvrtc-cu12==12.6.77
+ + nvidia-cuda-nvrtc-cu12==12.9.86
+ - nvidia-cufft-cu12==11.3.0.4
+ + nvidia-cufft-cu12==11.4.1.4
+ - nvidia-curand-cu12==10.3.7.77
+ + nvidia-curand-cu12==10.3.10.19
+ - nvidia-cusolver-cu12==11.7.1.2
+ + nvidia-cusolver-cu12==11.7.5.82
+ - nvidia-cusparse-cu12==12.5.4.2
+ + nvidia-cusparse-cu12==12.5.10.65
+ + nvidia-libnvcomp-cu12==5.1.0.21
+ + nvidia-nvimgcodec-cu12==0.7.0.11
+ - nvidia-nvjitlink-cu12==12.6.85
+ + nvidia-nvjitlink-cu12==12.9.86
+ - nx-cugraph-cu12==25.6.0 (from https://pypi.nvidia.com/nx-cugraph-cu12/nx_cugraph_cu12-25.6.0-py3-none-any.whl)
+ + nx-cugraph-cu12==26.2.0
+ - panel==1.8.2
+ + panel==1.7.5
+ - polars==1.25.2
+ + polars==1.35.2
+ + polars-runtime-32==1.35.2
+ + pyct==0.6.0
+ - pylibcudf-cu12==25.6.0 (from https://pypi.nvidia.com/pylibcudf-cu12/pylibcudf_cu12-25.6.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl)
+ + pylibcudf-cu12==26.2.1
+ - pylibcugraph-cu12==25.6.0
+ + pylibcugraph-cu12==26.2.0
+ - pylibraft-cu12==25.6.0
+ + pylibraft-cu12==26.2.0
+ - raft-dask-cu12==25.6.0
+ + raft-dask-cu12==26.2.0
+ - rapids-dask-dependency==25.6.0
+ + rapids-dask-dependency==26.2.0
+ - rapids-logger==0.1.1
+ + rapids-logger==0.2.3
+ - rmm-cu12==25.6.0
+ + rmm-cu12==26.2.0
+ - shapely==2.1.2
+ + shapely==2.0.7
+ + simpervisor==1.0.0
+ - treelite==4.4.1
+ + treelite==4.7.2
+ - ucxx-cu12==0.44.0
+ + ucxx-cu12==0.48.0
+
+        ***********************************************************************
+        The pip install of RAPIDS is complete.
+
+        Please do not run any further installation from the conda based installation methods, as they may cause issues!
+
+        Please ensure that you're pulling from the git repo to remain updated with the latest working install scripts.
+
+        Troubleshooting:
+            - If there is an installation failure, please check back on RAPIDSAI owned templates/notebooks to see how to update your personal files.
+            - If an installation failure persists when using the latest script, please make an issue on https://github.com/rapidsai-community/rapidsai-csp-utils
+        ***********************************************************************
+```
+
+</details>
+
+<!-- nb:code cell=5 -->
+<details><summary>Código (1 líneas)</summary>
+
+```{python nb07_c05, eval=FALSE}
+import os; os.environ['CUPY_ACCELERATORS'] = ''; print(repr(os.environ['CUPY_ACCELERATORS']))
+```
+
+</details>
+
+<!-- nb:text cell=5 -->
+```text
+''
+```
+
+<!-- nb:code cell=6 -->
+<details><summary>Código (2 líneas)</summary>
+
+```{python nb07_c06, eval=FALSE}
+# Optuna y DEAP no vienen con RAPIDS -- se instalan aparte.
+!pip install -q optuna deap
+```
+
+</details>
+
+<!-- nb:text cell=6 -->
+```text
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 442.4/442.4 kB 40.4 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 93.1/93.1 kB 17.3 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 879.5/879.5 kB 80.2 MB/s eta 0:00:00
+```
+
+<!-- nb:md cell=7 -->
+### 2b. Instalación alternativa de cuML (solo si la instalación de la sección 2 falló)
+
+<!-- nb:code cell=8 -->
+<details><summary>Código (6 líneas)</summary>
+
+```{python nb07_c08, eval=FALSE}
+# Deja UNA sola familia de paquetes (CUDA 12; los drivers de Colab con CUDA 13 también ejecutan wheels cu12).
+!pip uninstall -y -q cupy-cuda12x cupy-cuda13x cuml-cu12 cuml-cu13 cudf-cu12 cudf-cu13 libcuml-cu12 libcuml-cu13 rmm-cu12 rmm-cu13 raft-dask-cu12 pylibraft-cu12 pylibraft-cu13
+!pip install -q --extra-index-url=https://pypi.nvidia.com cuml-cu12
+!pip list 2>/dev/null | grep -i -E "cupy|cuml|cudf|rmm|raft"
+print("
+Ahora: Entorno de ejecución -> Reiniciar sesión, y seguir desde la celda de imports.")
+```
+
+</details>
+
+<!-- nb:text cell=8 -->
+```text
+  File "/tmp/ipykernel_767/2465210510.py", line 5
+    print("
+          ^
+SyntaxError: unterminated string literal (detected at line 5)
+```
+
+<!-- nb:md cell=9 -->
+## 3. Imports + chequeo de versiones
+
+<!-- nb:code cell=10 -->
+<details><summary>Código (39 líneas)</summary>
+
+```{python nb07_c10, eval=FALSE}
+import sys
+import time
+import json
+import random
+import traceback
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+import cuml
+from cuml.svm import SVC as cuSVC
+
+import sklearn
+import imblearn
+import optuna
+import deap
+from imblearn.over_sampling import SMOTE, ADASYN
+from imblearn.pipeline import Pipeline as ImbPipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.model_selection import StratifiedKFold, ParameterGrid, ParameterSampler
+from sklearn.metrics import get_scorer, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from scipy.stats import loguniform
+from deap import base, creator, tools
+
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+print("cuml          :", cuml.__version__)
+print("scikit-learn  :", sklearn.__version__)
+print("imbalanced-learn:", imblearn.__version__)
+print("optuna        :", optuna.__version__)
+print("deap          :", deap.__version__)
+print("numpy         :", np.__version__)
+print("pandas        :", pd.__version__)
+print()
+print("Local (requirements.txt): scikit-learn==1.9.1, imbalanced-learn==0.14.2, "
+      "optuna==5.0.0, deap==1.4.3 -- comparar contra lo de arriba y anotar "
+      "cualquier diferencia relevante junto a los resultados.")
+```
+
+</details>
+
+<!-- nb:text cell=10 -->
+```text
+cuml          : 26.02.000
+scikit-learn  : 1.6.1
+imbalanced-learn: 0.14.0
+optuna        : 5.0.0
+deap          : 1.4
+numpy         : 2.0.2
+pandas        : 2.2.2
+
+Local (requirements.txt): scikit-learn==1.9.1, imbalanced-learn==0.14.2, optuna==5.0.0, deap==1.4.3 -- comparar contra lo de arriba y anotar cualquier diferencia relevante junto a los resultados.
+```
+
+<!-- nb:md cell=11 -->
+## 4. Chequeo de compatibilidad cuML (correr ANTES de cualquier combinación real)
+
+<!-- nb:code cell=12 -->
+<details><summary>Código (43 líneas)</summary>
+
+```{python nb07_c12, eval=FALSE}
+from sklearn.datasets import make_classification
+
+X_chk, y_chk = make_classification(
+    n_samples=300, n_features=8, n_informative=5, weights=[0.75, 0.25], random_state=42
+)
+X_chk = X_chk.astype(np.float32)
+
+print("Chequeo 1/3: SVC(probability=True).fit() + predict_proba()...")
+clf_chk = cuSVC(kernel="rbf", C=1.0, gamma=0.1, probability=True, random_state=42, output_type="numpy")
+clf_chk.fit(X_chk, y_chk)
+proba_chk = clf_chk.predict_proba(X_chk)
+pred_chk = clf_chk.predict(X_chk)
+assert proba_chk.shape == (300, 2), f"forma inesperada de predict_proba: {proba_chk.shape}"
+assert np.allclose(proba_chk.sum(axis=1), 1.0, atol=1e-3), "las filas de predict_proba no suman 1"
+assert list(clf_chk.classes_) == [0, 1], f"orden de clases inesperado: {clf_chk.classes_}"
+print("  OK -- predict_proba shape:", proba_chk.shape, "| classes_:", clf_chk.classes_)
+
+print("Chequeo 2/3: class_weight='balanced' (binario)...")
+clf_bal = cuSVC(kernel="rbf", C=1.0, gamma=0.1, probability=True, class_weight="balanced",
+                 random_state=42, output_type="numpy")
+clf_bal.fit(X_chk, y_chk)
+_ = clf_bal.predict_proba(X_chk)
+print("  OK")
+
+print("Chequeo 3/3: pipeline completo (preprocesamiento denso + SMOTE + cuML SVC) + CV manual...")
+ct_chk = ColumnTransformer(
+    transformers=[], remainder=StandardScaler()
+)
+pipe_chk = ImbPipeline(steps=[
+    ("preprocessing", ct_chk),
+    ("smote", SMOTE(random_state=42, k_neighbors=3)),
+    ("model", cuSVC(kernel="rbf", C=1.0, gamma=0.1, probability=True, random_state=42, output_type="numpy")),
+])
+cv_chk = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
+scorer_chk = get_scorer("f1")
+fold_scores_chk = []
+for tr_idx, val_idx in cv_chk.split(X_chk, y_chk):
+    pipe_chk.fit(X_chk[tr_idx], y_chk[tr_idx])
+    fold_scores_chk.append(scorer_chk(pipe_chk, X_chk[val_idx], y_chk[val_idx]))
+print("  OK -- f1 por fold:", [round(s, 4) for s in fold_scores_chk])
+
+print()
+print("Los 3 chequeos pasaron. Es seguro continuar con las combinaciones reales.")
+```
+
+</details>
+
+<!-- nb:text cell=12 -->
+```text
+Chequeo 1/3: SVC(probability=True).fit() + predict_proba()...
+  OK -- predict_proba shape: (300, 2) | classes_: [0 1]
+Chequeo 2/3: class_weight='balanced' (binario)...
+  OK
+Chequeo 3/3: pipeline completo (preprocesamiento denso + SMOTE + cuML SVC) + CV manual...
+  OK -- f1 por fold: [0.6786, 0.7442, 0.7742]
+
+Los 3 chequeos pasaron. Es seguro continuar con las combinaciones reales.
+```
+
+<!-- nb:md cell=13 -->
+## 5. Subir `dataset_final.csv`
+
+<!-- nb:code cell=14 -->
+<details><summary>Código (7 líneas)</summary>
+
+```{python nb07_c14, eval=FALSE}
+from google.colab import files
+
+uploaded = files.upload()
+assert "dataset_final.csv" in uploaded, (
+    f"Se esperaba un archivo llamado 'dataset_final.csv', se subio: {list(uploaded.keys())}"
+)
+DATASET_PATH = "dataset_final.csv"
+```
+
+</details>
+
+<!-- nb:text cell=14 -->
+```text
+<IPython.core.display.HTML object>---------------------------------------------------------------------------
+AssertionError                            Traceback (most recent call last)
+/tmp/ipython-input-3375918583.py in <cell line: 0>()
+      2
+      3 uploaded = files.upload()
+----> 4 assert "dataset_final.csv" in uploaded, (
+      5     f"Se esperaba un archivo llamado 'dataset_final.csv', se subio: {list(uploaded.keys())}"
+      6 )
+
+AssertionError: Se esperaba un archivo llamado 'dataset_final.csv', se subio: []
+```
+
+<!-- nb:code cell=15 -->
+<details><summary>Código (1 líneas)</summary>
+
+```{python nb07_c15, eval=FALSE}
+import os; DATASET_PATH = 'dataset_final.csv'; print(os.path.abspath(DATASET_PATH), os.path.getsize(DATASET_PATH))
+```
+
+</details>
+
+<!-- nb:text cell=15 -->
+```text
+/content/dataset_final.csv 5187321
+```
+
+<!-- nb:md cell=16 -->
+## 6. Cargar, verificar y separar X/y
+
+<!-- nb:code cell=17 -->
+<details><summary>Código (24 líneas)</summary>
+
+```{python nb07_c17, eval=FALSE}
+TARGET_COLUMN = "default_payment_next_month"
+CATEGORICAL_COLUMNS = ["SEX", "EDUCATION", "MARRIAGE"]
+RANDOM_STATE = 42
+
+df = pd.read_csv(DATASET_PATH)
+print(f"Dataset cargado: {df.shape}")
+assert df.shape == (29965, 21), f"forma inesperada: {df.shape} (se esperaba (29965, 21): dataset_final.csv de la Parte 5 del EDA)"
+
+n_before = len(df)
+df = df.drop_duplicates(subset=None, keep="first").reset_index(drop=True)
+n_removed = n_before - len(df)
+print(f"Filas duplicadas eliminadas: {n_removed}")
+assert n_removed == 0, (
+    f"Se esperaban 0 filas duplicadas (el dataset ya viene deduplicado del EDA), se encontraron {n_removed}. "
+    "Verificar que este sea el MISMO dataset_final.csv que el proyecto local -- si no, "
+    "los folds de este notebook NO van a coincidir con los de las corridas locales."
+)
+
+X = df.drop(columns=[TARGET_COLUMN])
+y = df[TARGET_COLUMN]
+print(f"X: {X.shape}, balance del target: {y.value_counts(normalize=True).round(4).to_dict()}")
+
+np.random.seed(RANDOM_STATE)
+random.seed(RANDOM_STATE)
+```
+
+</details>
+
+<!-- nb:text cell=17 -->
+```text
+Dataset cargado: (29965, 21)
+Filas duplicadas eliminadas: 0
+X: (29965, 20), balance del target: {0: 0.7787, 1: 0.2213}
+```
+
+<!-- nb:md cell=18 -->
+## 7. Configuración (idéntica a `src/config.py`)
+
+<!-- nb:code cell=19 -->
+<details><summary>Código (26 líneas)</summary>
+
+```{python nb07_c19, eval=FALSE}
+N_OUTER_FOLDS = 5
+N_INNER_FOLDS = 5
+
+RANDOM_SEARCH_ITER = 25
+OPTUNA_N_TRIALS = 30
+
+GA_POPULATION_SIZE = 16
+GA_N_GENERATIONS = 10
+GA_CX_PROB = 0.6
+GA_MUT_PROB = 0.3
+GA_MUT_INDPB = 0.2
+GA_TOURNAMENT_SIZE = 3
+GA_ELITE_SIZE = 2
+
+DEFAULT_SCORING = "f1"
+CORE_METRICS = ("accuracy", "precision", "recall", "f1", "roc_auc")
+
+# Parametros del modelo SVM (fijos, no bajo busqueda): kernel RBF fijo
+# (requisito del curso), probability=True (necesario para roc_auc),
+# max_iter acotado (misma razon que en el proyecto local: evitar que el
+# solver SMO tarde indefinidamente en converger en combinaciones
+# patologicas de C/gamma -- ver models.py::_svm_factory).
+SVM_MAX_ITER = 200_000
+SVM_CACHE_SIZE_MIB = 2048  # generoso: se usó una A100-40GB (40GB de memoria): no es un hiperparametro bajo busqueda
+
+print("Config OK")
+```
+
+</details>
+
+<!-- nb:text cell=19 -->
+```text
+Config OK
+```
+
+<!-- nb:md cell=20 -->
+## 8. Espacio de búsqueda de SVM (idéntico a `models.py::MODEL_REGISTRY["svm"]`)
+
+<!-- nb:code cell=21 -->
+<details><summary>Código (40 líneas)</summary>
+
+```{python nb07_c21, eval=FALSE}
+from dataclasses import dataclass
+
+
+@dataclass
+class HyperparamSpec:
+    name: str
+    low: float
+    high: float
+    log: bool = True  # los dos hiperparametros de SVM (C, gamma) son log=True
+
+
+SVM_HYPERPARAMS = [
+    HyperparamSpec("C", low=1e-2, high=1e2),
+    HyperparamSpec("gamma", low=1e-4, high=1e0),
+]
+
+
+def get_param_grid(hyperparams=SVM_HYPERPARAMS, n_points=4):
+    '''Igual a models.py::get_param_grid especializado a floats log=True.
+    n_points=4 (igual que localmente: numeric_hp_count=2 > 1, entonces
+    n_points = max(2, min(4, int(200 ** (1/2)))) = 4 -> 4x4 = 16 combinaciones,
+    igual que grid_search en la corrida local).'''
+    grid = {}
+    for hp in hyperparams:
+        values = np.logspace(np.log10(hp.low), np.log10(hp.high), num=n_points)
+        grid[hp.name] = list(values)
+    return grid
+
+
+def get_param_distributions(hyperparams=SVM_HYPERPARAMS):
+    '''Igual a models.py::get_param_distributions para floats log=True.'''
+    return {hp.name: loguniform(hp.low, hp.high) for hp in hyperparams}
+
+
+SVM_PARAM_GRID = get_param_grid()
+SVM_PARAM_DISTRIBUTIONS = get_param_distributions()
+print("param_grid (n_points=4):")
+for k, v in SVM_PARAM_GRID.items():
+    print(f"  {k}: {[round(float(x), 6) for x in v]}")
+print(f"Total combinaciones grid_search: {len(list(ParameterGrid(SVM_PARAM_GRID)))} (se espera 16)")
+```
+
+</details>
+
+<!-- nb:text cell=21 -->
+```text
+param_grid (n_points=4):
+  C: [0.01, 0.215443, 4.641589, 100.0]
+  gamma: [0.0001, 0.002154, 0.046416, 1.0]
+Total combinaciones grid_search: 16 (se espera 16)
+```
+
+<!-- nb:md cell=22 -->
+## 9. Preprocesamiento (idéntico a `preprocessing.py`, con salida densa)
+
+<!-- nb:code cell=23 -->
+<details><summary>Código (11 líneas)</summary>
+
+```{python nb07_c23, eval=FALSE}
+def build_column_transformer(categorical_columns=CATEGORICAL_COLUMNS):
+    return ColumnTransformer(
+        transformers=[
+            (
+                "categorical",
+                OneHotEncoder(handle_unknown="ignore", drop="if_binary", sparse_output=False),
+                categorical_columns,
+            )
+        ],
+        remainder=StandardScaler(),
+    )
+```
+
+</details>
+
+<!-- nb:md cell=24 -->
+## 10. Balanceo (idéntico a `balancing.py`) + fábrica del modelo cuML
+
+<!-- nb:code cell=25 -->
+<details><summary>Código (61 líneas)</summary>
+
+```{python nb07_c25, eval=FALSE}
+BALANCING_TECHNIQUES = ("none", "smote", "adasyn", "class_weight")
+
+
+def _safe_k_neighbors(y, default=5, cv_n_splits=None):
+    '''Identico a balancing.py::_safe_k_neighbors.'''
+    n_minority = int(pd.Series(y).value_counts().min())
+    if cv_n_splits is not None and cv_n_splits > 1:
+        n_minority = int(n_minority * (cv_n_splits - 1) / cv_n_splits)
+    return max(1, min(default, n_minority - 1))
+
+
+def get_resampler(technique, y_train=None, random_state=RANDOM_STATE, cv_n_splits=None):
+    '''Identico a balancing.py::get_resampler.'''
+    if technique in ("none", "class_weight"):
+        return None
+    if technique == "smote":
+        k = _safe_k_neighbors(y_train, cv_n_splits=cv_n_splits) if y_train is not None else 5
+        return SMOTE(random_state=random_state, k_neighbors=k)
+    if technique == "adasyn":
+        k = _safe_k_neighbors(y_train, cv_n_splits=cv_n_splits) if y_train is not None else 5
+        return ADASYN(random_state=random_state, n_neighbors=k)
+    raise ValueError(f"Tecnica de balanceo desconocida: '{technique}'")
+
+
+def svm_factory(random_state=RANDOM_STATE, **kwargs):
+    '''Equivalente cuML de models.py::_svm_factory. kernel='rbf' fijo,
+    probability=True (necesario para roc_auc), max_iter/cache_size iguales
+    en espiritu a la version CPU (ver aviso #5 sobre unidades de cache_size).'''
+    return cuSVC(
+        kernel="rbf",
+        probability=True,
+        max_iter=SVM_MAX_ITER,
+        cache_size=SVM_CACHE_SIZE_MIB,
+        random_state=random_state,
+        output_type="numpy",
+        **kwargs,
+    )
+
+
+def build_pipeline(technique, y_train=None, cv_n_splits=None, random_state=RANDOM_STATE, **model_kwargs):
+    '''Identico a balancing.py::build_pipeline, especializado a SVM+cuML.'''
+    steps = [("preprocessing", build_column_transformer())]
+
+    resampler = get_resampler(technique, y_train=y_train, random_state=random_state, cv_n_splits=cv_n_splits)
+    if resampler is not None:
+        steps.append((technique, resampler))
+
+    extra_kwargs = dict(model_kwargs)
+    if technique == "class_weight":
+        if y_train is None:
+            raise ValueError("technique='class_weight' requiere y_train.")
+        extra_kwargs["class_weight"] = "balanced"  # SVM: class_weight_param default ("balanced" nativo de SVC)
+
+    estimator = svm_factory(random_state=random_state, **extra_kwargs)
+    steps.append(("model", estimator))
+
+    return ImbPipeline(steps=steps)  # sin memory=Memory(...): cache de joblib no aporta con GPU (el costo esta en el fit, no en recalcular SMOTE/ADASYN)
+
+
+print("build_pipeline OK -- ejemplo:")
+print(build_pipeline("smote", y_train=y, cv_n_splits=3, C=1.0, gamma=0.1))
+```
+
+</details>
+
+<!-- nb:text cell=25 -->
+```text
+build_pipeline OK -- ejemplo:
+Pipeline(steps=[('preprocessing',
+                 ColumnTransformer(remainder=StandardScaler(),
+                                   transformers=[('categorical',
+                                                  OneHotEncoder(drop='if_binary',
+                                                                handle_unknown='ignore',
+                                                                sparse_output=False),
+                                                  ['SEX', 'EDUCATION',
+                                                   'MARRIAGE'])])),
+                ('smote', SMOTE(random_state=42)), ('model', SVC())])
+```
+
+<!-- nb:md cell=26 -->
+## 11. Los 4 métodos de optimización (idénticos a `optimization.py`)
+
+<!-- nb:code cell=27 -->
+<details><summary>Código (194 líneas)</summary>
+
+```{python nb07_c27, eval=FALSE}
+def _n_splits(cv):
+    return int(cv.n_splits)
+
+
+def _mean_cv_score(params, technique, X, y, cv, scoring):
+    scorer = get_scorer(scoring)
+    fold_scores = []
+    for train_idx, val_idx in cv.split(X, y):
+        X_tr, X_val = X.iloc[train_idx], X.iloc[val_idx]
+        y_tr, y_val = y.iloc[train_idx], y.iloc[val_idx]
+        pipe = build_pipeline(technique, y_train=y_tr, cv_n_splits=_n_splits(cv), random_state=RANDOM_STATE, **params)
+        pipe.fit(X_tr, y_tr)
+        fold_scores.append(scorer(pipe, X_val, y_val))
+    return float(np.mean(fold_scores))
+
+
+def _manual_search(candidates, technique, X, y, cv, scoring):
+    '''Mismo algoritmo que GridSearchCV/RandomizedSearchCV: evalua cada
+    candidato con CV interna, se queda con el de mejor score promedio
+    (primer empate gana, igual que np.argmax), refit sobre todo (X, y).'''
+    best_score, best_params = -np.inf, None
+    for params in candidates:
+        score = _mean_cv_score(params, technique, X, y, cv, scoring)
+        if score > best_score:
+            best_score, best_params = score, params
+
+    best_pipeline = build_pipeline(technique, y_train=y, cv_n_splits=_n_splits(cv), random_state=RANDOM_STATE, **best_params)
+    best_pipeline.fit(X, y)
+    return {
+        "best_params": best_params,
+        "best_score": best_score,
+        "best_pipeline": best_pipeline,
+        "n_evaluations": len(candidates),
+    }
+
+
+def run_grid_search(technique, X, y, cv, scoring=DEFAULT_SCORING):
+    candidates = list(ParameterGrid(SVM_PARAM_GRID))
+    return _manual_search(candidates, technique, X, y, cv, scoring)
+
+
+def run_random_search(technique, X, y, cv, scoring=DEFAULT_SCORING, n_iter=RANDOM_SEARCH_ITER):
+    # ParameterSampler es EXACTAMENTE lo que RandomizedSearchCV usa por dentro
+    # para generar candidatos -- misma secuencia dado el mismo random_state.
+    candidates = list(ParameterSampler(SVM_PARAM_DISTRIBUTIONS, n_iter=n_iter, random_state=RANDOM_STATE))
+    candidates = [{k: float(v) for k, v in c.items()} for c in candidates]
+    return _manual_search(candidates, technique, X, y, cv, scoring)
+
+
+def run_bayesian_search(technique, X, y, cv, scoring=DEFAULT_SCORING, n_trials=OPTUNA_N_TRIALS):
+    '''Transcripcion de optimization.py::run_bayesian_search.'''
+    scorer = get_scorer(scoring)
+
+    def objective(trial):
+        params = {
+            "C": trial.suggest_float("C", 1e-2, 1e2, log=True),
+            "gamma": trial.suggest_float("gamma", 1e-4, 1e0, log=True),
+        }
+        fold_scores = []
+        for train_idx, val_idx in cv.split(X, y):
+            X_tr, X_val = X.iloc[train_idx], X.iloc[val_idx]
+            y_tr, y_val = y.iloc[train_idx], y.iloc[val_idx]
+            pipe = build_pipeline(technique, y_train=y_tr, random_state=RANDOM_STATE, **params)
+            pipe.fit(X_tr, y_tr)
+            fold_scores.append(scorer(pipe, X_val, y_val))
+        return float(np.mean(fold_scores))
+
+    sampler = optuna.samplers.TPESampler(seed=RANDOM_STATE)
+    study = optuna.create_study(direction="maximize", sampler=sampler)
+    study.optimize(objective, n_trials=n_trials, n_jobs=1, show_progress_bar=False)
+
+    best_params = study.best_params
+    best_pipeline = build_pipeline(technique, y_train=y, cv_n_splits=_n_splits(cv), random_state=RANDOM_STATE, **best_params)
+    best_pipeline.fit(X, y)
+    return {
+        "best_params": best_params,
+        "best_score": float(study.best_value),
+        "best_pipeline": best_pipeline,
+        "n_evaluations": len(study.trials),
+    }
+
+
+# --- Algoritmo genetico (DEAP) -- transcripcion de optimization.py::run_genetic_search ---
+
+def _init_gene(hp):
+    return float(10 ** random.uniform(np.log10(hp.low), np.log10(hp.high)))
+
+
+def _cx_uniform(ind1, ind2, indpb=0.5):
+    for i in range(len(ind1)):
+        if random.random() < indpb:
+            ind1[i], ind2[i] = ind2[i], ind1[i]
+    return ind1, ind2
+
+
+def _mutate_individual(individual, hyperparams, indpb, sigma=0.15):
+    for i, hp in enumerate(hyperparams):
+        if random.random() > indpb:
+            continue
+        log_lo, log_hi = np.log10(hp.low), np.log10(hp.high)
+        current_log = np.log10(max(individual[i], 1e-300))
+        new_log = current_log + random.gauss(0, sigma * (log_hi - log_lo))
+        new_log = min(max(new_log, log_lo), log_hi)
+        individual[i] = float(10 ** new_log)
+    return (individual,)
+
+
+def run_genetic_search(
+    technique, X, y, cv, scoring=DEFAULT_SCORING,
+    population_size=GA_POPULATION_SIZE, n_generations=GA_N_GENERATIONS,
+    cx_prob=GA_CX_PROB, mut_prob=GA_MUT_PROB, mut_indpb=GA_MUT_INDPB,
+    tournament_size=GA_TOURNAMENT_SIZE, elite_size=GA_ELITE_SIZE,
+):
+    random.seed(RANDOM_STATE)  # DEAP usa el modulo `random` global, igual que localmente
+
+    if not hasattr(creator, "FitnessMax"):
+        creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+    if not hasattr(creator, "Individual"):
+        creator.create("Individual", list, fitness=creator.FitnessMax)
+
+    hyperparams = SVM_HYPERPARAMS
+    scorer = get_scorer(scoring)
+
+    def _init_individual():
+        return creator.Individual([_init_gene(hp) for hp in hyperparams])
+
+    def _decode(individual):
+        return {hp.name: gene for hp, gene in zip(hyperparams, individual)}
+
+    def _evaluate(individual):
+        params = _decode(individual)
+        fold_scores = []
+        for train_idx, val_idx in cv.split(X, y):
+            X_tr, X_val = X.iloc[train_idx], X.iloc[val_idx]
+            y_tr, y_val = y.iloc[train_idx], y.iloc[val_idx]
+            pipe = build_pipeline(technique, y_train=y_tr, random_state=RANDOM_STATE, **params)
+            pipe.fit(X_tr, y_tr)
+            fold_scores.append(scorer(pipe, X_val, y_val))
+        return (float(np.mean(fold_scores)),)
+
+    toolbox = base.Toolbox()
+    toolbox.register("individual", _init_individual)
+    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+    toolbox.register("mate", _cx_uniform, indpb=0.5)
+    toolbox.register("mutate", _mutate_individual, hyperparams=hyperparams, indpb=mut_indpb)
+    toolbox.register("select", tools.selTournament, tournsize=tournament_size)
+    toolbox.register("evaluate", _evaluate)
+
+    population = toolbox.population(n=population_size)
+    for ind, fit in zip(population, map(toolbox.evaluate, population)):
+        ind.fitness.values = fit
+    n_evaluations = len(population)
+
+    for _generation in range(1, n_generations + 1):
+        elite = [toolbox.clone(ind) for ind in tools.selBest(population, elite_size)]
+        offspring = [toolbox.clone(ind) for ind in toolbox.select(population, len(population) - elite_size)]
+
+        for child1, child2 in zip(offspring[::2], offspring[1::2]):
+            if random.random() < cx_prob:
+                toolbox.mate(child1, child2)
+                del child1.fitness.values
+                del child2.fitness.values
+
+        for mutant in offspring:
+            if random.random() < mut_prob:
+                toolbox.mutate(mutant)
+                del mutant.fitness.values
+
+        invalid = [ind for ind in offspring if not ind.fitness.valid]
+        for ind, fit in zip(invalid, map(toolbox.evaluate, invalid)):
+            ind.fitness.values = fit
+        n_evaluations += len(invalid)
+
+        population = elite + offspring
+
+    best_ind = tools.selBest(population, 1)[0]
+    best_params = _decode(best_ind)
+    best_pipeline = build_pipeline(technique, y_train=y, cv_n_splits=_n_splits(cv), random_state=RANDOM_STATE, **best_params)
+    best_pipeline.fit(X, y)
+    return {
+        "best_params": best_params,
+        "best_score": float(best_ind.fitness.values[0]),
+        "best_pipeline": best_pipeline,
+        "n_evaluations": n_evaluations,
+    }
+
+
+OPTIMIZATION_DISPATCH = {
+    "grid_search": run_grid_search,
+    "random_search": run_random_search,
+    "bayesian_optuna": run_bayesian_search,
+    "genetic_deap": run_genetic_search,
+}
+print("4 metodos de optimizacion definidos:", list(OPTIMIZATION_DISPATCH.keys()))
+```
+
+</details>
+
+<!-- nb:text cell=27 -->
+```text
+4 metodos de optimizacion definidos: ['grid_search', 'random_search', 'bayesian_optuna', 'genetic_deap']
+```
+
+<!-- nb:md cell=28 -->
+## 12. Validación cruzada anidada (idéntica a `nested_cv.py`)
+
+<!-- nb:code cell=29 -->
+<details><summary>Código (65 líneas)</summary>
+
+```{python nb07_c29, eval=FALSE}
+def compute_core_metrics(y_true, y_pred, y_proba):
+    '''Identico a nested_cv.py::compute_core_metrics.'''
+    return {
+        "accuracy": float(accuracy_score(y_true, y_pred)),
+        "precision": float(precision_score(y_true, y_pred, zero_division=0)),
+        "recall": float(recall_score(y_true, y_pred, zero_division=0)),
+        "f1": float(f1_score(y_true, y_pred, zero_division=0)),
+        "roc_auc": float(roc_auc_score(y_true, y_proba)),
+    }
+
+
+def run_nested_cv(technique, method, X, y, n_outer_folds=N_OUTER_FOLDS, n_inner_folds=N_INNER_FOLDS,
+                   scoring=DEFAULT_SCORING, random_state=RANDOM_STATE):
+    '''Identico a nested_cv.py::run_nested_cv, especializado a SVM+cuML.'''
+    outer_cv = StratifiedKFold(n_splits=n_outer_folds, shuffle=True, random_state=random_state)
+    inner_cv = StratifiedKFold(n_splits=n_inner_folds, shuffle=True, random_state=random_state)
+
+    fold_results = []
+    t_start_total = time.time()
+
+    for fold_index, (train_idx, test_idx) in enumerate(outer_cv.split(X, y)):
+        X_train_outer, X_test_outer = X.iloc[train_idx], X.iloc[test_idx]
+        y_train_outer, y_test_outer = y.iloc[train_idx], y.iloc[test_idx]
+
+        t0 = time.time()
+        opt_result = OPTIMIZATION_DISPATCH[method](technique, X_train_outer, y_train_outer, inner_cv, scoring=scoring)
+        fit_time_seconds = time.time() - t0
+
+        y_pred = opt_result["best_pipeline"].predict(X_test_outer)
+        y_proba = opt_result["best_pipeline"].predict_proba(X_test_outer)[:, 1]
+        y_true = y_test_outer.to_numpy()
+
+        fold_results.append({
+            "fold_index": fold_index,
+            "best_params": opt_result["best_params"],
+            "metrics": compute_core_metrics(y_true, y_pred, y_proba),
+            "fit_time_seconds": fit_time_seconds,
+        })
+        print(
+            f"    fold {fold_index}: f1={fold_results[-1]['metrics']['f1']:.4f} "
+            f"best_params={ {k: round(v, 6) for k, v in opt_result['best_params'].items()} } "
+            f"({fit_time_seconds:.1f}s)"
+        )
+
+    total_time_seconds = time.time() - t_start_total
+
+    row = {
+        "model": "svm",
+        "technique": technique,
+        "method": method,
+        "total_time_seconds": total_time_seconds,
+        "n_outer_folds": len(fold_results),
+    }
+    for metric_name in CORE_METRICS:
+        values = [fr["metrics"][metric_name] for fr in fold_results]
+        row[f"{metric_name}_mean"] = float(np.mean(values))
+        row[f"{metric_name}_std"] = float(np.std(values))
+        row[f"{metric_name}_per_fold"] = json.dumps(values)
+    row["best_params_per_fold"] = json.dumps([fr["best_params"] for fr in fold_results])
+    row["random_state"] = random_state
+    row["n_inner_folds"] = n_inner_folds
+    return row
+
+
+print("run_nested_cv definido")
+```
+
+</details>
+
+<!-- nb:text cell=29 -->
+```text
+run_nested_cv definido
+```
+
+<!-- nb:md cell=30 -->
+## 13. Selección de combinaciones a correr
+
+Por defecto corre las **16 combinaciones** de SVM (4 técnicas x 4 métodos): este
+modelo se corre solo en Colab, porque en CPU local representó aprox. 90% del tiempo
+total de la corrida anterior (ver `EXPERIMENT_STATUS.md`). Las filas de los
+otros 6 modelos salen de `04_run_experiments.ipynb`.
+
+Editar `COMBOS_TO_RUN` para correr solo un subconjunto (por ejemplo, dejar
+para una segunda sesión las 4 de `genetic_deap`, que son las más largas).
+
+<!-- nb:code cell=31 -->
+<details><summary>Código (9 líneas)</summary>
+
+```{python nb07_c31, eval=FALSE}
+ALL_SVM_COMBOS = [(t, m) for t in BALANCING_TECHNIQUES
+                  for m in ("grid_search", "random_search", "bayesian_optuna", "genetic_deap")]
+assert len(ALL_SVM_COMBOS) == 16
+
+# Editar esta lista para correr solo un subconjunto:
+# Primero las 12 combinaciones sin búsqueda genética; las 4 genéticas (las más largas) al final.
+COMBOS_TO_RUN = [c for c in ALL_SVM_COMBOS if c[1] != "genetic_deap"] + [c for c in ALL_SVM_COMBOS if c[1] == "genetic_deap"]
+
+print(f"COMBOS_TO_RUN ({len(COMBOS_TO_RUN)}): {COMBOS_TO_RUN}")
+```
+
+</details>
+
+<!-- nb:text cell=31 -->
+```text
+COMBOS_TO_RUN (16): [('none', 'grid_search'), ('none', 'random_search'), ('none', 'bayesian_optuna'), ('smote', 'grid_search'), ('smote', 'random_search'), ('smote', 'bayesian_optuna'), ('adasyn', 'grid_search'), ('adasyn', 'random_search'), ('adasyn', 'bayesian_optuna'), ('class_weight', 'grid_search'), ('class_weight', 'random_search'), ('class_weight', 'bayesian_optuna'), ('none', 'genetic_deap'), ('smote', 'genetic_deap'), ('adasyn', 'genetic_deap'), ('class_weight', 'genetic_deap')]
+```
+
+<!-- nb:md cell=32 -->
+## 14. Ejecutar: guardado incremental (una fila apenas termina cada combinación)
+
+<!-- nb:code cell=33 -->
+<details><summary>Código (49 líneas)</summary>
+
+```{python nb07_c33, eval=FALSE}
+# Se guarda en Google Drive para no perder lo ya corrido si Colab recicla la sesión
+# (el disco local de Colab se borra al desconectarse). Si no se monta Drive, cae al disco local.
+try:
+    from google.colab import drive
+    drive.mount("/content/drive")
+    OUT_DIR = Path("/content/drive/MyDrive/svm_resultados")
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+except Exception as exc:
+    print("No se pudo montar Drive, se guarda en el disco local de Colab:", exc)
+    OUT_DIR = Path(".")
+RESULTS_CSV_PATH = OUT_DIR / "svm_gpu_results.csv"
+ERRORS_LOG_PATH = OUT_DIR / "svm_gpu_errors_log.csv"
+print("Resultados en:", RESULTS_CSV_PATH.resolve())
+
+already_done = set()
+if RESULTS_CSV_PATH.exists():
+    existing = pd.read_csv(RESULTS_CSV_PATH)
+    already_done = set(zip(existing["technique"], existing["method"]))
+    print(f"{len(already_done)} combinaciones ya en {RESULTS_CSV_PATH}, se omiten.")
+
+to_run = [c for c in COMBOS_TO_RUN if c not in already_done]
+print(f"{len(to_run)} combinaciones a correr en esta sesion: {to_run}")
+
+for technique, method in to_run:
+    print(f"\n=== svm / {technique} / {method} ===")
+    t0 = time.time()
+    try:
+        row = run_nested_cv(technique, method, X, y)
+    except Exception as exc:
+        elapsed = time.time() - t0
+        print(f"  ERROR tras {elapsed:.1f}s: {exc!r}")
+        traceback.print_exc()
+        err_row = pd.DataFrame([{
+            "technique": technique, "method": method,
+            "elapsed_seconds": elapsed, "error": repr(exc), "traceback": traceback.format_exc(),
+        }])
+        err_row.to_csv(ERRORS_LOG_PATH, mode="a", header=not ERRORS_LOG_PATH.exists(), index=False)
+        continue
+
+    row_df = pd.DataFrame([row])
+    row_df.to_csv(RESULTS_CSV_PATH, mode="a", header=not RESULTS_CSV_PATH.exists(), index=False)
+    print(
+        f"  OK svm/{technique}/{method} -- "
+        f"f1={row['f1_mean']:.4f}+/-{row['f1_std']:.4f} "
+        f"roc_auc={row['roc_auc_mean']:.4f}+/-{row['roc_auc_std']:.4f} "
+        f"({row['total_time_seconds']:.1f}s)"
+    )
+
+print("\nListo. Filas guardadas en:", RESULTS_CSV_PATH.resolve())
+```
+
+</details>
+
+<!-- nb:text cell=33 -->
+<details><summary>Salida (101 líneas)</summary>
+
+```text
+Mounted at /content/drive
+Resultados en: /content/drive/MyDrive/svm_resultados/svm_gpu_results.csv
+16 combinaciones a correr en esta sesion: [('none', 'grid_search'), ('none', 'random_search'), ('none', 'bayesian_optuna'), ('smote', 'grid_search'), ('smote', 'random_search'), ('smote', 'bayesian_optuna'), ('adasyn', 'grid_search'), ('adasyn', 'random_search'), ('adasyn', 'bayesian_optuna'), ('class_weight', 'grid_search'), ('class_weight', 'random_search'), ('class_weight', 'bayesian_optuna'), ('none', 'genetic_deap'), ('smote', 'genetic_deap'), ('adasyn', 'genetic_deap'), ('class_weight', 'genetic_deap')]
+
+=== svm / none / grid_search ===
+    fold 0: f1=0.4378 best_params={'C': np.float64(0.215443), 'gamma': np.float64(0.046416)} (81.1s)
+    fold 1: f1=0.4402 best_params={'C': np.float64(0.215443), 'gamma': np.float64(0.046416)} (78.8s)
+    fold 2: f1=0.4405 best_params={'C': np.float64(0.215443), 'gamma': np.float64(0.046416)} (80.2s)
+  OK svm/none/grid_search -- f1=0.4395+/-0.0012 roc_auc=0.7199+/-0.0064 (240.4s)
+
+=== svm / none / random_search ===
+    fold 0: f1=0.4266 best_params={'C': 8.471801, 'gamma': 0.02481} (91.6s)
+    fold 1: f1=0.4465 best_params={'C': 0.108423, 'gamma': 0.044678} (85.0s)
+    fold 2: f1=0.4363 best_params={'C': 5.456725, 'gamma': 0.005762} (87.4s)
+  OK svm/none/random_search -- f1=0.4365+/-0.0081 roc_auc=0.7214+/-0.0060 (264.2s)
+
+=== svm / none / bayesian_optuna ===
+    fold 0: f1=0.4360 best_params={'C': 0.430558, 'gamma': 0.035778} (178.3s)
+    fold 1: f1=0.4376 best_params={'C': 0.156283, 'gamma': 0.056814} (178.4s)
+    fold 2: f1=0.4398 best_params={'C': 0.322411, 'gamma': 0.063427} (146.9s)
+  OK svm/none/bayesian_optuna -- f1=0.4378+/-0.0016 roc_auc=0.7198+/-0.0043 (503.9s)
+
+=== svm / smote / grid_search ===
+    fold 0: f1=0.5445 best_params={'C': np.float64(100.0), 'gamma': np.float64(0.002154)} (94.9s)
+    fold 1: f1=0.5304 best_params={'C': np.float64(100.0), 'gamma': np.float64(0.002154)} (95.0s)
+    fold 2: f1=0.5389 best_params={'C': np.float64(0.215443), 'gamma': np.float64(0.046416)} (89.2s)
+  OK svm/smote/grid_search -- f1=0.5379+/-0.0058 roc_auc=0.7620+/-0.0084 (279.4s)
+
+=== svm / smote / random_search ===
+    fold 0: f1=0.5420 best_params={'C': 5.456725, 'gamma': 0.005762} (93.8s)
+    fold 1: f1=0.5291 best_params={'C': 0.108423, 'gamma': 0.044678} (93.4s)
+    fold 2: f1=0.5394 best_params={'C': 0.108423, 'gamma': 0.044678} (92.4s)
+  OK svm/smote/random_search -- f1=0.5368+/-0.0056 roc_auc=0.7662+/-0.0064 (279.8s)
+
+=== svm / smote / bayesian_optuna ===
+    fold 0: f1=0.5429 best_params={'C': 32.570777, 'gamma': 0.002958} (183.1s)
+    fold 1: f1=0.5308 best_params={'C': 0.368901, 'gamma': 0.015678} (140.4s)
+    fold 2: f1=0.5412 best_params={'C': 10.536033, 'gamma': 0.007991} (187.6s)
+  OK svm/smote/bayesian_optuna -- f1=0.5383+/-0.0053 roc_auc=0.7623+/-0.0049 (511.5s)
+
+=== svm / adasyn / grid_search ===
+    fold 0: f1=0.5362 best_params={'C': np.float64(100.0), 'gamma': np.float64(0.002154)} (96.7s)
+    fold 1: f1=0.5221 best_params={'C': np.float64(100.0), 'gamma': np.float64(0.002154)} (97.0s)
+    fold 2: f1=0.5289 best_params={'C': np.float64(0.215443), 'gamma': np.float64(0.046416)} (92.2s)
+  OK svm/adasyn/grid_search -- f1=0.5290+/-0.0058 roc_auc=0.7633+/-0.0071 (286.2s)
+
+=== svm / adasyn / random_search ===
+    fold 0: f1=0.5358 best_params={'C': 5.456725, 'gamma': 0.005762} (97.3s)
+    fold 1: f1=0.5219 best_params={'C': 5.456725, 'gamma': 0.005762} (96.6s)
+    fold 2: f1=0.5308 best_params={'C': 5.456725, 'gamma': 0.005762} (96.5s)
+  OK svm/adasyn/random_search -- f1=0.5295+/-0.0058 roc_auc=0.7642+/-0.0058 (290.8s)
+
+=== svm / adasyn / bayesian_optuna ===
+    fold 0: f1=0.5363 best_params={'C': 58.173179, 'gamma': 0.002395} (170.4s)
+    fold 1: f1=0.5207 best_params={'C': 7.941838, 'gamma': 0.003763} (154.7s)
+    fold 2: f1=0.5324 best_params={'C': 32.570777, 'gamma': 0.002958} (166.8s)
+  OK svm/adasyn/bayesian_optuna -- f1=0.5298+/-0.0066 roc_auc=0.7626+/-0.0055 (492.2s)
+
+=== svm / class_weight / grid_search ===
+    fold 0: f1=0.5398 best_params={'C': np.float64(100.0), 'gamma': np.float64(0.002154)} (75.1s)
+    fold 1: f1=0.5318 best_params={'C': np.float64(100.0), 'gamma': np.float64(0.002154)} (74.4s)
+    fold 2: f1=0.5431 best_params={'C': np.float64(0.215443), 'gamma': np.float64(0.046416)} (70.5s)
+  OK svm/class_weight/grid_search -- f1=0.5383+/-0.0047 roc_auc=0.7640+/-0.0091 (220.3s)
+
+=== svm / class_weight / random_search ===
+    fold 0: f1=0.5409 best_params={'C': 5.456725, 'gamma': 0.005762} (79.5s)
+    fold 1: f1=0.5312 best_params={'C': 5.456725, 'gamma': 0.005762} (80.4s)
+    fold 2: f1=0.5396 best_params={'C': 5.456725, 'gamma': 0.005762} (79.7s)
+  OK svm/class_weight/random_search -- f1=0.5372+/-0.0043 roc_auc=0.7638+/-0.0081 (239.9s)
+
+=== svm / class_weight / bayesian_optuna ===
+    fold 0: f1=0.5406 best_params={'C': 4.09877, 'gamma': 0.00664} (162.4s)
+    fold 1: f1=0.5303 best_params={'C': 4.555327, 'gamma': 0.010897} (147.6s)
+    fold 2: f1=0.5443 best_params={'C': 0.579423, 'gamma': 0.036036} (103.1s)
+  OK svm/class_weight/bayesian_optuna -- f1=0.5384+/-0.0059 roc_auc=0.7639+/-0.0091 (413.4s)
+
+=== svm / none / genetic_deap ===
+    fold 0: f1=0.4337 best_params={'C': 0.480272, 'gamma': 0.027714} (987.8s)
+    fold 1: f1=0.4460 best_params={'C': 0.229616, 'gamma': 0.027714} (536.9s)
+    fold 2: f1=0.4372 best_params={'C': 3.976837, 'gamma': 0.006378} (710.1s)
+  OK svm/none/genetic_deap -- f1=0.4390+/-0.0051 roc_auc=0.7207+/-0.0068 (2235.1s)
+
+=== svm / smote / genetic_deap ===
+    fold 0: f1=0.5432 best_params={'C': 100.0, 'gamma': 0.00222} (1074.0s)
+    fold 1: f1=0.5311 best_params={'C': 0.227255, 'gamma': 0.022754} (565.1s)
+    fold 2: f1=0.5379 best_params={'C': 3.976837, 'gamma': 0.009738} (583.9s)
+  OK svm/smote/genetic_deap -- f1=0.5374+/-0.0049 roc_auc=0.7632+/-0.0052 (2223.2s)
+
+=== svm / adasyn / genetic_deap ===
+    fold 0: f1=0.5353 best_params={'C': 67.429865, 'gamma': 0.001724} (894.9s)
+    fold 1: f1=0.5191 best_params={'C': 0.395338, 'gamma': 0.022754} (559.8s)
+    fold 2: f1=0.5340 best_params={'C': 0.227255, 'gamma': 0.022754} (556.7s)
+  OK svm/adasyn/genetic_deap -- f1=0.5295+/-0.0074 roc_auc=0.7659+/-0.0061 (2011.7s)
+
+=== svm / class_weight / genetic_deap ===
+    fold 0: f1=0.5404 best_params={'C': 0.399445, 'gamma': 0.022754} (478.5s)
+    fold 1: f1=0.5315 best_params={'C': 66.73647, 'gamma': 0.003513} (976.3s)
+    fold 2: f1=0.5437 best_params={'C': 3.976837, 'gamma': 0.017082} (489.7s)
+  OK svm/class_weight/genetic_deap -- f1=0.5385+/-0.0052 roc_auc=0.7635+/-0.0091 (1944.9s)
+
+Listo. Filas guardadas en: /content/drive/MyDrive/svm_resultados/svm_gpu_results.csv
+```
+
+</details>
+
+<!-- nb:md cell=34 -->
+## 15. Resultado final + descarga
+
+<!-- nb:code cell=35 -->
+<details><summary>Código (9 líneas)</summary>
+
+```{python nb07_c35, eval=FALSE}
+final_results = pd.read_csv(RESULTS_CSV_PATH) if RESULTS_CSV_PATH.exists() else pd.DataFrame()
+display(final_results)
+
+if ERRORS_LOG_PATH.exists():
+    print("\nHubo errores en algunas combinaciones -- revisar antes de dar por completo el batch:")
+    display(pd.read_csv(ERRORS_LOG_PATH)[["technique", "method", "elapsed_seconds", "error"]])
+
+from google.colab import files
+files.download(str(RESULTS_CSV_PATH))
+```
+
+</details>
+
+<!-- nb:table cell=35 -->
+```{r nb07_t35_1, echo=FALSE}
+mostrar_tabla("07_svm_gpu_colab", "cell35_1.csv")
+```
+
+<!-- nb:text cell=35 -->
+```text
+<IPython.core.display.Javascript object><IPython.core.display.Javascript object>
+```

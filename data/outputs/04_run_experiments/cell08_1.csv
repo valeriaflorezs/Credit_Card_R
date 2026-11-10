@@ -1,0 +1,12 @@
+,model,technique,method,accuracy,precision,recall,f1,roc_auc
+79,random_forest,class_weight,genetic_deap,0.7776 ± 0.0053,0.498 ± 0.0098,0.6042 ± 0.0092,0.546 ± 0.0088,0.7813 ± 0.0056
+77,random_forest,class_weight,random_search,0.7759 ± 0.007,0.4951 ± 0.0129,0.6071 ± 0.006,0.5453 ± 0.0088,0.782 ± 0.0045
+62,xgboost,class_weight,bayesian_optuna,0.7726 ± 0.0094,0.4896 ± 0.0161,0.6154 ± 0.0089,0.5451 ± 0.0099,0.7817 ± 0.0041
+76,random_forest,class_weight,grid_search,0.7743 ± 0.004,0.492 ± 0.0072,0.6103 ± 0.0112,0.5448 ± 0.0074,0.7833 ± 0.0039
+78,random_forest,class_weight,bayesian_optuna,0.7785 ± 0.0068,0.4998 ± 0.0126,0.598 ± 0.0035,0.5444 ± 0.0079,0.7804 ± 0.0055
+...,...,...,...,...,...,...,...,...
+82,knn,none,bayesian_optuna,0.8023 ± 0.0028,0.5924 ± 0.0134,0.3418 ± 0.0019,0.4334 ± 0.0038,0.7318 ± 0.0146
+19,logistic_regression,none,genetic_deap,0.8071 ± 0.0017,0.6599 ± 0.0114,0.2647 ± 0.0024,0.3778 ± 0.0037,0.75 ± 0.0096
+16,logistic_regression,none,grid_search,0.8071 ± 0.0017,0.6597 ± 0.0113,0.2647 ± 0.0024,0.3778 ± 0.0037,0.75 ± 0.0096
+17,logistic_regression,none,random_search,0.8071 ± 0.0017,0.6597 ± 0.0113,0.2647 ± 0.0024,0.3778 ± 0.0037,0.75 ± 0.0096
+18,logistic_regression,none,bayesian_optuna,0.8071 ± 0.0017,0.6597 ± 0.0113,0.2647 ± 0.0024,0.3778 ± 0.0037,0.75 ± 0.0096

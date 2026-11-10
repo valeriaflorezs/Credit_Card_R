@@ -1,0 +1,2 @@
+,modelo,accuracy (score),log_loss (error),roc_auc
+0,Regresión Logística (base),0.8056,0.4552,0.7407

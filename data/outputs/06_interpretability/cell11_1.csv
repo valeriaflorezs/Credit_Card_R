@@ -1,0 +1,11 @@
+,feature,shap_value,lime_weight
+0,remainder__PAY_0,1.271134,0.151140
+1,remainder__BILL_AMT_MEAN_6M_LOG,0.645500,0.069701
+2,remainder__BILL_AMT_TREND_6M_LOG,0.279066,NaN
+3,remainder__LIMIT_BAL_LOG,-0.233314,-0.090640
+4,remainder__PAY_3,0.212533,0.085833
+5,remainder__PAY_5,0.151020,NaN
+6,remainder__PAY_4,0.142220,0.048580
+7,remainder__PAY_2,0.125343,0.053187
+8,remainder__PAY_AMT1_LOG,0.120100,0.047900
+9,remainder__PAY_AMT4_LOG,0.102073,0.027926

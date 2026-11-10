@@ -1,9 +1,119 @@
-/* Estilos adicionales del libro */
-.book .book-body .page-wrapper .page-inner section.normal table { font-size: 0.9em; }
+/* Tema del libro: misma paleta y estilo que el tablero (dash-credit-kv).
+   Adaptado del tema del Jupyter Book (_static/dash_theme.css) a la estructura de bookdown (gitbook). */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
-/* Portada */
-.portada { text-align: center; padding: 2.5em 1em; margin-bottom: 1.5em; border-bottom: 3px solid #c9a227; background: #0f2a4a; color: #fff; border-radius: 6px; }
-.portada p { margin: 0.6em 0; color: #fff; }
-.portada-titulo { font-size: 1.6em; font-weight: 700; line-height: 1.3; }
-.portada-autoras { font-size: 1.15em; color: #e8c85a !important; }
-.portada-inst { font-size: 0.95em; opacity: 0.9; }
+:root {
+  --deep: #1A233D;
+  --navy: #36456D;
+  --pale: #D2BB89;
+  --gold: #B88F3D;
+  --cream: #F3EFE7;
+  --surface: #FFFFFF;
+  --text: #1A233D;
+  --muted: #5D667F;
+  --line: rgba(26, 35, 61, .10);
+  --line-strong: rgba(26, 35, 61, .24);
+  --note-bg: #F6F0E1;
+  --tech-bg: #ECEEF4;
+  --code-bg: #EBE5D5;
+  --zebra: #FAF8F3;
+}
+
+.book, .book .book-body, .book .book-body .body-inner {
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+}
+.book .book-body, .book .book-body .body-inner, .book .book-body .page-wrapper .page-inner section.normal { background: var(--cream); }
+
+/* ---- Títulos ---- */
+.book .book-body .page-wrapper .page-inner section.normal h1,
+.book .book-body .page-wrapper .page-inner section.normal h2,
+.book .book-body .page-wrapper .page-inner section.normal h3,
+.book .book-body .page-wrapper .page-inner section.normal h4 { font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+.book .book-body .page-wrapper .page-inner section.normal h1 { font-weight: 800; }
+.book .book-body .page-wrapper .page-inner section.normal h2 { padding-bottom: .35rem; border-bottom: 2px solid var(--gold); display: inline-block; }
+.book .book-body .page-wrapper .page-inner section.normal h3 { color: var(--navy); }
+.book .book-body .page-wrapper .page-inner section.normal a { color: var(--navy); }
+.book .book-body .page-wrapper .page-inner section.normal a:hover { color: var(--gold); }
+
+/* ---- Barra lateral oscura, como en el tablero ---- */
+.book .book-summary { background: #1A233D; border-right: 0; color: #D3D8E5; }
+.book .book-summary ul.summary li a, .book .book-summary ul.summary li span { color: #D3D8E5; background: transparent; }
+.book .book-summary ul.summary li a:hover { background: rgba(255, 255, 255, .06); color: #FFFFFF; text-decoration: none; }
+.book .book-summary ul.summary li.active > a { background: rgba(255, 255, 255, .10); color: #FFFFFF; box-shadow: inset 3px 0 0 #D2BB89; font-weight: 600; }
+.book .book-summary ul.summary li.divider { background: rgba(255, 255, 255, .10); }
+.book .book-summary ul.summary li a { border-radius: 8px; }
+
+/* ---- Tablas: encabezado azul profundo, cebra y desplazamiento horizontal ---- */
+.book .book-body .page-wrapper .page-inner section.normal table {
+  display: block; overflow-x: auto; max-width: 100%;
+  font-size: 0.9em; border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+}
+.book .book-body .page-wrapper .page-inner section.normal table thead th { background: #1A233D; color: #FFFFFF; font-weight: 600; border: 0; text-align: left; }
+.book .book-body .page-wrapper .page-inner section.normal table tbody tr:nth-child(even) td { background: var(--zebra); }
+.book .book-body .page-wrapper .page-inner section.normal table td,
+.book .book-body .page-wrapper .page-inner section.normal table th { padding: .5rem .75rem; border-color: var(--line); }
+
+/* ---- Código en línea y plegables ---- */
+.book .book-body .page-wrapper .page-inner section.normal code:not(.sourceCode) { background: var(--code-bg); color: var(--text); border-radius: 6px; padding: .05em .35em; border: 0; }
+.book .book-body .page-wrapper .page-inner section.normal details { margin: 0.6em 0; }
+.book .book-body .page-wrapper .page-inner section.normal summary { cursor: pointer; color: var(--navy); font-weight: 600; }
+
+/* ---- Viñetas con marcador dorado ---- */
+.book .book-body .page-wrapper .page-inner section.normal ul > li::marker { color: var(--gold); }
+.book .book-body .page-wrapper .page-inner section.normal ol > li::marker { color: var(--navy); font-weight: 700; }
+
+/* ---- Tarjetas (grid) y recuadros propios ---- */
+.cc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin: 1rem 0 1.4rem; }
+.cc-gcard, .cc-box {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(26, 35, 61, .05), 0 8px 24px rgba(26, 35, 61, .05);
+  padding: 1rem 1.2rem;
+}
+.cc-gcard > :last-child, .cc-box > :last-child { margin-bottom: 0; }
+.cc-gtitle { font-weight: 700; margin: 0 0 .4rem; }
+.cc-gtitle a { text-decoration: none; }
+.cc-gcard:hover { border-color: var(--gold); }
+.cc-box { margin: 1rem 0; padding: 1.1rem 1.4rem; }
+.cc-box.cc-resumen { border-left: 4px solid var(--gold); text-align: justify; padding: 1.2rem 1.6rem; }
+.cc-step { border-top: 4px solid var(--navy); }
+.cc-kpi { border-left: 4px solid var(--gold); padding: .8rem 1.1rem; }
+.cc-kpi .kpi-label { font-size: .8rem; font-weight: 600; color: var(--muted); margin: 0; }
+.cc-kpi .kpi-value { font-size: 1.9rem; font-weight: 800; color: var(--text); line-height: 1.15; margin: .15rem 0; }
+.cc-kpi .kpi-note { font-size: .78rem; color: var(--muted); margin: 0; }
+
+/* ---- Recuadros de aviso (admonitions) ---- */
+.admonition { border: 1px solid var(--line); border-left: 4px solid var(--navy); border-radius: 12px; background: var(--tech-bg); padding: .8rem 1.2rem; margin: 1rem 0; }
+.admonition > .admonition-title { font-weight: 700; color: var(--text); margin: 0 0 .4rem; }
+.admonition > :last-child { margin-bottom: 0; }
+.admonition.cc-pregunta, .admonition.cc-limites, .admonition.note, .admonition.warning { background: var(--note-bg); border-left-color: var(--gold); }
+.admonition.cc-pregunta p:not(.admonition-title) { font-size: 1.12rem; font-weight: 700; }
+
+/* ---- Fórmulas en recuadro ---- */
+.cc-formula { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 12px; padding: .5rem 1.2rem; margin: 1rem 0; overflow-x: auto; }
+
+/* ---- Palabras clave como etiquetas ---- */
+.cc-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .8rem 0 0; }
+.cc-chip { background: var(--note-bg); border: 1px solid var(--line-strong); color: var(--text); border-radius: 999px; padding: .15rem .75rem; font-size: .82rem; font-weight: 600; }
+
+/* ---- Portada: tarjeta de crédito ---- */
+.cc-hero { display: grid; grid-template-columns: minmax(280px, 1.1fr) 1fr; gap: 2rem; align-items: center; margin: 1.5rem 0 2rem; }
+@media (max-width: 800px) { .cc-hero { grid-template-columns: 1fr; } }
+.cc-card {
+  aspect-ratio: 1.586; border-radius: 20px; padding: 1.4rem 1.6rem; color: #F3EFE7;
+  background: radial-gradient(circle at 85% 18%, rgba(255,255,255,.10) 0, transparent 40%), linear-gradient(135deg, #36456D 0%, #1A233D 70%);
+  box-shadow: 0 24px 40px -18px rgba(26,35,61,.55);
+  display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,.12);
+}
+.cc-card-top { display: flex; justify-content: space-between; align-items: center; font-weight: 700; letter-spacing: .04em; color: var(--pale); }
+.cc-chip-ic { width: 50px; height: 38px; border-radius: 8px; background: linear-gradient(135deg, #E9D7A3, #B88F3D); border: 1px solid rgba(0,0,0,.2);
+  background-image: linear-gradient(135deg, #E9D7A3, #B88F3D), repeating-linear-gradient(0deg, transparent 0 11px, rgba(0,0,0,.18) 11px 12px); background-blend-mode: multiply; }
+.cc-number { white-space: nowrap; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: clamp(.8rem, 1.7vw, 1.3rem); letter-spacing: .1em; }
+.cc-card-bottom { display: flex; justify-content: space-between; align-items: flex-end; font-size: .78rem; letter-spacing: .08em; }
+.cc-card-bottom small { display: block; color: #AEB6CC; font-weight: 400; letter-spacing: .04em; margin-bottom: .15rem; }
+.cc-card-bottom strong { text-transform: uppercase; font-weight: 600; }
+.cc-hero-text .cc-kicker { color: var(--gold); font-weight: 700; margin: 0 0 .4rem; }
+.cc-hero-text p { margin: .3rem 0; color: var(--muted); }
+.cc-hero-text .cc-names { color: var(--text); font-weight: 700; font-size: 1.1rem; }
+a.cc-btn, .book .book-body .page-wrapper .page-inner section.normal a.cc-btn { display: inline-block; margin-top: .8rem; background: var(--navy) !important; color: #FFFFFF !important; padding: .6rem 1.2rem; border-radius: 8px; font-weight: 600; text-decoration: none; }
+a.cc-btn:hover { background: #1A233D !important; }

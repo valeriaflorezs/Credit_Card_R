@@ -1,0 +1,4 @@
+,model,f1_mean,f1_std,dif. frente a las 112
+0,catboost,0.5480,0.0088,0.0015
+1,cs_fof,0.5479,0.0054,0.0014
+3,lightgbm,0.5462,0.0086,-0.0004

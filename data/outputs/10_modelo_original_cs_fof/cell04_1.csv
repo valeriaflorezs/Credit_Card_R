@@ -1,0 +1,11 @@
+,puesto,model,grupo,technique,method,f1_mean,f1_std,precision_mean,recall_mean,roc_auc_mean
+0,1,catboost,nuevo,class_weight,random_search,0.5480,0.0088,0.4840,0.6317,0.7838
+1,2,cs_fof,nuevo,class_weight,random_search,0.5479,0.0054,0.5148,0.5864,0.7847
+2,3,xgboost,tradicional,class_weight,bayesian_optuna,0.5466,0.0091,0.4927,0.6149,0.7828
+3,4,lightgbm,nuevo,class_weight,bayesian_optuna,0.5462,0.0086,0.4878,0.6207,0.7843
+4,5,random_forest,tradicional,class_weight,random_search,0.5452,0.0077,0.4974,0.6041,0.7831
+5,6,svm,tradicional,smote,random_search,0.5387,0.0048,0.4795,0.6148,0.7638
+6,7,knn,tradicional,class_weight,random_search,0.5264,0.0122,0.4569,0.6208,0.7629
+7,8,decision_tree,tradicional,class_weight,bayesian_optuna,0.5254,0.0043,0.4788,0.5854,0.7569
+8,9,logistic_regression,tradicional,class_weight,genetic_deap,0.5182,0.0104,0.4484,0.6139,0.7449
+9,10,naive_bayes,tradicional,smote,grid_search,0.4987,0.0078,0.4136,0.6279,0.7454

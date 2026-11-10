@@ -1,0 +1,5 @@
+technique,F1 medio,rango medio
+class_weight,0.5263,1.2500
+smote,0.5195,1.8214
+adasyn,0.5126,2.9286
+none,0.4549,4.0000

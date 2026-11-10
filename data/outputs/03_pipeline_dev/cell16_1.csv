@@ -1,0 +1,5 @@
+,model,technique,method,f1_mean,f1_std
+0,logistic_regression,none,random_search,0.529900,0.041528
+1,logistic_regression,class_weight,random_search,0.552394,0.040199
+2,decision_tree,none,random_search,0.554688,0.054688
+3,decision_tree,class_weight,random_search,0.518280,0.015054

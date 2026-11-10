@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Marco del proyecto | Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning</title>
+  <meta name="description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y los notebooks del proyecto Default of Credit Card Clients." />
+  <meta name="generator" content="bookdown 0.48 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Marco del proyecto | Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y los notebooks del proyecto Default of Credit Card Clients." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Marco del proyecto | Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning" />
+  
+  <meta name="twitter:description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y los notebooks del proyecto Default of Credit Card Clients." />
+  
+
+<meta name="author" content="Katherin Barrera López y Valeria Florez Sarmiento" />
+
+
+<meta name="date" content="2026-09-11" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="nb00.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.12.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Credit Card Default (Barrera y Florez)</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Portada</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#resumen"><i class="fa fa-check"></i>Resumen</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#resultados-en-cifras"><i class="fa fa-check"></i>Resultados en cifras</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contenido-del-libro"><i class="fa fa-check"></i>Contenido del libro</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html"><i class="fa fa-check"></i>Marco del proyecto</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#introducci%C3%B3n"><i class="fa fa-check"></i>Introducción</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#planteamiento-del-problema"><i class="fa fa-check"></i>Planteamiento del problema</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#hip%C3%B3tesis-exploratorias"><i class="fa fa-check"></i>Hipótesis exploratorias</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#justificaci%C3%B3n"><i class="fa fa-check"></i>Justificación</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#objetivos"><i class="fa fa-check"></i>Objetivos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#alcance-y-limitaciones"><i class="fa fa-check"></i>Alcance y limitaciones</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#marco-te%C3%B3rico"><i class="fa fa-check"></i>Marco teórico</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#riesgo-de-cr%C3%A9dito-y-default"><i class="fa fa-check"></i>Riesgo de crédito y <em>default</em></a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#an%C3%A1lisis-exploratorio-de-datos"><i class="fa fa-check"></i>Análisis exploratorio de datos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#valores-at%C3%ADpicos-y-asimetr%C3%ADa"><i class="fa fa-check"></i>Valores atípicos y asimetría</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#desbalance-de-clases"><i class="fa fa-check"></i>Desbalance de clases</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#correlaci%C3%B3n-de-spearman-y-multicolinealidad"><i class="fa fa-check"></i>Correlación de Spearman y multicolinealidad</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#asociaci%C3%B3n-y-comparaci%C3%B3n-de-grupos"><i class="fa fa-check"></i>Asociación y comparación de grupos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#calibraci%C3%B3n-de-probabilidades"><i class="fa fa-check"></i>Calibración de probabilidades</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#antecedentes"><i class="fa fa-check"></i>Antecedentes</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#diccionario-de-variables"><i class="fa fa-check"></i>Diccionario de variables</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#metodolog%C3%ADa"><i class="fa fa-check"></i>Metodología</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#datos"><i class="fa fa-check"></i>Datos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#etl"><i class="fa fa-check"></i>ETL</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#an%C3%A1lisis-exploratorio"><i class="fa fa-check"></i>Análisis exploratorio</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#modelo-base"><i class="fa fa-check"></i>Modelo base</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#dise%C3%B1o-experimental"><i class="fa fa-check"></i>Diseño experimental</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#modelo-original-y-m%C3%A9todos-recientes"><i class="fa fa-check"></i>Modelo original y métodos recientes</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#interpretabilidad"><i class="fa fa-check"></i>Interpretabilidad</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#estructura-del-libro"><i class="fa fa-check"></i>Estructura del libro</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#referencias"><i class="fa fa-check"></i>Referencias</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html"><i class="fa fa-check"></i>EDA: Análisis Exploratorio de Datos</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#tipo-y-descripci%C3%B3n-de-las-variables"><i class="fa fa-check"></i>Tipo y descripción de las variables</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#valores-nulos-y-duplicados"><i class="fa fa-check"></i>Valores nulos y duplicados</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#categor%C3%ADas-no-documentadas-valores-centinela"><i class="fa fa-check"></i>Categorías no documentadas / valores centinela</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#montos-de-facturaci%C3%B3n-negativos"><i class="fa fa-check"></i>Montos de facturación negativos</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#an%C3%A1lisis-de-la-variable-objetivo"><i class="fa fa-check"></i>Análisis de la variable objetivo</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#an%C3%A1lisis-univariado"><i class="fa fa-check"></i>Análisis Univariado</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#estad%C3%ADsticos-descriptivos-completos"><i class="fa fa-check"></i>1.1 Estadísticos descriptivos completos</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#visualizaci%C3%B3n-interactiva"><i class="fa fa-check"></i>1.2 Visualización interactiva</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#an%C3%A1lisis-bivariado"><i class="fa fa-check"></i>Análisis Bivariado</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#pruebas-de-hip%C3%B3tesis-y-comparaci%C3%B3n-de-grupos"><i class="fa fa-check"></i>2.1 Pruebas de hipótesis y comparación de grupos</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#visualizaciones-segmentadas-por-default"><i class="fa fa-check"></i>2.2 Visualizaciones segmentadas por default</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#multicolinealidad"><i class="fa fa-check"></i>Multicolinealidad</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#matriz-de-correlaci%C3%B3n"><i class="fa fa-check"></i>3.1 Matriz de correlación</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#factor-de-inflaci%C3%B3n-de-la-varianza-vif"><i class="fa fa-check"></i>3.2 Factor de Inflación de la Varianza (VIF)</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#coordenadas-paralelas-interacci%C3%B3n-conjunta-entre-las-variables-de-facturaci%C3%B3n"><i class="fa fa-check"></i>3.3 Coordenadas paralelas: interacción conjunta entre las variables de facturación</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#parte-4-interpretabilidad-avanzada-con-shap"><i class="fa fa-check"></i>PARTE 4: Interpretabilidad Avanzada con SHAP</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#importancia-global-mean-shap"><i class="fa fa-check"></i>4.1 Importancia global (mean |SHAP|)</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#beeswarm-interactivo-todas-las-variables"><i class="fa fa-check"></i>4.2 Beeswarm interactivo (todas las variables)</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#gr%C3%A1fico-de-dependencia"><i class="fa fa-check"></i>4.3 Gráfico de dependencia</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#interpretabilidad-1"><i class="fa fa-check"></i>4.4 Interpretabilidad</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#parte-5-preprocesamiento-resoluci%C3%B3n-de-los-hallazgos"><i class="fa fa-check"></i>PARTE 5: Preprocesamiento: resolución de los hallazgos</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#construcci%C3%B3n-del-dataset-final"><i class="fa fa-check"></i>5.1 Construcción del dataset final</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#efecto-de-las-transformaciones"><i class="fa fa-check"></i>5.2 Efecto de las transformaciones</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#verificaci%C3%B3n-de-que-cada-hallazgo-qued%C3%B3-resuelto"><i class="fa fa-check"></i>5.3 Verificación de que cada hallazgo quedó resuelto</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#qu%C3%A9-recibe-el-modelado"><i class="fa fa-check"></i>5.4 Qué recibe el modelado</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#conclusiones-generales-del-eda"><i class="fa fa-check"></i>Conclusiones generales del EDA</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html"><i class="fa fa-check"></i>01. Modelo base: Regresión Logística</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#preparaci%C3%B3n-de-los-datos"><i class="fa fa-check"></i>1. Preparación de los datos</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#carga-del-dataset-final"><i class="fa fa-check"></i>1.1 Carga del dataset final</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#divisi%C3%B3n-traintest-encoding-y-escalado"><i class="fa fa-check"></i>2. División train/test, encoding y escalado</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#ajuste-del-modelo"><i class="fa fa-check"></i>3. Ajuste del modelo</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#evaluaci%C3%B3n-score-error-y-auc-roc"><i class="fa fa-check"></i>4. Evaluación: score, error y AUC-ROC</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#coeficientes-del-modelo"><i class="fa fa-check"></i>5. Coeficientes del modelo</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#matriz-de-confusi%C3%B3n-reporte-de-clasificaci%C3%B3n-y-curva-roc"><i class="fa fa-check"></i>6. Matriz de confusión, reporte de clasificación y curva ROC</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#s%C3%ADntesis"><i class="fa fa-check"></i>7. Síntesis</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb02.html"><a href="nb02.html"><i class="fa fa-check"></i>02. Verificación del protocolo experimental</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html"><i class="fa fa-check"></i>03. Desarrollo y prueba del pipeline completo</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#datos-sint%C3%A9ticos"><i class="fa fa-check"></i>1. Datos sintéticos</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#preprocesamiento-encoding-scaling-condicional"><i class="fa fa-check"></i>2. Preprocesamiento: encoding + scaling condicional</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#balanceo-compatibilidad-por-modelo"><i class="fa fa-check"></i>3. Balanceo: compatibilidad por modelo</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#modelos-base-y-espacios-de-b%C3%BAsqueda"><i class="fa fa-check"></i>4. Modelos base y espacios de búsqueda</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#optimizaci%C3%B3n-los-4-m%C3%A9todos-en-miniatura"><i class="fa fa-check"></i>5. Optimización: los 4 métodos, en miniatura</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#validaci%C3%B3n-cruzada-anidada-inner-vs.-outer"><i class="fa fa-check"></i>6. Validación cruzada anidada: inner vs. outer</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#orquestador-unas-pocas-combinaciones"><i class="fa fa-check"></i>7. Orquestador: unas pocas combinaciones</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#complejidad-computacional-est%C3%A1ndar-vs.-optimizado"><i class="fa fa-check"></i>8. Complejidad computacional: estándar vs. optimizado</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#evaluaci%C3%B3n-y-calibraci%C3%B3n"><i class="fa fa-check"></i>9. Evaluación y calibración</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#interpretabilidad-shap-r%C3%A1pido"><i class="fa fa-check"></i>10. Interpretabilidad: SHAP rápido</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#comparaci%C3%B3n-estad%C3%ADstica-jer%C3%A1rquica"><i class="fa fa-check"></i>11. Comparación estadística jerárquica</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html"><i class="fa fa-check"></i>04. Ejecutar experimentos</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#cargar-datos"><i class="fa fa-check"></i>Cargar datos</a></li>
+<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#configuraci%C3%B3n-de-la-corrida"><i class="fa fa-check"></i>Configuración de la corrida</a></li>
+<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#resultado"><i class="fa fa-check"></i>Resultado</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html"><i class="fa fa-check"></i>05. Análisis de resultados</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#objetivo-prioritario"><i class="fa fa-check"></i>Objetivo prioritario:</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#cargar-datos-y-tabla-maestra"><i class="fa fa-check"></i>Cargar datos y tabla maestra</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#tabla-de-m%C3%A9tricas-media-y-desviaci%C3%B3n-est%C3%A1ndar-outer-loop"><i class="fa fa-check"></i>Tabla de métricas (media y desviación estándar, outer loop)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#m%C3%A9tricas-complementarias-independientes-del-umbral"><i class="fa fa-check"></i>Métricas complementarias (independientes del umbral)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#cobertura-de-la-grilla-112-combinaciones-te%C3%B3ricas"><i class="fa fa-check"></i>Cobertura de la grilla: 112 combinaciones teóricas</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#comparaci%C3%B3n-estad%C3%ADstica-jer%C3%A1rquica-1"><i class="fa fa-check"></i>Comparación estadística jerárquica</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#comparaci%C3%B3n-por-factor-del-dise%C3%B1o-t%C3%A9cnica-m%C3%A9todo-de-optimizaci%C3%B3n-modelo"><i class="fa fa-check"></i>Comparación por factor del diseño (técnica, método de optimización, modelo)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#combinaci%C3%B3n-con-mayor-f1-medio-matriz-de-confusi%C3%B3n-y-curva-roc"><i class="fa fa-check"></i>Combinación con mayor F1 medio: matriz de confusión y curva ROC</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#calibraci%C3%B3n-brier-ece-reliability-diagram-recalibraci%C3%B3n-si-corresponde"><i class="fa fa-check"></i>Calibración: Brier, ECE, reliability diagram (+ recalibración si corresponde)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#complejidad-computacional-est%C3%A1ndar-vs.-optimizado-1"><i class="fa fa-check"></i>Complejidad computacional: estándar vs. optimizado</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#siguiente-paso"><i class="fa fa-check"></i>Siguiente Paso</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#siguiente-paso-modelo-original-y-m%C3%A9todos-recientes"><i class="fa fa-check"></i>Siguiente paso: modelo original y métodos recientes</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#figuras-guardadas-en-resultsfigures"><i class="fa fa-check"></i>Figuras guardadas en results/figures</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html"><i class="fa fa-check"></i>06. Interpretabilidad (SHAP y LIME)</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#elegir-el-mejor-modelo-y-ajustar-su-pipeline"><i class="fa fa-check"></i>Elegir el mejor modelo y ajustar su pipeline</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-global-summary-plot"><i class="fa fa-check"></i>SHAP global (summary plot)</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-local-una-observaci%C3%B3n-bien-clasificada-y-una-con-error-alto"><i class="fa fa-check"></i>SHAP local: una observación bien clasificada y una con error alto</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#lime-vs.-shap-espec%C3%ADficamente-para-xgboost"><i class="fa fa-check"></i>LIME vs. SHAP (específicamente para XGBoost)</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#discusi%C3%B3n-cu%C3%A1ndo-divergen-lime-y-shap"><i class="fa fa-check"></i>Discusión: ¿cuándo divergen LIME y SHAP?</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-y-lime-con-m%C3%A1s-de-un-fold-y-m%C3%A1s-de-una-observaci%C3%B3n"><i class="fa fa-check"></i>SHAP y LIME con más de un fold y más de una observación</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-global-en-los-5-folds-externos"><i class="fa fa-check"></i>5. SHAP global en los 5 folds externos</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#lime-frente-a-shap-en-200-observaciones-por-modelo"><i class="fa fa-check"></i>6. LIME frente a SHAP en 200 observaciones por modelo</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#figuras-guardadas-en-resultsfigures-1"><i class="fa fa-check"></i>Figuras guardadas en results/figures</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html"><i class="fa fa-check"></i>SVM + RBF acelerado por GPU (cuML/RAPIDS)</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#verificar-gpu-asignada"><i class="fa fa-check"></i>1. Verificar GPU asignada</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#instalar-rapids-cuml"><i class="fa fa-check"></i>2. Instalar RAPIDS cuML</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#b.-instalaci%C3%B3n-alternativa-de-cuml-solo-si-la-instalaci%C3%B3n-de-la-secci%C3%B3n-2-fall%C3%B3"><i class="fa fa-check"></i>2b. Instalación alternativa de cuML (solo si la instalación de la sección 2 falló)</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#imports-chequeo-de-versiones"><i class="fa fa-check"></i>3. Imports + chequeo de versiones</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#chequeo-de-compatibilidad-cuml-correr-antes-de-cualquier-combinaci%C3%B3n-real"><i class="fa fa-check"></i>4. Chequeo de compatibilidad cuML (correr ANTES de cualquier combinación real)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#subir-dataset_final.csv"><i class="fa fa-check"></i>5. Subir <code>dataset_final.csv</code></a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#cargar-verificar-y-separar-xy"><i class="fa fa-check"></i>6. Cargar, verificar y separar X/y</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#configuraci%C3%B3n-id%C3%A9ntica-a-srcconfig.py"><i class="fa fa-check"></i>7. Configuración (idéntica a <code>src/config.py</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#espacio-de-b%C3%BAsqueda-de-svm-id%C3%A9ntico-a-models.pymodel_registrysvm"><i class="fa fa-check"></i>8. Espacio de búsqueda de SVM (idéntico a <code>models.py::MODEL_REGISTRY["svm"]</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#preprocesamiento-id%C3%A9ntico-a-preprocessing.py-con-salida-densa"><i class="fa fa-check"></i>9. Preprocesamiento (idéntico a <code>preprocessing.py</code>, con salida densa)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#balanceo-id%C3%A9ntico-a-balancing.py-f%C3%A1brica-del-modelo-cuml"><i class="fa fa-check"></i>10. Balanceo (idéntico a <code>balancing.py</code>) + fábrica del modelo cuML</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#los-4-m%C3%A9todos-de-optimizaci%C3%B3n-id%C3%A9nticos-a-optimization.py"><i class="fa fa-check"></i>11. Los 4 métodos de optimización (idénticos a <code>optimization.py</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#validaci%C3%B3n-cruzada-anidada-id%C3%A9ntica-a-nested_cv.py"><i class="fa fa-check"></i>12. Validación cruzada anidada (idéntica a <code>nested_cv.py</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#selecci%C3%B3n-de-combinaciones-a-correr"><i class="fa fa-check"></i>13. Selección de combinaciones a correr</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#ejecutar-guardado-incremental-una-fila-apenas-termina-cada-combinaci%C3%B3n"><i class="fa fa-check"></i>14. Ejecutar: guardado incremental (una fila apenas termina cada combinación)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#resultado-final-descarga"><i class="fa fa-check"></i>15. Resultado final + descarga</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html"><i class="fa fa-check"></i>08. Tabla maestra consolidada y comparabilidad del SVM</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#tabla-maestra-de-las-112-combinaciones"><i class="fa fa-check"></i>1. Tabla maestra de las 112 combinaciones</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#mejor-combinaci%C3%B3n-por-modelo-y-motivo-de-la-selecci%C3%B3n"><i class="fa fa-check"></i>2. Mejor combinación por modelo y motivo de la selección</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#son-comparables-las-16-filas-de-svm"><i class="fa fa-check"></i>3. ¿Son comparables las 16 filas de SVM?</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#sensibilidad-de-la-comparaci%C3%B3n-estad%C3%ADstica-al-tratamiento-de-svm"><i class="fa fa-check"></i>4. Sensibilidad de la comparación estadística al tratamiento de SVM</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#limitaciones"><i class="fa fa-check"></i>Limitaciones</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html"><i class="fa fa-check"></i>09. Curvas anytime y multi-fidelidad</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#curvas-anytime-arrepentimiento-frente-al-n%C3%BAmero-de-evaluaciones"><i class="fa fa-check"></i>1. Curvas anytime: arrepentimiento frente al número de evaluaciones</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#curvas-anytime-frente-al-costo-de-c%C3%B3mputo"><i class="fa fa-check"></i>2. Curvas anytime frente al costo de cómputo</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#resumen-costo-para-acercarse-al-mejor-score-y-desempe%C3%B1o-en-el-fold-externo"><i class="fa fa-check"></i>3. Resumen: costo para acercarse al mejor score y desempeño en el fold externo</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#multi-fidelidad-hyperband-frente-a-random-search-con-un-costo-comparable"><i class="fa fa-check"></i>4. Multi-fidelidad: Hyperband frente a Random Search con un costo comparable</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#limitaciones-1"><i class="fa fa-check"></i>Limitaciones</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html"><i class="fa fa-check"></i>10. Modelo original (CS-FOF) y métodos recientes</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#la-idea-de-cs-fof"><i class="fa fa-check"></i>1. La idea de CS-FOF</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#mejor-combinaci%C3%B3n-de-cada-modelo"><i class="fa fa-check"></i>2. Mejor combinación de cada modelo</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#la-diferencia-de-cs-fof-es-significativa"><i class="fa fa-check"></i>3. ¿La diferencia de CS-FOF es significativa?</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#ranking-global-friedman-y-nemenyi"><i class="fa fa-check"></i>4. Ranking global: Friedman y Nemenyi</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#comparaci%C3%B3n-sobre-las-mismas-predicciones-delong-y-mcnemar"><i class="fa fa-check"></i>5. Comparación sobre las mismas predicciones: DeLong y McNemar</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#conclusi%C3%B3n-parcial"><i class="fa fa-check"></i>6. Conclusión (parcial)</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html"><i class="fa fa-check"></i>12. Corrida 5 x 5 en Colab (todos los modelos con el mismo código)</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html#resultado-de-esta-sesi%C3%B3n"><i class="fa fa-check"></i>Resultado de esta sesión</a></li>
+<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html#despu%C3%A9s-de-que-terminen-todas-las-sesiones"><i class="fa fa-check"></i>Después de que terminen todas las sesiones</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="marco" class="section level1 hasAnchor">
+<h1>Marco del proyecto<a href="marco.html#marco" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="introducción" class="section level2 hasAnchor">
+<h2>Introducción<a href="marco.html#introducci%C3%B3n" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Las tarjetas de crédito son una de las líneas de la banca minorista con mayor exposición al riesgo: cada cliente
+recibe un cupo (límite de crédito) y se espera que lo pague en las fechas pactadas. Cuando no lo hace, la entidad
+enfrenta pérdidas, mayores costos de cobranza y la necesidad de provisionar capital. Anticipar qué clientes tienen
+mayor probabilidad de incurrir en mora permite ajustar límites de crédito, definir tasas diferenciadas y diseñar
+estrategias de cobranza preventivas <span class="citation">(<a href="#ref-yeh2009">Yeh and Lien 2009</a>)</span>.</p>
+<p>Desde la perspectiva técnica, el problema se ha abordado extensamente como una tarea de clasificación binaria, con
+modelos que van desde la regresión logística hasta métodos de ensamble como Random Forest y <em>gradient boosting</em>,
+evaluados originalmente sobre el conjunto de datos de este trabajo <span class="citation">(<a href="#ref-yeh2009">Yeh and Lien 2009</a>)</span>. Técnicas de interpretabilidad
+como SHAP <span class="citation">(<a href="#ref-lundberg2017">Lundberg and Lee 2017</a>)</span> complementan estos modelos con explicaciones a nivel de variable, algo valioso en
+contextos regulados como el financiero.</p>
+<p>Este libro presenta el análisis del conjunto <em>Default of Credit Card Clients</em> (UCI), con 30,000 clientes de un banco
+de Taiwán observados entre abril y septiembre de 2005. Para cada cliente se conoce su límite de crédito, sus
+características demográficas, su historial de pagos de seis meses, los montos facturados, los montos pagados y si
+incumplió el pago del mes siguiente (variable objetivo). El proyecto se desarrolló en etapas: comprensión del
+problema, proceso ETL, análisis exploratorio (EDA), modelo base de regresión logística, comparación sistemática de
+112 configuraciones de modelos, análisis de resultados e interpretabilidad. El resumen de resultados está en la
+portada y cada etapa se documenta en los capítulos siguientes.</p>
+<div class="cc-grid">
+<div class="cc-gcard cc-kpi">
+<p class="kpi-label">
+Clientes analizados
+</p>
+<p class="kpi-value">
+29,965
+</p>
+<p class="kpi-note">
+tras la limpieza
+</p>
+</div>
+<div class="cc-gcard cc-kpi">
+<p class="kpi-label">
+Columnas finales
+</p>
+<p class="kpi-value">
+21
+</p>
+<p class="kpi-note">
+20 predictoras y el objetivo
+</p>
+</div>
+<div class="cc-gcard cc-kpi">
+<p class="kpi-label">
+Tasa de default
+</p>
+<p class="kpi-value">
+22.1 %
+</p>
+<p class="kpi-note">
+6,630 clientes
+</p>
+</div>
+<div class="cc-gcard cc-kpi">
+<p class="kpi-label">
+Periodo
+</p>
+<p class="kpi-value">
+2005
+</p>
+<p class="kpi-note">
+abril a septiembre, banco de Taiwán
+</p>
+</div>
+</div>
+</div>
+<div id="planteamiento-del-problema" class="section level2 hasAnchor">
+<h2>Planteamiento del problema<a href="marco.html#planteamiento-del-problema" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Una entidad financiera otorga crédito sin saber con certeza quién pagará. Si concede cupos demasiado altos a
+clientes que luego incumplen, la cartera se deteriora: se pierde el capital no recuperado, aumentan los costos de
+cobranza y se deben constituir mayores provisiones. Si, por el contrario, restringe el crédito en exceso, pierde
+ingresos por intereses y comisiones.</p>
+<p>En esta muestra, el 22.1 % de los clientes (6,630) no pagó su tarjeta el mes siguiente. Identificar tempranamente
+qué perfiles y comportamientos anticipan ese incumplimiento es la base para fijar límites, priorizar la cobranza
+preventiva y alimentar un modelo de <em>scoring</em>.</p>
+<p>Los errores no son simétricos: no detectar a quien incumplirá (falso negativo) suele costar más que revisar de más a
+quien sí pagaría (falso positivo). Por eso reportar solo el <em>accuracy</em> es engañoso: un clasificador que siempre
+prediga “no <em>default</em>” ya alcanzaría 77.9 % de <em>accuracy</em> sin detectar a ningún cliente en riesgo.</p>
+<p>Tres dificultades hacen que el problema no se resuelva con un modelo estándar:</p>
+<div class="cc-grid">
+<div class="cc-gcard cc-step">
+<p class="cc-gtitle">
+Desbalance de clases
+</p>
+<p>Un modelo entrenado sin ajustes favorece la clase mayoritaria. La regresión logística base de este proyecto tiene un F1 de la clase minoritaria de cerca de 0.38.</p>
+</div>
+<div class="cc-gcard cc-step">
+<p class="cc-gtitle">
+Calidad y estructura de los datos
+</p>
+<p>Hay duplicados exactos, categorías no documentadas en <code>EDUCATION</code> y <code>MARRIAGE</code>, códigos ambiguos en las variables <code>PAY_x</code>, distribuciones muy asimétricas y una multicolinealidad severa entre las seis variables <code>BILL_AMT</code>.</p>
+</div>
+<div class="cc-gcard cc-step">
+<p class="cc-gtitle">
+Muchas decisiones que interactúan
+</p>
+<p>El algoritmo, la técnica de balanceo y la forma de optimizar los hiperparámetros afectan el resultado y rara vez se comparan de manera conjunta y con una validación que evite la fuga de información.</p>
+</div>
+</div>
+<div class="admonition cc-pregunta">
+<p class="admonition-title">
+Pregunta de investigación
+</p>
+<p>¿Qué características del cliente, de su línea de crédito y de su historial reciente de pagos se asocian con el incumplimiento del mes siguiente, y con qué intensidad?</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">
+Preguntas específicas
+</p>
+<ol style="list-style-type: decimal">
+<li>¿Cómo se distribuyen las variables y qué problemas de calidad presentan?</li>
+<li>¿Qué tan desbalanceada está la variable objetivo?</li>
+<li>¿Qué variables separan mejor a los clientes que incumplen?</li>
+<li>¿Existe redundancia entre las variables predictoras?</li>
+<li>¿Qué combinación de algoritmo, técnica de balanceo y método de optimización de hiperparámetros detecta mejor a
+los clientes en riesgo, y qué parte de la mejora se debe a cada decisión?</li>
+</ol>
+</div>
+</div>
+<div id="hipótesis-exploratorias" class="section level2 hasAnchor">
+<h2>Hipótesis exploratorias<a href="marco.html#hip%C3%B3tesis-exploratorias" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Se contrastan de forma descriptiva y visual a lo largo del EDA.</p>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Hipótesis</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>H1</td>
+<td>El historial reciente de pagos (<code>PAY_0</code> a <code>PAY_6</code>) es el factor más fuertemente asociado al incumplimiento.</td>
+</tr>
+<tr class="even">
+<td>H2</td>
+<td>Los clientes con menor límite de crédito (<code>LIMIT_BAL</code>) presentan una mayor tasa de <em>default</em>.</td>
+</tr>
+<tr class="odd">
+<td>H3</td>
+<td>Las variables demográficas (sexo, educación, estado civil, edad) se asocian con el <em>default</em>, pero con un tamaño de efecto pequeño.</td>
+</tr>
+<tr class="even">
+<td>H4</td>
+<td>Los montos facturados mensuales (<code>BILL_AMT1</code> a <code>BILL_AMT6</code>) están fuertemente correlacionados entre sí (multicolinealidad).</td>
+</tr>
+<tr class="odd">
+<td>H5</td>
+<td>La clase <em>default</em> es minoritaria, por lo que el problema presenta desbalance de clases.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="justificación" class="section level2 hasAnchor">
+<h2>Justificación<a href="marco.html#justificaci%C3%B3n" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="cc-box">
+<p>Un EDA riguroso evita errores costosos en el modelado: revela datos mal codificados, variables redundantes, sesgos de
+muestreo y desbalance antes de que afecten al modelo. Además, en riesgo crediticio el <em>accuracy</em> no basta, y el
+trabajo prioriza métricas sensibles a la clase minoritaria (F1, <em>recall</em>, PR-AUC). Documentar de forma reproducible
+el preprocesamiento y comparar de manera sistemática las alternativas permite separar el aporte real de cada
+decisión (por ejemplo, el balanceo frente al modelo elegido) y evitar conclusiones basadas en una sola
+configuración. También permite explicar a perfiles no técnicos (riesgos, cobranza, gerencia) qué señales preceden al
+incumplimiento, con evidencia visual y estadística.</p>
+</div>
+</div>
+<div id="objetivos" class="section level2 hasAnchor">
+<h2>Objetivos<a href="marco.html#objetivos" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="admonition cc-pregunta">
+<p class="admonition-title">
+Objetivo general
+</p>
+<p>Evaluar de forma sistemática el efecto del preprocesamiento, el algoritmo, la técnica de balanceo y el método de
+optimización de hiperparámetros sobre la capacidad de predecir el incumplimiento de pago de clientes de tarjetas de
+crédito, a partir de un análisis exploratorio univariado y multivariado.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">
+Objetivos específicos
+</p>
+<ol style="list-style-type: decimal">
+<li>Describir la calidad de los datos y documentar la limpieza aplicada (duplicados, categorías no documentadas,
+saldos negativos).</li>
+<li>Caracterizar la distribución de cada variable, su asimetría y la presencia de valores atípicos.</li>
+<li>Cuantificar el desbalance de clases y comparar a los clientes con y sin <em>default</em> según variables demográficas,
+de crédito y de pagos.</li>
+<li>Identificar relaciones entre variables y detectar multicolinealidad (correlaciones y VIF).</li>
+<li>Entrenar un modelo base (regresión logística) sobre una partición <em>train/test</em> libre de fuga de información y
+cuantificar su margen de mejora, con atención a falsos negativos y falsos positivos.</li>
+<li>Comparar 112 configuraciones (7 modelos por 4 técnicas de balanceo por 4 métodos de optimización) con validación
+cruzada anidada y el F1 de la clase <em>default</em> como métrica principal.</li>
+<li>Contrastar estadísticamente las configuraciones, analizar la calibración de probabilidades y el costo
+computacional, e interpretar los modelos con SHAP y LIME.</li>
+</ol>
+</div>
+</div>
+<div id="alcance-y-limitaciones" class="section level2 hasAnchor">
+<h2>Alcance y limitaciones<a href="marco.html#alcance-y-limitaciones" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="admonition cc-limites">
+<p class="admonition-title">
+Qué tener presente
+</p>
+<ul>
+<li>Los datos provienen de un solo banco de Taiwán y de un periodo corto (de abril a septiembre de 2005): no se
+generalizan sin cautela a otros mercados o épocas.</li>
+<li>El análisis es asociativo; una correlación no implica causalidad.</li>
+<li>Los códigos <code>-2</code> y <code>0</code> de <code>PAY_x</code> no están documentados con precisión en la fuente; se conservan sin recodificar.</li>
+<li>Existen grupos de clientes con predictoras idénticas pero etiqueta distinta (ruido propio de la fuente), lo que
+impone un techo al desempeño de cualquier modelo con estas variables.</li>
+<li>Las cifras monetarias están en dólares taiwaneses (NT$).</li>
+</ul>
+</div>
+</div>
+<div id="marco-teórico" class="section level2 hasAnchor">
+<h2>Marco teórico<a href="marco.html#marco-te%C3%B3rico" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="riesgo-de-crédito-y-default" class="section level3 hasAnchor">
+<h3>Riesgo de crédito y <em>default</em><a href="marco.html#riesgo-de-cr%C3%A9dito-y-default" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>El riesgo de crédito es la posibilidad de que una entidad sufra pérdidas porque un deudor no cumple, total o
+parcialmente, sus obligaciones. En la regulación bancaria (Basilea II) la pérdida esperada se descompone así:</p>
+<div class="cc-formula">
+<p><span class="math display">\[
+EL = PD \times LGD \times EAD
+\]</span></p>
+</div>
+<p>donde <span class="math inline">\(PD\)</span> es la probabilidad de incumplimiento en un horizonte dado (lo que estudian estos datos), <span class="math inline">\(LGD\)</span> la fracción
+de la exposición que se pierde si hay incumplimiento y <span class="math inline">\(EAD\)</span> el monto expuesto en ese momento. En este proyecto,
+<em>default</em> es la variable binaria que indica si el cliente no pagó en el mes siguiente. Los modelos de <em>scoring</em>
+estiman la <span class="math inline">\(PD\)</span> a partir del comportamiento de pago, el límite, la deuda y el perfil demográfico.</p>
+</div>
+<div id="análisis-exploratorio-de-datos" class="section level3 hasAnchor">
+<h3>Análisis exploratorio de datos<a href="marco.html#an%C3%A1lisis-exploratorio-de-datos" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Propuesto por Tukey <span class="citation">(<a href="#ref-tukey1977">Tukey 1977</a>)</span>, consiste en explorar los datos con resúmenes numéricos y gráficos antes de
+ajustar modelos, para descubrir patrones, anomalías y supuestos. El análisis univariado estudia una variable a la
+vez; el bivariado y el multivariado, las relaciones entre dos o más variables.</p>
+</div>
+<div id="valores-atípicos-y-asimetría" class="section level3 hasAnchor">
+<h3>Valores atípicos y asimetría<a href="marco.html#valores-at%C3%ADpicos-y-asimetr%C3%ADa" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>La asimetría indica hacia dónde se alarga la cola de una distribución y la curtosis qué tan pesadas son sus colas.
+Según el criterio de Tukey, un valor <span class="math inline">\(x\)</span> es atípico si</p>
+<div class="cc-formula">
+<p><span class="math display">\[
+x &lt; Q_1 - 1.5\,\mathrm{IQR}
+\quad \text{o} \quad
+x &gt; Q_3 + 1.5\,\mathrm{IQR},
+\qquad \mathrm{IQR} = Q_3 - Q_1 .
+\]</span></p>
+</div>
+<p>La winsorización recorta los extremos a percentiles (por ejemplo, P1 y P99) sin eliminar clientes. Para suavizar
+colas largas cuando hay ceros o negativos se usa el logaritmo con signo:</p>
+<div class="cc-formula">
+<p><span class="math display">\[
+\operatorname{slog}(x) = \operatorname{sign}(x)\,\ln\!\left(1 + |x|\right).
+\]</span></p>
+</div>
+</div>
+<div id="desbalance-de-clases" class="section level3 hasAnchor">
+<h3>Desbalance de clases<a href="marco.html#desbalance-de-clases" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Cuando una clase es mucho menos frecuente, un clasificador puede lograr alta exactitud ignorándola. Se recomienda
+ponderar las clases (<code>class_weight</code>), sobremuestrear la minoritaria (SMOTE <span class="citation">(<a href="#ref-chawla2002">Chawla et al. 2002</a>)</span> o ADASYN), ajustar el
+umbral de decisión y evaluar con <span class="math inline">\(F_1\)</span>, <em>recall</em> de la clase minoritaria y AUC en lugar del <em>accuracy</em>. Con <span class="math inline">\(TP\)</span>, <span class="math inline">\(FP\)</span> y
+<span class="math inline">\(FN\)</span> los verdaderos positivos, falsos positivos y falsos negativos de la clase <em>default</em>:</p>
+<div class="cc-formula">
+<p><span class="math display">\[
+\mathrm{Precision} = \frac{TP}{TP + FP}, \qquad
+\mathrm{Recall} = \frac{TP}{TP + FN}, \qquad
+F_1 = \frac{2\,\mathrm{Precision}\cdot\mathrm{Recall}}{\mathrm{Precision} + \mathrm{Recall}} .
+\]</span></p>
+</div>
+</div>
+<div id="correlación-de-spearman-y-multicolinealidad" class="section level3 hasAnchor">
+<h3>Correlación de Spearman y multicolinealidad<a href="marco.html#correlaci%C3%B3n-de-spearman-y-multicolinealidad" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>La correlación de Spearman <span class="citation">(<a href="#ref-spearman1904">Spearman 1904</a>)</span> mide asociación monótona: es la correlación de Pearson aplicada a
+los rangos de los datos,</p>
+<div class="cc-formula">
+<p><span class="math display">\[
+\rho_s = \rho\!\left(\operatorname{rango}(X),\, \operatorname{rango}(Y)\right).
+\]</span></p>
+</div>
+<p>No exige linealidad ni normalidad y resiste los valores extremos, lo que la hace adecuada para montos muy
+asimétricos, variables <code>PAY_x</code> ordinales y un objetivo binario. La multicolinealidad se evalúa con el Factor de
+Inflación de la Varianza, donde <span class="math inline">\(R_j^2\)</span> es el coeficiente de determinación al regresar la variable <span class="math inline">\(j\)</span> sobre las demás
+predictoras:</p>
+<div class="cc-formula">
+<p><span class="math display">\[
+\mathrm{VIF}_j = \frac{1}{1 - R_j^2} .
+\]</span></p>
+</div>
+<p>Un VIF mayor que 10 (algunos autores usan 5) es señal de alerta.</p>
+</div>
+<div id="asociación-y-comparación-de-grupos" class="section level3 hasAnchor">
+<h3>Asociación y comparación de grupos<a href="marco.html#asociaci%C3%B3n-y-comparaci%C3%B3n-de-grupos" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>La prueba <span class="math inline">\(\chi^2\)</span> de independencia contrasta si dos variables categóricas están asociadas; su tamaño de efecto se
+mide con la V de Cramér <span class="citation">(<a href="#ref-cramer1946">Cramér 1946</a>)</span>, con <span class="math inline">\(n\)</span> observaciones y <span class="math inline">\(k\)</span> el menor número de categorías entre las dos
+variables:</p>
+<div class="cc-formula">
+<p><span class="math display">\[
+V = \sqrt{\frac{\chi^2 / n}{k - 1}} ,
+\]</span></p>
+</div>
+<p>con <span class="math inline">\(V &lt; 0.1\)</span> como efecto pequeño. Para comparar grupos sin suponer normalidad se usan Mann-Whitney
+<span class="citation">(<a href="#ref-mann1947">Mann and Whitney 1947</a>)</span> (dos grupos) y Kruskal-Wallis <span class="citation">(<a href="#ref-kruskal1952">Kruskal and Wallis 1952</a>)</span> (tres o más), y la t de Welch para medias con
+varianzas distintas. Con <span class="math inline">\(R_g\)</span> la suma de rangos del grupo <span class="math inline">\(g\)</span>, <span class="math inline">\(n_g\)</span> su tamaño y <span class="math inline">\(N\)</span> el total de observaciones:</p>
+<div class="cc-formula">
+<p><span class="math display">\[
+U_1 = R_1 - \frac{n_1 (n_1 + 1)}{2}, \qquad
+H = \frac{12}{N(N+1)} \sum_{g} \frac{R_g^2}{n_g} - 3(N+1), \qquad
+t = \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{\dfrac{s_1^2}{n_1} + \dfrac{s_2^2}{n_2}}} .
+\]</span></p>
+</div>
+<p>Con cerca de 30,000 observaciones casi cualquier diferencia resulta significativa, por lo que se reporta el tamaño
+del efecto y no solo el <span class="math inline">\(p\)</span>-valor.</p>
+</div>
+<div id="calibración-de-probabilidades" class="section level3 hasAnchor">
+<h3>Calibración de probabilidades<a href="marco.html#calibraci%C3%B3n-de-probabilidades" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Un modelo está calibrado si, entre los clientes a los que asigna probabilidad <span class="math inline">\(p\)</span>, la proporción de <em>default</em> es
+cercana a <span class="math inline">\(p\)</span>. Se mide con el puntaje de Brier y con el error de calibración esperado (ECE), que agrupa las
+probabilidades en <span class="math inline">\(B\)</span> intervalos:</p>
+<div class="cc-formula">
+<p><span class="math display">\[
+\mathrm{Brier} = \frac{1}{N}\sum_{i=1}^{N}\left(\hat p_i - y_i\right)^2, \qquad
+\mathrm{ECE} = \sum_{b=1}^{B} \frac{n_b}{N}\,\left|\,\mathrm{acc}_b - \mathrm{conf}_b\,\right| ,
+\]</span></p>
+</div>
+<p>donde <span class="math inline">\(n_b\)</span> es el número de clientes en el intervalo <span class="math inline">\(b\)</span>, <span class="math inline">\(\mathrm{acc}_b\)</span> la frecuencia observada de <em>default</em> y
+<span class="math inline">\(\mathrm{conf}_b\)</span> la probabilidad media predicha.</p>
+</div>
+<div id="antecedentes" class="section level3 hasAnchor">
+<h3>Antecedentes<a href="marco.html#antecedentes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Yeh y Lien <span class="citation">(<a href="#ref-yeh2009">Yeh and Lien 2009</a>)</span> compararon seis técnicas de minería de datos (regresión logística, análisis
+discriminante, k vecinos, Naive Bayes, redes neuronales y árboles de clasificación) con estos mismos datos y
+propusieron un método de suavizado por ordenamiento para estimar la probabilidad real de incumplimiento. Este
+trabajo parte de ese conjunto de datos, completa la etapa de comprensión de los datos y compara de manera
+sistemática algoritmos modernos, técnicas de balanceo y métodos de optimización.</p>
+</div>
+</div>
+<div id="diccionario-de-variables" class="section level2 hasAnchor">
+<h2>Diccionario de variables<a href="marco.html#diccionario-de-variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>LIMIT_BAL</code></td>
+<td>Numérica continua</td>
+<td>Monto del crédito otorgado (individual y familiar) en NT<span class="math inline">\(. |
+| `SEX` | Categórica | 1 = hombre, 2 = mujer. |
+| `EDUCATION` | Categórica ordinal | 1 = posgrado, 2 = universidad, 3 = secundaria, 4 = otros (los códigos 0, 5 y 6 no documentados se reagrupan en &quot;Otros&quot;). |
+| `MARRIAGE` | Categórica | 1 = casado, 2 = soltero, 3 = otros (el código 0 se reagrupa en &quot;Otros&quot;). |
+| `AGE` | Numérica discreta | Edad en años. |
+| `PAY_0`, `PAY_2` a `PAY_6` | Ordinal | Estado de pago mensual, de septiembre (`PAY_0`) a abril (`PAY_6`). -2, -1 y 0 = sin atraso; 1 = un mes de atraso; y así hasta 8 o 9 meses. El dataset no incluye `PAY_1`. |
+| `BILL_AMT1` a `BILL_AMT6` | Numérica continua | Monto facturado de septiembre (1) a abril (6), en NT\)</span>. Puede ser negativo (saldo a favor).</td>
+</tr>
+<tr class="even">
+<td><code>PAY_AMT1</code> a <code>PAY_AMT6</code></td>
+<td>Numérica continua</td>
+<td>Monto efectivamente pagado de septiembre (1) a abril (6), en NT$.</td>
+</tr>
+<tr class="odd">
+<td><code>default_payment_next_month</code></td>
+<td>Binaria (objetivo)</td>
+<td>1 = el cliente incumple el pago el mes siguiente (octubre de 2005); 0 = no incumple.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="metodología" class="section level2 hasAnchor">
+<h2>Metodología<a href="marco.html#metodolog%C3%ADa" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="datos" class="section level3 hasAnchor">
+<h3>Datos<a href="marco.html#datos" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><em>Default of Credit Card Clients Dataset</em> del repositorio UCI <span class="citation">(<a href="#ref-uci">UCI Machine Learning Repository, n.d.</a>)</span>, publicado por Yeh y Lien
+<span class="citation">(<a href="#ref-yeh2009">Yeh and Lien 2009</a>)</span>: 30,000 clientes, 23 variables predictoras y la variable objetivo
+<code>default_payment_next_month</code> (78 % clase 0, 22 % clase 1).</p>
+</div>
+<div id="etl" class="section level3 hasAnchor">
+<h3>ETL<a href="marco.html#etl" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li><strong>Extract:</strong> lectura del archivo fuente con <code>pandas</code>, renombrado de la variable objetivo y uso de <code>ID</code> solo
+como índice, no como predictor.</li>
+<li><strong>Transform:</strong> eliminación de 35 duplicados exactos (para que una fila no quede en entrenamiento y su copia en
+prueba); reagrupación de los códigos no documentados de <code>EDUCATION</code> y <code>MARRIAGE</code> en “Otros”; conservación de
+los códigos <code>-2</code>, <code>-1</code> y <code>0</code> de <code>PAY_x</code>, con su ambigüedad documentada como limitación; transformación
+logarítmica con signo de <code>LIMIT_BAL</code> y <code>PAY_AMT1</code> a <code>PAY_AMT6</code>; reemplazo de <code>BILL_AMT1</code> a <code>BILL_AMT6</code> por su promedio, su
+tendencia y el número de meses con saldo a favor, para resolver la multicolinealidad.</li>
+<li><strong>Load:</strong> conjunto de datos final con 29,965 filas x 21 columnas. El escalado y los demás pasos que dependen de
+estadísticos de la muestra se aplican dentro de cada pipeline, después de la partición, para evitar fuga de
+información.</li>
+</ul>
+</div>
+<div id="análisis-exploratorio" class="section level3 hasAnchor">
+<h3>Análisis exploratorio<a href="marco.html#an%C3%A1lisis-exploratorio" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Estadística descriptiva, diagnóstico de nulos y duplicados, forma de las distribuciones, valores atípicos
+(criterio de Tukey), comparación formal de grupos con pruebas no paramétricas y de independencia, y
+multicolinealidad con correlaciones y VIF.</p>
+</div>
+<div id="modelo-base" class="section level3 hasAnchor">
+<h3>Modelo base<a href="marco.html#modelo-base" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Regresión logística en un <em>pipeline</em> de <code>scikit-learn</code> con partición estratificada 80/20, codificación y
+escalado, evaluada con <em>accuracy</em>, <em>log-loss</em>, ROC-AUC, matriz de confusión y reporte de clasificación.</p>
+</div>
+<div id="diseño-experimental" class="section level3 hasAnchor">
+<h3>Diseño experimental<a href="marco.html#dise%C3%B1o-experimental" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Diseño factorial de <strong>7 x 4 x 4 = 112 configuraciones</strong>:</p>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Factor</th>
+<th>Niveles</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Modelo (7)</td>
+<td>Regresión logística, árbol de decisión, Random Forest, XGBoost, K-Nearest Neighbors, Naive Bayes gaussiano, SVM</td>
+</tr>
+<tr class="even">
+<td>Balanceo (4)</td>
+<td>Sin balanceo, SMOTE, ADASYN, <code>class_weight</code></td>
+</tr>
+<tr class="odd">
+<td>Optimización de hiperparámetros (4)</td>
+<td>Grid search, random search, optimización bayesiana (Optuna), algoritmo genético (DEAP)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Validación:</strong> validación cruzada anidada, con 5 folds externos para estimar el desempeño y 5 internos para
+seleccionar hiperparámetros, y <code>random_state=42</code>.</li>
+<li><strong>Métrica principal:</strong> F1 de la clase <em>default</em>. Se reportan también precisión, <em>recall</em>, ROC-AUC y PR-AUC.</li>
+<li><strong>Ejecución:</strong> cinco modelos (80 combinaciones) se corrieron localmente en CPU. SVM y KNN (32 combinaciones) se corrieron en
+Google Colab con una GPU T4 (cuML), con otro solver y otras versiones de librerías, por lo que no son
+estrictamente comparables con el resto, en especial en tiempos.</li>
+<li><strong>Comparación estadística:</strong> prueba de Friedman con post-hoc de Nemenyi, comparación por factor y prueba de
+DeLong. Con 5 folds el post-hoc de Nemenyi solo separa los extremos del ranking, sin ordenar las combinaciones
+de cabeza, y la comparación entre ellas se interpreta de manera descriptiva.</li>
+<li><strong>Calibración y complejidad:</strong> curvas de calibración, error de calibración esperado (ECE) y costo
+computacional de cada configuración.</li>
+</ul>
+</div>
+<div id="modelo-original-y-métodos-recientes" class="section level3 hasAnchor">
+<h3>Modelo original y métodos recientes<a href="marco.html#modelo-original-y-m%C3%A9todos-recientes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Las 112 configuraciones anteriores son los modelos tradicionales y fijan el punto de comparación: su mejor F1 medio
+es 0.547 (XGBoost con <code>class_weight</code> y optimización bayesiana). Con ese valor como referencia se busca un modelo que
+lo supere: un bosque aleatorio propio con cortes oblicuos sensibles al costo (CS-FOF), contrastado además con dos
+métodos recientes de boosting (LightGBM y CatBoost) bajo el mismo protocolo de validación anidada 5 x 5.</p>
+</div>
+<div id="interpretabilidad" class="section level3 hasAnchor">
+<h3>Interpretabilidad<a href="marco.html#interpretabilidad" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>SHAP sobre el Random Forest y comparación LIME vs. SHAP para XGBoost sobre una observación.</p>
+</div>
+</div>
+<div id="estructura-del-libro" class="section level2 hasAnchor">
+<h2>Estructura del libro<a href="marco.html#estructura-del-libro" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Capítulo</th>
+<th>Contenido</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>00. EDA</td>
+<td>Análisis exploratorio y construcción del conjunto de datos final</td>
+</tr>
+<tr class="even">
+<td>01. Modelo base</td>
+<td>Regresión logística con partición 80/20</td>
+</tr>
+<tr class="odd">
+<td>02. Verificación del protocolo</td>
+<td>Protocolo experimental: semilla y validación cruzada anidada</td>
+</tr>
+<tr class="even">
+<td>03. Desarrollo del pipeline</td>
+<td>Prueba del pipeline completo con datos sintéticos</td>
+</tr>
+<tr class="odd">
+<td>04. Experimentos</td>
+<td>Corrida de las combinaciones</td>
+</tr>
+<tr class="even">
+<td>05. Análisis de resultados</td>
+<td>Resultados, comparación estadística, calibración y complejidad</td>
+</tr>
+<tr class="odd">
+<td>06. Interpretabilidad</td>
+<td>SHAP y LIME</td>
+</tr>
+<tr class="even">
+<td>08. Tabla maestra</td>
+<td>Tabla maestra, comparabilidad del SVM</td>
+</tr>
+<tr class="odd">
+<td>09. Curvas anytime</td>
+<td>Curvas anytime y multi-fidelidad</td>
+</tr>
+<tr class="even">
+<td>10. Modelo original</td>
+<td>CS-FOF, LightGBM y CatBoost frente a las 112 combinaciones</td>
+</tr>
+<tr class="odd">
+<td>07. SVM en GPU (Colab)</td>
+<td>SVM con RBF acelerado por GPU (cuML)</td>
+</tr>
+<tr class="even">
+<td>12. Corrida 5 x 5 en Colab</td>
+<td>Corrida 5 x 5 de todos los modelos con el mismo código</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="referencias" class="section level2 hasAnchor">
+<h2>Referencias<a href="marco.html#referencias" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div class="csl-entry">
+Chawla, N. V., K. W. Bowyer, L. O. Hall, and W. P. Kegelmeyer. 2002. <span>“<span>SMOTE</span>: Synthetic Minority over-Sampling Technique.”</span> <em>Journal of Artificial Intelligence Research</em> 16: 321–57.
+</div>
+<div class="csl-entry">
+Cramér, H. 1946. <em>Mathematical Methods of Statistics</em>. Princeton University Press.
+</div>
+<div class="csl-entry">
+Kruskal, W. H., and W. A. Wallis. 1952. <span>“Use of Ranks in One-Criterion Variance Analysis.”</span> <em>Journal of the American Statistical Association</em> 47 (260): 583–621.
+</div>
+<div class="csl-entry">
+Lundberg, S. M., and S. I. Lee. 2017. <span>“A Unified Approach to Interpreting Model Predictions.”</span> <em>Advances in Neural Information Processing Systems</em> 30: 4765–74.
+</div>
+<div class="csl-entry">
+Mann, H. B., and D. R. Whitney. 1947. <span>“On a Test of Whether One of Two Random Variables Is Stochastically Larger Than the Other.”</span> <em>Annals of Mathematical Statistics</em> 18 (1): 50–60.
+</div>
+<div class="csl-entry">
+Spearman, C. 1904. <span>“The Proof and Measurement of Association Between Two Things.”</span> <em>The American Journal of Psychology</em> 15 (1): 72–101.
+</div>
+<div class="csl-entry">
+Tukey, J. W. 1977. <em>Exploratory Data Analysis</em>. Addison-Wesley.
+</div>
+<div class="csl-entry">
+UCI Machine Learning Repository. n.d. <em>Default of Credit Card Clients Dataset</em>.
+</div>
+<div class="csl-entry">
+Yeh, I. C., and C. F. Lien. 2009. <span>“The Comparisons of Data Mining Techniques for the Predictive Accuracy of Probability of Default of Credit Card Clients.”</span> <em>Expert Systems with Applications</em> 36 (2): 2473–80.
+</div>
+</div>
+
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-chawla2002" class="csl-entry">
+Chawla, N. V., K. W. Bowyer, L. O. Hall, and W. P. Kegelmeyer. 2002. <span>“<span>SMOTE</span>: Synthetic Minority over-Sampling Technique.”</span> <em>Journal of Artificial Intelligence Research</em> 16: 321–57.
+</div>
+<div id="ref-cramer1946" class="csl-entry">
+Cramér, H. 1946. <em>Mathematical Methods of Statistics</em>. Princeton University Press.
+</div>
+<div id="ref-kruskal1952" class="csl-entry">
+Kruskal, W. H., and W. A. Wallis. 1952. <span>“Use of Ranks in One-Criterion Variance Analysis.”</span> <em>Journal of the American Statistical Association</em> 47 (260): 583–621.
+</div>
+<div id="ref-lundberg2017" class="csl-entry">
+Lundberg, S. M., and S. I. Lee. 2017. <span>“A Unified Approach to Interpreting Model Predictions.”</span> <em>Advances in Neural Information Processing Systems</em> 30: 4765–74.
+</div>
+<div id="ref-mann1947" class="csl-entry">
+Mann, H. B., and D. R. Whitney. 1947. <span>“On a Test of Whether One of Two Random Variables Is Stochastically Larger Than the Other.”</span> <em>Annals of Mathematical Statistics</em> 18 (1): 50–60.
+</div>
+<div id="ref-spearman1904" class="csl-entry">
+Spearman, C. 1904. <span>“The Proof and Measurement of Association Between Two Things.”</span> <em>The American Journal of Psychology</em> 15 (1): 72–101.
+</div>
+<div id="ref-tukey1977" class="csl-entry">
+Tukey, J. W. 1977. <em>Exploratory Data Analysis</em>. Addison-Wesley.
+</div>
+<div id="ref-uci" class="csl-entry">
+UCI Machine Learning Repository. n.d. <em>Default of Credit Card Clients Dataset</em>.
+</div>
+<div id="ref-yeh2009" class="csl-entry">
+Yeh, I. C., and C. F. Lien. 2009. <span>“The Comparisons of Data Mining Techniques for the Predictive Accuracy of Probability of Default of Credit Card Clients.”</span> <em>Expert Systems with Applications</em> 36 (2): 2473–80.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="nb00.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

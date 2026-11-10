@@ -1,0 +1,4 @@
+escenario,combinaciones,chi2,p,CD Nemenyi,máx. dif. de rangos,Nemenyi con potencia,mejor,2.º,3.º
+"A. 112 filas, SVM de Colab",112,534.600162,1.123308e-56,89.372108,108.3,True,xgboost|class_weight|bayesian_optuna,random_forest|class_weight|random_search,random_forest|class_weight|grid_search
+"B. 96 filas, sin SVM",96,453.809081,3.363868e-48,75.490309,92.3,True,xgboost|class_weight|bayesian_optuna,random_forest|class_weight|random_search,random_forest|class_weight|grid_search
+"C. 112 filas, SVM reajustado en CPU",112,535.948560,6.562144e-57,89.372108,106.3,True,xgboost|class_weight|bayesian_optuna,random_forest|class_weight|random_search,svm|class_weight|grid_search

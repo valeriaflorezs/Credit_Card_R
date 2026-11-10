@@ -1,0 +1,313 @@
+# 08. Tabla maestra consolidada y comparabilidad del SVM {#nb08}
+
+```{r setup-nb08, include=FALSE}
+knitr::opts_chunk$set(python.reticulate = FALSE)
+BASE <- if (file.exists(file.path("R", "portar_notebook.R"))) "." else ".."
+source(file.path(BASE, "R", "portar_notebook.R"))
+```
+
+<!-- nb:md cell=0 -->
+
+Este notebook consolida la tabla maestra de resultados y verifica la comparabilidad de las filas de SVM, corridas en Colab con `cuml.svm.SVC`, frente a las demás, que usan `sklearn.svm.SVC`. Los números de este notebook son los de la corrida 5 x 5 (5 folds externos x 5 internos). KNN también corrió en la GPU de Colab (cuML), y se documenta aparte su diferencia con scikit-learn.
+
+## 1. Tabla maestra de las 112 combinaciones
+
+<!-- nb:code cell=1 -->
+<details><summary>Código (24 líneas)</summary>
+
+```{python nb08_c01, eval=FALSE}
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path.cwd().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+import json
+
+import numpy as np
+import pandas as pd
+
+from src import config
+from src import master_table as mt
+from src import stats_comparison as sc
+
+pd.set_option("display.width", 200)
+pd.set_option("display.max_columns", 30)
+
+master, best = mt.save_master_tables()
+print(f"Tabla maestra: {len(master)} filas -> {mt.MASTER_112_PATH.relative_to(config.PROJECT_ROOT)}")
+print(f"Selección por modelo: {len(best)} filas -> {mt.BEST_PER_MODEL_PATH.relative_to(config.PROJECT_ROOT)}")
+print(f"Diferencia crítica de Nemenyi (k = {len(master)}, {config.N_OUTER_FOLDS} folds): {master.attrs['critical_difference']:.1f}")
+master.groupby(["model", "source"]).size().unstack(fill_value=0)
+```
+
+</details>
+
+<!-- nb:text cell=1 -->
+```text
+Diferencia crítica de Nemenyi (k = 112, 5 folds): 89.4
+```
+
+<!-- nb:table cell=1 -->
+```{r nb08_t01_1, echo=FALSE}
+mostrar_tabla("08_tabla_maestra_svm", "cell01_1.csv")
+```
+
+<!-- nb:md cell=2 -->
+La tabla maestra une las 96 filas de la validación anidada 5 x 5 (80 de la CPU local y 16 de KNN en Colab), las 16 de SVM y las métricas complementarias. Cada fila trae el origen del cálculo, la semilla, el tiempo y las métricas por fold con su media y desviación estándar entre los 5 folds externos, **con `ddof=1` en todas** (la tabla de la corrida 3 x 3 usaba `ddof=0`). También trae el rango medio de F1 entre las 112 combinaciones y si la combinación queda a menos de la diferencia crítica de Nemenyi (89.4) de la mejor. Los tiempos de SVM y de KNN son de GPU y se marcan como no comparables. El PR-AUC de SVM viene del reajuste en CPU, y el de KNN del reajuste con scikit-learn. A continuación, las 15 primeras filas ordenadas por rango medio de F1.
+
+<!-- nb:code cell=3 -->
+<details><summary>Código (4 líneas)</summary>
+
+```{python nb08_c03, eval=FALSE}
+columns = ["model", "technique", "method", "source", "random_state", "total_time_seconds", "time_comparable",
+           "f1_mean", "f1_std", "precision_mean", "recall_mean", "roc_auc_mean", "roc_auc_std", "pr_auc_mean",
+           "f1_avg_rank", "within_nemenyi_cd_of_best"]
+master[columns].head(15).round(4)
+```
+
+</details>
+
+<!-- nb:table cell=3 -->
+```{r nb08_t03_1, echo=FALSE}
+mostrar_tabla("08_tabla_maestra_svm", "cell03_1.csv")
+```
+
+<!-- nb:code cell=4 -->
+<details><summary>Código (5 líneas)</summary>
+
+```{python nb08_c04, eval=FALSE}
+# Control de integridad: una fila por combinación, sin vacíos en las columnas clave.
+assert len(master) == 112 and not master.duplicated(["model", "technique", "method"]).any()
+assert master[["f1_mean", "f1_std", "roc_auc_mean", "total_time_seconds"]].notna().all().all()
+print("OK: 112 combinaciones únicas; F1, ROC-AUC y tiempo completos.")
+print("Filas sin PR-AUC:", int(master["pr_auc_mean"].isna().sum()))
+```
+
+</details>
+
+<!-- nb:text cell=4 -->
+```text
+OK: 112 combinaciones únicas; F1, ROC-AUC y tiempo completos.
+Filas sin PR-AUC: 0
+```
+
+<!-- nb:md cell=5 -->
+## 2. Mejor combinación por modelo y motivo de la selección
+
+<!-- nb:md cell=6 -->
+Para cada modelo se elige la combinación (técnica de balanceo y método de optimización) con mayor F1 medio en el bucle externo. Se registra el motivo de cada selección y si la combinación está dentro del conjunto de finalistas de la comparación de Friedman y Nemenyi (a menos de la diferencia crítica de la mejor global).
+
+<!-- nb:code cell=7 -->
+<details><summary>Código (2 líneas)</summary>
+
+```{python nb08_c07, eval=FALSE}
+best[["model", "technique", "method", "f1_mean_std", "roc_auc_mean_std", "gap_to_runner_up",
+      "runner_up", "within_nemenyi_cd_of_global_best", "is_global_best", "source"]].round(4)
+```
+
+</details>
+
+<!-- nb:table cell=7 -->
+```{r nb08_t07_1, echo=FALSE}
+mostrar_tabla("08_tabla_maestra_svm", "cell07_1.csv")
+```
+
+<!-- nb:code cell=8 -->
+<details><summary>Código (2 líneas)</summary>
+
+```{python nb08_c08, eval=FALSE}
+for _, r in best.iterrows():
+    print(f"- {r['model']}: {r['selection_reason']}")
+```
+
+</details>
+
+<!-- nb:text cell=8 -->
+```text
+- xgboost: Mayor F1 medio externo entre las 16 combinaciones de xgboost; ventaja de 0.0037 sobre class_weight|grid_search (0.4 desviaciones estándar entre folds).
+- random_forest: Mayor F1 medio externo entre las 16 combinaciones de random_forest; ventaja de 0.0005 sobre class_weight|grid_search (0.1 desviaciones estándar entre folds).
+- svm: Mayor F1 medio externo entre las 16 combinaciones de svm; ventaja de 0.0001 sobre class_weight|genetic_deap (0.0 desviaciones estándar entre folds).
+- knn: Mayor F1 medio externo entre las 16 combinaciones de knn; ventaja de 0.0012 sobre class_weight|grid_search (0.1 desviaciones estándar entre folds).
+- decision_tree: Mayor F1 medio externo entre las 16 combinaciones de decision_tree; ventaja de 0.0003 sobre class_weight|genetic_deap (0.1 desviaciones estándar entre folds).
+- logistic_regression: Mayor F1 medio externo entre las 16 combinaciones de logistic_regression; ventaja de 0.0017 sobre class_weight|bayesian_optuna (0.2 desviaciones estándar entre folds).
+- naive_bayes: Mayor F1 medio externo entre las 16 combinaciones de naive_bayes; ventaja de 0.0001 sobre smote|bayesian_optuna (0.0 desviaciones estándar entre folds).
+```
+
+<!-- nb:md cell=9 -->
+- La mejor combinación global es XGBoost con `class_weight` y `bayesian_optuna` (F1 0.5466 más o menos 0.0091), seguida de Random Forest con `class_weight` y `random_search` (0.5452 más o menos 0.0077).
+- Las siete combinaciones elegidas están dentro de la diferencia crítica de la mejor global. Esto **no prueba equivalencia**: la diferencia crítica es 89.4 y la máxima diferencia de rangos, 108.3, así que Nemenyi separa solo combinaciones muy alejadas en el ranking y no puede ordenar las cercanas a la mejor.
+- La ventaja de cada combinación elegida sobre la segunda mejor de su mismo modelo es de entre 0.0001 y 0.0037 de F1, menor que la desviación entre folds. La elección dentro de cada modelo es prácticamente un desempate. En cinco de los siete modelos la técnica elegida es `class_weight` y en los otros dos es SMOTE.
+
+<!-- nb:md cell=10 -->
+## 3. ¿Son comparables las 16 filas de SVM?
+
+<!-- nb:md cell=11 -->
+Repetir las búsquedas de SVM en CPU no es viable (en la corrida inicial 3 x 3, `svm/none/genetic_deap` tardó más de 4 horas en la CPU local, y con 5 x 5 sería varias veces más). Lo que sí se puede verificar es la parte de la comparación que depende de la evaluación y no de la búsqueda:
+
+1. Se toman los hiperparámetros que eligió el bucle interno de Colab en cada fold externo.
+2. Se reajusta, con el mismo pipeline del resto del proyecto (con `sklearn.svm.SVC`), sobre los mismos folds externos, y se mide el F1 de prueba.
+3. Se compara con el F1 por fold que reportó Colab.
+
+Si los dos coinciden, las filas de SVM miden lo mismo que las demás. Lo que **no** se puede verificar con esto es que la búsqueda de cuML habría elegido los mismos hiperparámetros que la de libsvm, ni los tiempos.
+
+<!-- nb:code cell=12 -->
+<details><summary>Código (18 líneas)</summary>
+
+```{python nb08_c12, eval=FALSE}
+check = mt.load_svm_check()
+if check is None or len(check) < 16:
+    raise RuntimeError("Falta el reajuste local de SVM: correr `python -m src.svm_comparability`.")
+check = check.reset_index()
+cmp = check[["technique", "method", "f1_colab_mean", "f1_local_mean", "f1_max_abs_diff_per_fold",
+             "roc_auc_max_abs_diff_per_fold"]].copy()
+cmp["dif_media_f1 (local - colab)"] = cmp["f1_local_mean"] - cmp["f1_colab_mean"]
+cmp = cmp.sort_values(["technique", "method"]).reset_index(drop=True)
+display(cmp.round(4))
+
+diff = cmp["dif_media_f1 (local - colab)"]
+by_tech = cmp.groupby("technique")["dif_media_f1 (local - colab)"].mean().round(4)
+print(f"Diferencia media de F1 (local - Colab), 16 filas: {diff.mean():+.4f} (mín {diff.min():+.4f}, máx {diff.max():+.4f})")
+print("Por técnica:", by_tech.to_dict())
+print(f"Máxima diferencia absoluta por fold: {cmp['f1_max_abs_diff_per_fold'].max():.4f}")
+print(f"Filas con diferencia por fold mayor que 0.01: {(cmp['f1_max_abs_diff_per_fold'] > 0.01).sum()} de 16")
+print(f"Mediana de la desviación estándar entre folds del F1 (resto de modelos): "
+      f"{master.loc[master['model'] != 'svm', 'f1_std'].median():.4f}")
+```
+
+</details>
+
+<!-- nb:table cell=12 -->
+```{r nb08_t12_1, echo=FALSE}
+mostrar_tabla("08_tabla_maestra_svm", "cell12_1.csv")
+```
+
+<!-- nb:text cell=12 -->
+```text
+Diferencia media de F1 (local - Colab), 16 filas: +0.0089 (mín +0.0033, máx +0.0221)
+Por técnica: {'adasyn': 0.0079, 'class_weight': 0.0061, 'none': 0.0173, 'smote': 0.0044}
+Máxima diferencia absoluta por fold: 0.0264
+Filas con diferencia por fold mayor que 0.01: 9 de 16
+Mediana de la desviación estándar entre folds del F1 (resto de modelos): 0.0104
+```
+
+<!-- nb:md cell=13 -->
+- **Las filas de SVM de Colab no reproducen exactamente el F1 de scikit-learn.** Con los mismos hiperparámetros, los mismos folds y el mismo pipeline, el F1 reajustado en CPU es mayor en las 16 filas, en promedio en 0.009 (entre 0.003 y 0.022). La diferencia es mayor sin balanceo (0.017) y menor con SMOTE (0.004) y `class_weight` (0.006). En 9 de las 16 filas hay al menos un fold con diferencia mayor que 0.01. La mediana de la desviación entre folds de los demás modelos es 0.010, de modo que la diferencia es algo menor que una desviación estándar.
+- El ROC-AUC casi no cambia (diferencia máxima por fold de 0.001), así que el orden en que el modelo clasifica a los clientes es el mismo y la discrepancia viene del punto de corte de las predicciones. Es consistente con que el solver y la calibración de probabilidades de cuML no son idénticos a los de libsvm, pero es una hipótesis que no se verificó.
+- Las filas de SVM de Colab no son estrictamente comparables en F1 con las demás, y el sesgo siempre va en contra de SVM. Los tiempos tampoco son comparables. Por eso el análisis siguiente se hace con tres versiones de la comparación.
+- **KNN también corrió en la GPU de Colab (cuML).** No se rehízo la búsqueda en CPU, pero se reajustaron con scikit-learn los hiperparámetros elegidos: las clases predichas coinciden en 99.98 % a 100 % de los casos y el F1 por fold difiere hasta 0.0066 respecto al de Colab (en las 96 filas no SVM, ese es el máximo). Las probabilidades difieren por precisión float32 y empates entre vecinos. Es una diferencia menor que la de SVM y no sistemática.
+
+<!-- nb:md cell=14 -->
+## 4. Sensibilidad de la comparación estadística al tratamiento de SVM
+
+<!-- nb:md cell=15 -->
+Se repite la prueba de Friedman sobre el F1 por fold en tres escenarios: **A**, las 112 filas tal como se reportaron; **B**, solo las 96 combinaciones locales, sin SVM; **C**, las 112 filas con el F1 por fold de SVM reemplazado por el del reajuste en CPU. Si las conclusiones no cambian entre escenarios, no dependen del tratamiento de SVM.
+
+<!-- nb:code cell=16 -->
+<details><summary>Código (32 líneas)</summary>
+
+```{python nb08_c16, eval=FALSE}
+def friedman_summary(table, label):
+    matrix = sc.build_performance_matrix_from_table(table, metric="f1")
+    fr = sc.friedman_test(matrix)
+    cd = sc.compute_critical_difference(k=fr["k_combinations"], n_blocks=fr["n_blocks"])
+    ranks = fr["avg_ranks"]
+    top = ranks.index[:3].tolist()
+    spread = float(ranks.max() - ranks.min())
+    return {
+        "escenario": label, "combinaciones": fr["k_combinations"],
+        "chi2": fr["statistic"], "p": fr["p_value"], "CD Nemenyi": cd,
+        "máx. dif. de rangos": spread, "Nemenyi con potencia": bool(spread > cd),
+        "mejor": top[0], "2.º": top[1], "3.º": top[2],
+    }, ranks
+
+
+# A: las 112 filas tal como se reportaron (SVM de Colab).
+A = master
+# B: solo las 96 combinaciones locales (sin SVM).
+B = master[master["model"] != "svm"]
+# C: las 112 filas, con el F1 por fold de SVM reemplazado por el del reajuste en CPU.
+C = master.copy()
+is_svm = C["model"] == "svm"
+C.loc[is_svm, "f1_per_fold"] = C.loc[is_svm, "f1_cpu_refit_per_fold"]
+C.loc[is_svm, "f1_mean"] = C.loc[is_svm, "f1_cpu_refit_mean"]
+
+rows, ranks_by_scenario = [], {}
+for label, table in [("A. 112 filas, SVM de Colab", A), ("B. 96 filas, sin SVM", B), ("C. 112 filas, SVM reajustado en CPU", C)]:
+    summary, ranks = friedman_summary(table, label)
+    rows.append(summary)
+    ranks_by_scenario[label] = ranks
+sens = pd.DataFrame(rows).set_index("escenario")
+sens
+```
+
+</details>
+
+<!-- nb:table cell=16 -->
+```{r nb08_t16_1, echo=FALSE}
+mostrar_tabla("08_tabla_maestra_svm", "cell16_1.csv")
+```
+
+<!-- nb:code cell=17 -->
+<details><summary>Código (8 líneas)</summary>
+
+```{python nb08_c17, eval=FALSE}
+# Ranking de las mejores combinaciones de cada modelo en cada escenario (mejor F1 medio por modelo).
+def best_by_model(table):
+    idx = table.groupby("model")["f1_mean"].idxmax()
+    return table.loc[idx].sort_values("f1_mean", ascending=False)[["model", "technique", "method", "f1_mean"]]
+
+for label, table in [("A", A), ("B", B), ("C", C)]:
+    print(f"\nEscenario {label}:")
+    display(best_by_model(table).reset_index(drop=True).round(4))
+```
+
+</details>
+
+<!-- nb:text cell=17 -->
+```text
+
+Escenario A:
+```
+
+<!-- nb:table cell=17 -->
+```{r nb08_t17_1, echo=FALSE}
+mostrar_tabla("08_tabla_maestra_svm", "cell17_1.csv")
+```
+
+<!-- nb:text cell=17 -->
+```text
+
+Escenario B:
+```
+
+<!-- nb:table cell=17 -->
+```{r nb08_t17_2, echo=FALSE}
+mostrar_tabla("08_tabla_maestra_svm", "cell17_2.csv")
+```
+
+<!-- nb:text cell=17 -->
+```text
+
+Escenario C:
+```
+
+<!-- nb:table cell=17 -->
+```{r nb08_t17_3, echo=FALSE}
+mostrar_tabla("08_tabla_maestra_svm", "cell17_3.csv")
+```
+
+<!-- nb:md cell=18 -->
+- **La conclusión estadística no cambia.** En los tres escenarios Friedman es significativo ($p<10^{-47}$) y Nemenyi tiene algo de potencia: la máxima diferencia de rangos medios (108.3, 92.3 y 106.3) supera la diferencia crítica (89.4, 75.5 y 89.4), de modo que separa los extremos del ranking pero no las combinaciones de cabeza. Las dos primeras combinaciones son las mismas en los tres escenarios: XGBoost con `class_weight` y `bayesian_optuna`, y Random Forest con `class_weight` y `random_search`.
+- **El ranking de modelos cambia solo en la posición de SVM.** Con el SVM de Colab (escenario A), la mejor combinación de SVM tiene F1 0.5387 (SMOTE, `random_search`) y queda tercera entre los modelos. Con el reajuste en CPU (escenario C) sube a 0.5446 (`class_weight` con `grid_search`), a 0.0020 de XGBoost (0.5466), y la tercera combinación del ranking global pasa de Random Forest con `grid_search` a SVM con `class_weight` y `grid_search`. Este cambio es desfavorable para la versión de Colab, que subestimaba a SVM, y se reporta así. XGBoost sigue siendo el mejor, y la diferencia con SVM está muy por debajo de la desviación entre folds.
+- Sin SVM (escenario B) el orden de los otros seis modelos es el mismo que con SVM.
+
+<!-- nb:md cell=19 -->
+## Limitaciones
+
+- El reajuste en CPU usa los hiperparámetros que eligió Colab. No demuestra que una búsqueda en CPU habría elegido lo mismo, así que el F1 reajustado es el de la mejor configuración encontrada por cuML evaluada con libsvm, no el de una búsqueda completa en CPU.
+- El F1 reajustado se calculó con `probability=False` (las predicciones de `SVC` usan el signo de la función de decisión en ambos casos). El ROC-AUC y el PR-AUC de SVM en este reajuste salen de `decision_function` y no de `predict_proba`.
+- En la tabla maestra se conservan los valores de Colab como fueron reportados (columnas `f1_*`) y el reajuste va aparte (`f1_cpu_refit_*`), para no reescribir resultados originales.
+- Los tiempos de SVM y de KNN (GPU T4, otro hardware) no son comparables con los del resto (CPU local).
+- Con 5 folds, la prueba de Nemenyi solo separa combinaciones muy alejadas en el ranking, y los intervalos de las métricas son anchos. La comparación entre las combinaciones de cabeza es descriptiva.

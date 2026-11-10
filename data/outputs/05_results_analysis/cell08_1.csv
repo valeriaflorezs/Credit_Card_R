@@ -1,0 +1,16 @@
+,model,technique,method,f1_mean,f1_std_ddof1,precision_mean,recall_mean,roc_auc_mean,pr_auc_posthoc_mean
+94,xgboost,class_weight,bayesian_optuna,0.5466,0.0091,0.4927,0.6149,0.7828,0.5567
+77,random_forest,class_weight,random_search,0.5452,0.0077,0.4974,0.6041,0.7831,0.5606
+76,random_forest,class_weight,grid_search,0.5448,0.0095,0.4962,0.6039,0.7846,0.5621
+78,random_forest,class_weight,bayesian_optuna,0.5441,0.0080,0.4944,0.6053,0.7825,0.5602
+79,random_forest,class_weight,genetic_deap,0.5434,0.0105,0.4971,0.5995,0.7822,0.5606
+92,xgboost,class_weight,grid_search,0.5429,0.0086,0.4783,0.6278,0.7823,0.5483
+95,xgboost,class_weight,genetic_deap,0.5422,0.0111,0.4853,0.6148,0.7830,0.5616
+93,xgboost,class_weight,random_search,0.5414,0.0107,0.4959,0.5968,0.7801,0.5533
+101,svm,smote,random_search,0.5387,0.0048,0.4795,0.6148,0.7638,NaN
+111,svm,class_weight,genetic_deap,0.5386,0.0081,0.4769,0.6192,0.7647,NaN
+110,svm,class_weight,bayesian_optuna,0.5385,0.0077,0.4765,0.6192,0.7649,NaN
+109,svm,class_weight,random_search,0.5385,0.0079,0.4779,0.6169,0.7646,NaN
+103,svm,smote,genetic_deap,0.5378,0.0075,0.4728,0.6237,0.7680,NaN
+102,svm,smote,bayesian_optuna,0.5376,0.0058,0.4765,0.6170,0.7649,NaN
+108,svm,class_weight,grid_search,0.5372,0.0069,0.4730,0.6225,0.7648,NaN

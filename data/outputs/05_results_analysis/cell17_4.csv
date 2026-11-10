@@ -1,0 +1,5 @@
+,bayesian_optuna,genetic_deap,grid_search,random_search
+bayesian_optuna,1.0000,0.3472,0.8153,1.0000
+genetic_deap,0.3472,1.0000,0.0545,0.3761
+grid_search,0.8153,0.0545,1.0000,0.7879
+random_search,1.0000,0.3761,0.7879,1.0000

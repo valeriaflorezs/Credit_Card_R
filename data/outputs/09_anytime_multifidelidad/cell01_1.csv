@@ -1,0 +1,4 @@
+method / model,bayesian_optuna,genetic_deap,grid_search,hyperband,random_search
+decision_tree,3,3,3,3,3
+logistic_regression,3,3,3,3,3
+xgboost,3,3,3,3,3

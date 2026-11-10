@@ -1,0 +1,10 @@
+model,fold,seed,F1 externo random,F1 externo hyperband,dif. F1 (hyperband - random),costo random (s),costo hyperband (s),razón de costo (hyperband/random)
+decision_tree,0,42,0.5217,0.5289,0.0072,30.5857,33.9511,1.1100
+decision_tree,1,42,0.5249,0.5200,-0.0050,29.4273,33.7932,1.1484
+decision_tree,2,42,0.5134,0.5199,0.0066,37.9352,41.9491,1.1058
+logistic_regression,0,42,0.5174,0.5132,-0.0042,102.2921,152.5897,1.4917
+logistic_regression,1,42,0.5033,0.5034,0.0002,136.1002,141.8778,1.0425
+logistic_regression,2,42,0.5005,0.5006,0.0002,90.7076,121.9173,1.3441
+xgboost,0,42,0.5463,0.5483,0.0020,824.8067,400.2349,0.4852
+xgboost,1,42,0.5355,0.5456,0.0101,512.0362,523.2601,1.0219
+xgboost,2,42,0.5332,0.5364,0.0031,385.3449,522.3061,1.3554

@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>10. Modelo original (CS-FOF) y métodos recientes | Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning</title>
+  <meta name="description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y los notebooks del proyecto Default of Credit Card Clients." />
+  <meta name="generator" content="bookdown 0.48 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="10. Modelo original (CS-FOF) y métodos recientes | Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y los notebooks del proyecto Default of Credit Card Clients." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="10. Modelo original (CS-FOF) y métodos recientes | Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning" />
+  
+  <meta name="twitter:description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y los notebooks del proyecto Default of Credit Card Clients." />
+  
+
+<meta name="author" content="Katherin Barrera López y Valeria Florez Sarmiento" />
+
+
+<meta name="date" content="2026-09-11" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="nb09.html"/>
+<link rel="next" href="nb12.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.12.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Credit Card Default (Barrera y Florez)</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Portada</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#resumen"><i class="fa fa-check"></i>Resumen</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#resultados-en-cifras"><i class="fa fa-check"></i>Resultados en cifras</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contenido-del-libro"><i class="fa fa-check"></i>Contenido del libro</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html"><i class="fa fa-check"></i>Marco del proyecto</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#introducci%C3%B3n"><i class="fa fa-check"></i>Introducción</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#planteamiento-del-problema"><i class="fa fa-check"></i>Planteamiento del problema</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#hip%C3%B3tesis-exploratorias"><i class="fa fa-check"></i>Hipótesis exploratorias</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#justificaci%C3%B3n"><i class="fa fa-check"></i>Justificación</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#objetivos"><i class="fa fa-check"></i>Objetivos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#alcance-y-limitaciones"><i class="fa fa-check"></i>Alcance y limitaciones</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#marco-te%C3%B3rico"><i class="fa fa-check"></i>Marco teórico</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#riesgo-de-cr%C3%A9dito-y-default"><i class="fa fa-check"></i>Riesgo de crédito y <em>default</em></a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#an%C3%A1lisis-exploratorio-de-datos"><i class="fa fa-check"></i>Análisis exploratorio de datos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#valores-at%C3%ADpicos-y-asimetr%C3%ADa"><i class="fa fa-check"></i>Valores atípicos y asimetría</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#desbalance-de-clases"><i class="fa fa-check"></i>Desbalance de clases</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#correlaci%C3%B3n-de-spearman-y-multicolinealidad"><i class="fa fa-check"></i>Correlación de Spearman y multicolinealidad</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#asociaci%C3%B3n-y-comparaci%C3%B3n-de-grupos"><i class="fa fa-check"></i>Asociación y comparación de grupos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#calibraci%C3%B3n-de-probabilidades"><i class="fa fa-check"></i>Calibración de probabilidades</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#antecedentes"><i class="fa fa-check"></i>Antecedentes</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#diccionario-de-variables"><i class="fa fa-check"></i>Diccionario de variables</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#metodolog%C3%ADa"><i class="fa fa-check"></i>Metodología</a>
+<ul>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#datos"><i class="fa fa-check"></i>Datos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#etl"><i class="fa fa-check"></i>ETL</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#an%C3%A1lisis-exploratorio"><i class="fa fa-check"></i>Análisis exploratorio</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#modelo-base"><i class="fa fa-check"></i>Modelo base</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#dise%C3%B1o-experimental"><i class="fa fa-check"></i>Diseño experimental</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#modelo-original-y-m%C3%A9todos-recientes"><i class="fa fa-check"></i>Modelo original y métodos recientes</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#interpretabilidad"><i class="fa fa-check"></i>Interpretabilidad</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#estructura-del-libro"><i class="fa fa-check"></i>Estructura del libro</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#referencias"><i class="fa fa-check"></i>Referencias</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html"><i class="fa fa-check"></i>EDA: Análisis Exploratorio de Datos</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#tipo-y-descripci%C3%B3n-de-las-variables"><i class="fa fa-check"></i>Tipo y descripción de las variables</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#valores-nulos-y-duplicados"><i class="fa fa-check"></i>Valores nulos y duplicados</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#categor%C3%ADas-no-documentadas-valores-centinela"><i class="fa fa-check"></i>Categorías no documentadas / valores centinela</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#montos-de-facturaci%C3%B3n-negativos"><i class="fa fa-check"></i>Montos de facturación negativos</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#an%C3%A1lisis-de-la-variable-objetivo"><i class="fa fa-check"></i>Análisis de la variable objetivo</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#an%C3%A1lisis-univariado"><i class="fa fa-check"></i>Análisis Univariado</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#estad%C3%ADsticos-descriptivos-completos"><i class="fa fa-check"></i>1.1 Estadísticos descriptivos completos</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#visualizaci%C3%B3n-interactiva"><i class="fa fa-check"></i>1.2 Visualización interactiva</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#an%C3%A1lisis-bivariado"><i class="fa fa-check"></i>Análisis Bivariado</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#pruebas-de-hip%C3%B3tesis-y-comparaci%C3%B3n-de-grupos"><i class="fa fa-check"></i>2.1 Pruebas de hipótesis y comparación de grupos</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#visualizaciones-segmentadas-por-default"><i class="fa fa-check"></i>2.2 Visualizaciones segmentadas por default</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#multicolinealidad"><i class="fa fa-check"></i>Multicolinealidad</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#matriz-de-correlaci%C3%B3n"><i class="fa fa-check"></i>3.1 Matriz de correlación</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#factor-de-inflaci%C3%B3n-de-la-varianza-vif"><i class="fa fa-check"></i>3.2 Factor de Inflación de la Varianza (VIF)</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#coordenadas-paralelas-interacci%C3%B3n-conjunta-entre-las-variables-de-facturaci%C3%B3n"><i class="fa fa-check"></i>3.3 Coordenadas paralelas: interacción conjunta entre las variables de facturación</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#parte-4-interpretabilidad-avanzada-con-shap"><i class="fa fa-check"></i>PARTE 4: Interpretabilidad Avanzada con SHAP</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#importancia-global-mean-shap"><i class="fa fa-check"></i>4.1 Importancia global (mean |SHAP|)</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#beeswarm-interactivo-todas-las-variables"><i class="fa fa-check"></i>4.2 Beeswarm interactivo (todas las variables)</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#gr%C3%A1fico-de-dependencia"><i class="fa fa-check"></i>4.3 Gráfico de dependencia</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#interpretabilidad-1"><i class="fa fa-check"></i>4.4 Interpretabilidad</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#parte-5-preprocesamiento-resoluci%C3%B3n-de-los-hallazgos"><i class="fa fa-check"></i>PARTE 5: Preprocesamiento: resolución de los hallazgos</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#construcci%C3%B3n-del-dataset-final"><i class="fa fa-check"></i>5.1 Construcción del dataset final</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#efecto-de-las-transformaciones"><i class="fa fa-check"></i>5.2 Efecto de las transformaciones</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#verificaci%C3%B3n-de-que-cada-hallazgo-qued%C3%B3-resuelto"><i class="fa fa-check"></i>5.3 Verificación de que cada hallazgo quedó resuelto</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#qu%C3%A9-recibe-el-modelado"><i class="fa fa-check"></i>5.4 Qué recibe el modelado</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#conclusiones-generales-del-eda"><i class="fa fa-check"></i>Conclusiones generales del EDA</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html"><i class="fa fa-check"></i>01. Modelo base: Regresión Logística</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#preparaci%C3%B3n-de-los-datos"><i class="fa fa-check"></i>1. Preparación de los datos</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#carga-del-dataset-final"><i class="fa fa-check"></i>1.1 Carga del dataset final</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#divisi%C3%B3n-traintest-encoding-y-escalado"><i class="fa fa-check"></i>2. División train/test, encoding y escalado</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#ajuste-del-modelo"><i class="fa fa-check"></i>3. Ajuste del modelo</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#evaluaci%C3%B3n-score-error-y-auc-roc"><i class="fa fa-check"></i>4. Evaluación: score, error y AUC-ROC</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#coeficientes-del-modelo"><i class="fa fa-check"></i>5. Coeficientes del modelo</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#matriz-de-confusi%C3%B3n-reporte-de-clasificaci%C3%B3n-y-curva-roc"><i class="fa fa-check"></i>6. Matriz de confusión, reporte de clasificación y curva ROC</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#s%C3%ADntesis"><i class="fa fa-check"></i>7. Síntesis</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb02.html"><a href="nb02.html"><i class="fa fa-check"></i>02. Verificación del protocolo experimental</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html"><i class="fa fa-check"></i>03. Desarrollo y prueba del pipeline completo</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#datos-sint%C3%A9ticos"><i class="fa fa-check"></i>1. Datos sintéticos</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#preprocesamiento-encoding-scaling-condicional"><i class="fa fa-check"></i>2. Preprocesamiento: encoding + scaling condicional</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#balanceo-compatibilidad-por-modelo"><i class="fa fa-check"></i>3. Balanceo: compatibilidad por modelo</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#modelos-base-y-espacios-de-b%C3%BAsqueda"><i class="fa fa-check"></i>4. Modelos base y espacios de búsqueda</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#optimizaci%C3%B3n-los-4-m%C3%A9todos-en-miniatura"><i class="fa fa-check"></i>5. Optimización: los 4 métodos, en miniatura</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#validaci%C3%B3n-cruzada-anidada-inner-vs.-outer"><i class="fa fa-check"></i>6. Validación cruzada anidada: inner vs. outer</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#orquestador-unas-pocas-combinaciones"><i class="fa fa-check"></i>7. Orquestador: unas pocas combinaciones</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#complejidad-computacional-est%C3%A1ndar-vs.-optimizado"><i class="fa fa-check"></i>8. Complejidad computacional: estándar vs. optimizado</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#evaluaci%C3%B3n-y-calibraci%C3%B3n"><i class="fa fa-check"></i>9. Evaluación y calibración</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#interpretabilidad-shap-r%C3%A1pido"><i class="fa fa-check"></i>10. Interpretabilidad: SHAP rápido</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#comparaci%C3%B3n-estad%C3%ADstica-jer%C3%A1rquica"><i class="fa fa-check"></i>11. Comparación estadística jerárquica</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html"><i class="fa fa-check"></i>04. Ejecutar experimentos</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#cargar-datos"><i class="fa fa-check"></i>Cargar datos</a></li>
+<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#configuraci%C3%B3n-de-la-corrida"><i class="fa fa-check"></i>Configuración de la corrida</a></li>
+<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#resultado"><i class="fa fa-check"></i>Resultado</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html"><i class="fa fa-check"></i>05. Análisis de resultados</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#objetivo-prioritario"><i class="fa fa-check"></i>Objetivo prioritario:</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#cargar-datos-y-tabla-maestra"><i class="fa fa-check"></i>Cargar datos y tabla maestra</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#tabla-de-m%C3%A9tricas-media-y-desviaci%C3%B3n-est%C3%A1ndar-outer-loop"><i class="fa fa-check"></i>Tabla de métricas (media y desviación estándar, outer loop)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#m%C3%A9tricas-complementarias-independientes-del-umbral"><i class="fa fa-check"></i>Métricas complementarias (independientes del umbral)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#cobertura-de-la-grilla-112-combinaciones-te%C3%B3ricas"><i class="fa fa-check"></i>Cobertura de la grilla: 112 combinaciones teóricas</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#comparaci%C3%B3n-estad%C3%ADstica-jer%C3%A1rquica-1"><i class="fa fa-check"></i>Comparación estadística jerárquica</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#comparaci%C3%B3n-por-factor-del-dise%C3%B1o-t%C3%A9cnica-m%C3%A9todo-de-optimizaci%C3%B3n-modelo"><i class="fa fa-check"></i>Comparación por factor del diseño (técnica, método de optimización, modelo)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#combinaci%C3%B3n-con-mayor-f1-medio-matriz-de-confusi%C3%B3n-y-curva-roc"><i class="fa fa-check"></i>Combinación con mayor F1 medio: matriz de confusión y curva ROC</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#calibraci%C3%B3n-brier-ece-reliability-diagram-recalibraci%C3%B3n-si-corresponde"><i class="fa fa-check"></i>Calibración: Brier, ECE, reliability diagram (+ recalibración si corresponde)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#complejidad-computacional-est%C3%A1ndar-vs.-optimizado-1"><i class="fa fa-check"></i>Complejidad computacional: estándar vs. optimizado</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#siguiente-paso"><i class="fa fa-check"></i>Siguiente Paso</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#siguiente-paso-modelo-original-y-m%C3%A9todos-recientes"><i class="fa fa-check"></i>Siguiente paso: modelo original y métodos recientes</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#figuras-guardadas-en-resultsfigures"><i class="fa fa-check"></i>Figuras guardadas en results/figures</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html"><i class="fa fa-check"></i>06. Interpretabilidad (SHAP y LIME)</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#elegir-el-mejor-modelo-y-ajustar-su-pipeline"><i class="fa fa-check"></i>Elegir el mejor modelo y ajustar su pipeline</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-global-summary-plot"><i class="fa fa-check"></i>SHAP global (summary plot)</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-local-una-observaci%C3%B3n-bien-clasificada-y-una-con-error-alto"><i class="fa fa-check"></i>SHAP local: una observación bien clasificada y una con error alto</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#lime-vs.-shap-espec%C3%ADficamente-para-xgboost"><i class="fa fa-check"></i>LIME vs. SHAP (específicamente para XGBoost)</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#discusi%C3%B3n-cu%C3%A1ndo-divergen-lime-y-shap"><i class="fa fa-check"></i>Discusión: ¿cuándo divergen LIME y SHAP?</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-y-lime-con-m%C3%A1s-de-un-fold-y-m%C3%A1s-de-una-observaci%C3%B3n"><i class="fa fa-check"></i>SHAP y LIME con más de un fold y más de una observación</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-global-en-los-5-folds-externos"><i class="fa fa-check"></i>5. SHAP global en los 5 folds externos</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#lime-frente-a-shap-en-200-observaciones-por-modelo"><i class="fa fa-check"></i>6. LIME frente a SHAP en 200 observaciones por modelo</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#figuras-guardadas-en-resultsfigures-1"><i class="fa fa-check"></i>Figuras guardadas en results/figures</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html"><i class="fa fa-check"></i>SVM + RBF acelerado por GPU (cuML/RAPIDS)</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#verificar-gpu-asignada"><i class="fa fa-check"></i>1. Verificar GPU asignada</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#instalar-rapids-cuml"><i class="fa fa-check"></i>2. Instalar RAPIDS cuML</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#b.-instalaci%C3%B3n-alternativa-de-cuml-solo-si-la-instalaci%C3%B3n-de-la-secci%C3%B3n-2-fall%C3%B3"><i class="fa fa-check"></i>2b. Instalación alternativa de cuML (solo si la instalación de la sección 2 falló)</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#imports-chequeo-de-versiones"><i class="fa fa-check"></i>3. Imports + chequeo de versiones</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#chequeo-de-compatibilidad-cuml-correr-antes-de-cualquier-combinaci%C3%B3n-real"><i class="fa fa-check"></i>4. Chequeo de compatibilidad cuML (correr ANTES de cualquier combinación real)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#subir-dataset_final.csv"><i class="fa fa-check"></i>5. Subir <code>dataset_final.csv</code></a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#cargar-verificar-y-separar-xy"><i class="fa fa-check"></i>6. Cargar, verificar y separar X/y</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#configuraci%C3%B3n-id%C3%A9ntica-a-srcconfig.py"><i class="fa fa-check"></i>7. Configuración (idéntica a <code>src/config.py</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#espacio-de-b%C3%BAsqueda-de-svm-id%C3%A9ntico-a-models.pymodel_registrysvm"><i class="fa fa-check"></i>8. Espacio de búsqueda de SVM (idéntico a <code>models.py::MODEL_REGISTRY["svm"]</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#preprocesamiento-id%C3%A9ntico-a-preprocessing.py-con-salida-densa"><i class="fa fa-check"></i>9. Preprocesamiento (idéntico a <code>preprocessing.py</code>, con salida densa)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#balanceo-id%C3%A9ntico-a-balancing.py-f%C3%A1brica-del-modelo-cuml"><i class="fa fa-check"></i>10. Balanceo (idéntico a <code>balancing.py</code>) + fábrica del modelo cuML</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#los-4-m%C3%A9todos-de-optimizaci%C3%B3n-id%C3%A9nticos-a-optimization.py"><i class="fa fa-check"></i>11. Los 4 métodos de optimización (idénticos a <code>optimization.py</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#validaci%C3%B3n-cruzada-anidada-id%C3%A9ntica-a-nested_cv.py"><i class="fa fa-check"></i>12. Validación cruzada anidada (idéntica a <code>nested_cv.py</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#selecci%C3%B3n-de-combinaciones-a-correr"><i class="fa fa-check"></i>13. Selección de combinaciones a correr</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#ejecutar-guardado-incremental-una-fila-apenas-termina-cada-combinaci%C3%B3n"><i class="fa fa-check"></i>14. Ejecutar: guardado incremental (una fila apenas termina cada combinación)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#resultado-final-descarga"><i class="fa fa-check"></i>15. Resultado final + descarga</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html"><i class="fa fa-check"></i>08. Tabla maestra consolidada y comparabilidad del SVM</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#tabla-maestra-de-las-112-combinaciones"><i class="fa fa-check"></i>1. Tabla maestra de las 112 combinaciones</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#mejor-combinaci%C3%B3n-por-modelo-y-motivo-de-la-selecci%C3%B3n"><i class="fa fa-check"></i>2. Mejor combinación por modelo y motivo de la selección</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#son-comparables-las-16-filas-de-svm"><i class="fa fa-check"></i>3. ¿Son comparables las 16 filas de SVM?</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#sensibilidad-de-la-comparaci%C3%B3n-estad%C3%ADstica-al-tratamiento-de-svm"><i class="fa fa-check"></i>4. Sensibilidad de la comparación estadística al tratamiento de SVM</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#limitaciones"><i class="fa fa-check"></i>Limitaciones</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html"><i class="fa fa-check"></i>09. Curvas anytime y multi-fidelidad</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#curvas-anytime-arrepentimiento-frente-al-n%C3%BAmero-de-evaluaciones"><i class="fa fa-check"></i>1. Curvas anytime: arrepentimiento frente al número de evaluaciones</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#curvas-anytime-frente-al-costo-de-c%C3%B3mputo"><i class="fa fa-check"></i>2. Curvas anytime frente al costo de cómputo</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#resumen-costo-para-acercarse-al-mejor-score-y-desempe%C3%B1o-en-el-fold-externo"><i class="fa fa-check"></i>3. Resumen: costo para acercarse al mejor score y desempeño en el fold externo</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#multi-fidelidad-hyperband-frente-a-random-search-con-un-costo-comparable"><i class="fa fa-check"></i>4. Multi-fidelidad: Hyperband frente a Random Search con un costo comparable</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#limitaciones-1"><i class="fa fa-check"></i>Limitaciones</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html"><i class="fa fa-check"></i>10. Modelo original (CS-FOF) y métodos recientes</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#la-idea-de-cs-fof"><i class="fa fa-check"></i>1. La idea de CS-FOF</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#mejor-combinaci%C3%B3n-de-cada-modelo"><i class="fa fa-check"></i>2. Mejor combinación de cada modelo</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#la-diferencia-de-cs-fof-es-significativa"><i class="fa fa-check"></i>3. ¿La diferencia de CS-FOF es significativa?</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#ranking-global-friedman-y-nemenyi"><i class="fa fa-check"></i>4. Ranking global: Friedman y Nemenyi</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#comparaci%C3%B3n-sobre-las-mismas-predicciones-delong-y-mcnemar"><i class="fa fa-check"></i>5. Comparación sobre las mismas predicciones: DeLong y McNemar</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#conclusi%C3%B3n-parcial"><i class="fa fa-check"></i>6. Conclusión (parcial)</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html"><i class="fa fa-check"></i>12. Corrida 5 x 5 en Colab (todos los modelos con el mismo código)</a>
+<ul>
+<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html#resultado-de-esta-sesi%C3%B3n"><i class="fa fa-check"></i>Resultado de esta sesión</a></li>
+<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html#despu%C3%A9s-de-que-terminen-todas-las-sesiones"><i class="fa fa-check"></i>Después de que terminen todas las sesiones</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="nb10" class="section level1 hasAnchor">
+<h1>10. Modelo original (CS-FOF) y métodos recientes<a href="nb10.html#nb10" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<!-- nb:md cell=0 -->
+<p>Las 112 combinaciones de los capítulos 04 a 09 son los modelos tradicionales y fijan el punto de comparación: su mejor F1 medio (validación anidada 5 x 5) es el de <strong>XGBoost con <code>class_weight</code> y optimización bayesiana, 0.5466</strong>. Este notebook responde una sola pregunta: <strong>¿existe un modelo que supere ese F1?</strong></p>
+<p>Para responderla se agregan tres modelos con el mismo protocolo (mismos 5 folds externos y 5 internos, semilla 42, F1 de la clase <em>default</em> como métrica):</p>
+<ul>
+<li><strong>CS-FOF</strong> (<em>Cost-Sensitive Fisher Oblique Forest</em>), el modelo original del proyecto, programado desde cero con <code>numpy</code>.</li>
+<li><strong>LightGBM</strong> y <strong>CatBoost</strong>, dos métodos recientes de boosting, como referencia del estado del arte.</li>
+</ul>
+<p>Los resultados son parciales, porque las corridas de los modelos nuevos todavía no terminan. Hasta ahora se cuenta con 4 combinaciones de CS-FOF y 25 de los métodos de boosting (16 de LightGBM y 9 de CatBoost, sin ADASYN), que se unen a las 112 para un total de 141 combinaciones.</p>
+<!-- nb:md cell=1 -->
+<div id="la-idea-de-cs-fof" class="section level2 hasAnchor">
+<h2>1. La idea de CS-FOF<a href="nb10.html#la-idea-de-cs-fof" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Un árbol clásico corta sobre una sola variable a la vez. Pero el riesgo de <em>default</em> depende de combinaciones (por ejemplo, del límite de crédito junto con lo pagado el mes anterior), de modo que la frontera es oblicua. En cada nodo, CS-FOF compara dos tipos de corte y se queda con el mejor:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Cortes rectos</strong>, como en Random Forest: umbrales sobre <span class="math inline">\(\sqrt{p}\)</span> variables sorteadas.</li>
+<li><strong>Un corte oblicuo</strong> en la dirección discriminante de Fisher, calculada solo con los clientes del nodo y ponderando más a los que incumplen (para penalizar más el falso negativo). Con <span class="math inline">\(\mu_0\)</span> y <span class="math inline">\(\mu_1\)</span> las medias de cada clase y <span class="math inline">\(S_w\)</span> la matriz de dispersión intraclase ponderada,</li>
+</ol>
+<p><span class="math display">\[
+v = S_w^{-1}\left(\mu_1 - \mu_0\right), \qquad z = v^\top x .
+\]</span></p>
+<p>El nodo elige el corte de mayor reducción de impureza de Gini ponderada <span class="math inline">\(\Delta G\)</span>:</p>
+<p><span class="math display">\[
+G = 1 - p_0^2 - p_1^2, \qquad
+\Delta G = G_{\text{padre}} - \frac{W_L}{W}\,G_L - \frac{W_R}{W}\,G_R .
+\]</span></p>
+<p>Como el corte oblicuo compite con todos los rectos, el corte elegido nunca es peor que el mejor recto <strong>en los datos de entrenamiento</strong>:</p>
+<p><span class="math display">\[
+\Delta G(\text{elegido}) \;\ge\; \max_j \Delta G(\text{recto}_j).
+\]</span></p>
+<p>Esto no garantiza que el bosque completo prediga mejor en clientes nuevos; eso solo lo pueden decir las pruebas de las secciones 3 y 4.</p>
+<!-- nb:code cell=2 -->
+<details>
+<summary>
+Código (22 líneas)
+</summary>
+<div class="sourceCode" id="cb219"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb219-1"><a href="nb10.html#cb219-1" tabindex="-1"></a><span class="im">import</span> sys, json</span>
+<span id="cb219-2"><a href="nb10.html#cb219-2" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb219-3"><a href="nb10.html#cb219-3" tabindex="-1"></a></span>
+<span id="cb219-4"><a href="nb10.html#cb219-4" tabindex="-1"></a>PROJECT_ROOT <span class="op">=</span> Path.cwd().parent</span>
+<span id="cb219-5"><a href="nb10.html#cb219-5" tabindex="-1"></a><span class="cf">if</span> <span class="bu">str</span>(PROJECT_ROOT) <span class="kw">not</span> <span class="kw">in</span> sys.path:</span>
+<span id="cb219-6"><a href="nb10.html#cb219-6" tabindex="-1"></a>    sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(PROJECT_ROOT))</span>
+<span id="cb219-7"><a href="nb10.html#cb219-7" tabindex="-1"></a></span>
+<span id="cb219-8"><a href="nb10.html#cb219-8" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb219-9"><a href="nb10.html#cb219-9" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb219-10"><a href="nb10.html#cb219-10" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb219-11"><a href="nb10.html#cb219-11" tabindex="-1"></a></span>
+<span id="cb219-12"><a href="nb10.html#cb219-12" tabindex="-1"></a><span class="im">from</span> src <span class="im">import</span> config</span>
+<span id="cb219-13"><a href="nb10.html#cb219-13" tabindex="-1"></a></span>
+<span id="cb219-14"><a href="nb10.html#cb219-14" tabindex="-1"></a>pd.options.display.float_format <span class="op">=</span> <span class="st">&quot;</span><span class="sc">{:,.4f}</span><span class="st">&quot;</span>.<span class="bu">format</span></span>
+<span id="cb219-15"><a href="nb10.html#cb219-15" tabindex="-1"></a>RES <span class="op">=</span> config.RESULTS_DIR</span>
+<span id="cb219-16"><a href="nb10.html#cb219-16" tabindex="-1"></a>COMP <span class="op">=</span> config.PROJECT_ROOT <span class="op">/</span> <span class="st">&quot;experiments&quot;</span> <span class="op">/</span> <span class="st">&quot;comparacion_final&quot;</span></span>
+<span id="cb219-17"><a href="nb10.html#cb219-17" tabindex="-1"></a></span>
+<span id="cb219-18"><a href="nb10.html#cb219-18" tabindex="-1"></a>NUEVOS <span class="op">=</span> [<span class="st">&quot;cs_fof&quot;</span>, <span class="st">&quot;lightgbm&quot;</span>, <span class="st">&quot;catboost&quot;</span>]</span>
+<span id="cb219-19"><a href="nb10.html#cb219-19" tabindex="-1"></a>tabla <span class="op">=</span> pd.read_csv(RES <span class="op">/</span> <span class="st">&quot;master_table_e3.csv&quot;</span>)</span>
+<span id="cb219-20"><a href="nb10.html#cb219-20" tabindex="-1"></a>tabla[<span class="st">&quot;grupo&quot;</span>] <span class="op">=</span> np.where(tabla[<span class="st">&quot;model&quot;</span>].isin(NUEVOS), <span class="st">&quot;nuevo&quot;</span>, <span class="st">&quot;tradicional&quot;</span>)</span>
+<span id="cb219-21"><a href="nb10.html#cb219-21" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Filas:&quot;</span>, <span class="bu">len</span>(tabla), <span class="st">&quot;|&quot;</span>, tabla[<span class="st">&quot;grupo&quot;</span>].value_counts().to_dict())</span>
+<span id="cb219-22"><a href="nb10.html#cb219-22" tabindex="-1"></a><span class="bu">print</span>(tabla.groupby(<span class="st">&quot;model&quot;</span>).size().sort_values(ascending<span class="op">=</span><span class="va">False</span>).to_string())</span></code></pre></div>
+</details>
+<!-- nb:text cell=2 -->
+<pre class="text"><code>Filas: 141 | {&#39;tradicional&#39;: 112, &#39;nuevo&#39;: 29}
+model
+knn                    16
+decision_tree          16
+naive_bayes            16
+random_forest          16
+lightgbm               16
+logistic_regression    16
+svm                    16
+xgboost                16
+catboost                9
+cs_fof                  4</code></pre>
+<!-- nb:md cell=3 -->
+</div>
+<div id="mejor-combinación-de-cada-modelo" class="section level2 hasAnchor">
+<h2>2. Mejor combinación de cada modelo<a href="nb10.html#mejor-combinaci%C3%B3n-de-cada-modelo" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Para cada modelo se toma la combinación (técnica de balanceo y método de optimización) con mayor F1 medio en los 5 folds externos. La desviación estándar usa <code>ddof=1</code>.</p>
+<!-- nb:code cell=4 -->
+<details>
+<summary>
+Código (7 líneas)
+</summary>
+<div class="sourceCode" id="cb221"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb221-1"><a href="nb10.html#cb221-1" tabindex="-1"></a>mejores <span class="op">=</span> (tabla.loc[tabla.groupby(<span class="st">&quot;model&quot;</span>)[<span class="st">&quot;f1_mean&quot;</span>].idxmax()]</span>
+<span id="cb221-2"><a href="nb10.html#cb221-2" tabindex="-1"></a>           .sort_values(<span class="st">&quot;f1_mean&quot;</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb221-3"><a href="nb10.html#cb221-3" tabindex="-1"></a>           .reset_index(drop<span class="op">=</span><span class="va">True</span>))</span>
+<span id="cb221-4"><a href="nb10.html#cb221-4" tabindex="-1"></a>mejores.insert(<span class="dv">0</span>, <span class="st">&quot;puesto&quot;</span>, mejores.index <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb221-5"><a href="nb10.html#cb221-5" tabindex="-1"></a>vista <span class="op">=</span> mejores[[<span class="st">&quot;puesto&quot;</span>, <span class="st">&quot;model&quot;</span>, <span class="st">&quot;grupo&quot;</span>, <span class="st">&quot;technique&quot;</span>, <span class="st">&quot;method&quot;</span>,</span>
+<span id="cb221-6"><a href="nb10.html#cb221-6" tabindex="-1"></a>                 <span class="st">&quot;f1_mean&quot;</span>, <span class="st">&quot;f1_std&quot;</span>, <span class="st">&quot;precision_mean&quot;</span>, <span class="st">&quot;recall_mean&quot;</span>, <span class="st">&quot;roc_auc_mean&quot;</span>]]</span>
+<span id="cb221-7"><a href="nb10.html#cb221-7" tabindex="-1"></a>vista</span></code></pre></div>
+</details>
+<!-- nb:table cell=4 -->
+<table>
+<colgroup>
+<col width="2%" />
+<col width="5%" />
+<col width="15%" />
+<col width="9%" />
+<col width="10%" />
+<col width="12%" />
+<col width="6%" />
+<col width="5%" />
+<col width="11%" />
+<col width="9%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">puesto</th>
+<th align="left">model</th>
+<th align="left">grupo</th>
+<th align="left">technique</th>
+<th align="left">method</th>
+<th align="left">f1_mean</th>
+<th align="left">f1_std</th>
+<th align="left">precision_mean</th>
+<th align="left">recall_mean</th>
+<th align="left">roc_auc_mean</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left">1</td>
+<td align="left">catboost</td>
+<td align="left">nuevo</td>
+<td align="left">class_weight</td>
+<td align="left">random_search</td>
+<td align="left">0.5480</td>
+<td align="left">0.0088</td>
+<td align="left">0.4840</td>
+<td align="left">0.6317</td>
+<td align="left">0.7838</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">cs_fof</td>
+<td align="left">nuevo</td>
+<td align="left">class_weight</td>
+<td align="left">random_search</td>
+<td align="left">0.5479</td>
+<td align="left">0.0054</td>
+<td align="left">0.5148</td>
+<td align="left">0.5864</td>
+<td align="left">0.7847</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">3</td>
+<td align="left">xgboost</td>
+<td align="left">tradicional</td>
+<td align="left">class_weight</td>
+<td align="left">bayesian_optuna</td>
+<td align="left">0.5466</td>
+<td align="left">0.0091</td>
+<td align="left">0.4927</td>
+<td align="left">0.6149</td>
+<td align="left">0.7828</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">4</td>
+<td align="left">lightgbm</td>
+<td align="left">nuevo</td>
+<td align="left">class_weight</td>
+<td align="left">bayesian_optuna</td>
+<td align="left">0.5462</td>
+<td align="left">0.0086</td>
+<td align="left">0.4878</td>
+<td align="left">0.6207</td>
+<td align="left">0.7843</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left">5</td>
+<td align="left">random_forest</td>
+<td align="left">tradicional</td>
+<td align="left">class_weight</td>
+<td align="left">random_search</td>
+<td align="left">0.5452</td>
+<td align="left">0.0077</td>
+<td align="left">0.4974</td>
+<td align="left">0.6041</td>
+<td align="left">0.7831</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="left">6</td>
+<td align="left">svm</td>
+<td align="left">tradicional</td>
+<td align="left">smote</td>
+<td align="left">random_search</td>
+<td align="left">0.5387</td>
+<td align="left">0.0048</td>
+<td align="left">0.4795</td>
+<td align="left">0.6148</td>
+<td align="left">0.7638</td>
+</tr>
+<tr class="odd">
+<td align="left">6</td>
+<td align="left">7</td>
+<td align="left">knn</td>
+<td align="left">tradicional</td>
+<td align="left">class_weight</td>
+<td align="left">random_search</td>
+<td align="left">0.5264</td>
+<td align="left">0.0122</td>
+<td align="left">0.4569</td>
+<td align="left">0.6208</td>
+<td align="left">0.7629</td>
+</tr>
+<tr class="even">
+<td align="left">7</td>
+<td align="left">8</td>
+<td align="left">decision_tree</td>
+<td align="left">tradicional</td>
+<td align="left">class_weight</td>
+<td align="left">bayesian_optuna</td>
+<td align="left">0.5254</td>
+<td align="left">0.0043</td>
+<td align="left">0.4788</td>
+<td align="left">0.5854</td>
+<td align="left">0.7569</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="left">9</td>
+<td align="left">logistic_regression</td>
+<td align="left">tradicional</td>
+<td align="left">class_weight</td>
+<td align="left">genetic_deap</td>
+<td align="left">0.5182</td>
+<td align="left">0.0104</td>
+<td align="left">0.4484</td>
+<td align="left">0.6139</td>
+<td align="left">0.7449</td>
+</tr>
+<tr class="even">
+<td align="left">9</td>
+<td align="left">10</td>
+<td align="left">naive_bayes</td>
+<td align="left">tradicional</td>
+<td align="left">smote</td>
+<td align="left">grid_search</td>
+<td align="left">0.4987</td>
+<td align="left">0.0078</td>
+<td align="left">0.4136</td>
+<td align="left">0.6279</td>
+<td align="left">0.7454</td>
+</tr>
+</tbody>
+</table>
+<!-- nb:code cell=5 -->
+<details>
+<summary>
+Código (8 líneas)
+</summary>
+<div class="sourceCode" id="cb222"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb222-1"><a href="nb10.html#cb222-1" tabindex="-1"></a>trad <span class="op">=</span> tabla[tabla[<span class="st">&quot;grupo&quot;</span>] <span class="op">==</span> <span class="st">&quot;tradicional&quot;</span>]</span>
+<span id="cb222-2"><a href="nb10.html#cb222-2" tabindex="-1"></a>ref <span class="op">=</span> trad.loc[trad[<span class="st">&quot;f1_mean&quot;</span>].idxmax()]</span>
+<span id="cb222-3"><a href="nb10.html#cb222-3" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Mejor de las 112 combinaciones: </span><span class="sc">{</span>ref[<span class="st">&#39;model&#39;</span>]<span class="sc">}</span><span class="ss"> / </span><span class="sc">{</span>ref[<span class="st">&#39;technique&#39;</span>]<span class="sc">}</span><span class="ss"> / </span><span class="sc">{</span>ref[<span class="st">&#39;method&#39;</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb222-4"><a href="nb10.html#cb222-4" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;F1 medio = </span><span class="sc">{</span>ref[<span class="st">&#39;f1_mean&#39;</span>]<span class="sc">:.4f}</span><span class="ss"> (desv. </span><span class="sc">{</span>ref[<span class="st">&#39;f1_std&#39;</span>]<span class="sc">:.4f}</span><span class="ss">)</span><span class="ch">\n</span><span class="ss">&quot;</span>)</span>
+<span id="cb222-5"><a href="nb10.html#cb222-5" tabindex="-1"></a></span>
+<span id="cb222-6"><a href="nb10.html#cb222-6" tabindex="-1"></a>nuevos <span class="op">=</span> mejores[mejores[<span class="st">&quot;grupo&quot;</span>] <span class="op">==</span> <span class="st">&quot;nuevo&quot;</span>][[<span class="st">&quot;model&quot;</span>, <span class="st">&quot;f1_mean&quot;</span>, <span class="st">&quot;f1_std&quot;</span>]].copy()</span>
+<span id="cb222-7"><a href="nb10.html#cb222-7" tabindex="-1"></a>nuevos[<span class="st">&quot;dif. frente a las 112&quot;</span>] <span class="op">=</span> nuevos[<span class="st">&quot;f1_mean&quot;</span>] <span class="op">-</span> ref[<span class="st">&quot;f1_mean&quot;</span>]</span>
+<span id="cb222-8"><a href="nb10.html#cb222-8" tabindex="-1"></a>nuevos</span></code></pre></div>
+</details>
+<!-- nb:text cell=5 -->
+<pre class="text"><code>Mejor de las 112 combinaciones: xgboost / class_weight / bayesian_optuna
+F1 medio = 0.5466 (desv. 0.0091)</code></pre>
+<!-- nb:table cell=5 -->
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">model</th>
+<th align="left">f1_mean</th>
+<th align="left">f1_std</th>
+<th align="left">dif. frente a las 112</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left">catboost</td>
+<td align="left">0.5480</td>
+<td align="left">0.0088</td>
+<td align="left">0.0015</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">cs_fof</td>
+<td align="left">0.5479</td>
+<td align="left">0.0054</td>
+<td align="left">0.0014</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">lightgbm</td>
+<td align="left">0.5462</td>
+<td align="left">0.0086</td>
+<td align="left">-0.0004</td>
+</tr>
+</tbody>
+</table>
+<!-- nb:code cell=6 -->
+<details>
+<summary>
+Código (10 líneas)
+</summary>
+<div class="sourceCode" id="cb224"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb224-1"><a href="nb10.html#cb224-1" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">4.6</span>))</span>
+<span id="cb224-2"><a href="nb10.html#cb224-2" tabindex="-1"></a>colores <span class="op">=</span> [<span class="st">&quot;#C9930C&quot;</span> <span class="cf">if</span> g <span class="op">==</span> <span class="st">&quot;nuevo&quot;</span> <span class="cf">else</span> <span class="st">&quot;#1B3071&quot;</span> <span class="cf">for</span> g <span class="kw">in</span> mejores[<span class="st">&quot;grupo&quot;</span>]]</span>
+<span id="cb224-3"><a href="nb10.html#cb224-3" tabindex="-1"></a>ax.barh(mejores[<span class="st">&quot;model&quot;</span>][::<span class="op">-</span><span class="dv">1</span>], mejores[<span class="st">&quot;f1_mean&quot;</span>][::<span class="op">-</span><span class="dv">1</span>], xerr<span class="op">=</span>mejores[<span class="st">&quot;f1_std&quot;</span>][::<span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb224-4"><a href="nb10.html#cb224-4" tabindex="-1"></a>        color<span class="op">=</span>colores[::<span class="op">-</span><span class="dv">1</span>], capsize<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb224-5"><a href="nb10.html#cb224-5" tabindex="-1"></a>ax.axvline(ref[<span class="st">&quot;f1_mean&quot;</span>], color<span class="op">=</span><span class="st">&quot;#0C1A41&quot;</span>, ls<span class="op">=</span><span class="st">&quot;--&quot;</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb224-6"><a href="nb10.html#cb224-6" tabindex="-1"></a>ax.text(ref[<span class="st">&quot;f1_mean&quot;</span>], <span class="op">-</span><span class="fl">0.9</span>, <span class="st">&quot;mejor de las 112&quot;</span>, ha<span class="op">=</span><span class="st">&quot;center&quot;</span>, va<span class="op">=</span><span class="st">&quot;top&quot;</span>, fontsize<span class="op">=</span><span class="dv">8</span>, color<span class="op">=</span><span class="st">&quot;#0C1A41&quot;</span>)</span>
+<span id="cb224-7"><a href="nb10.html#cb224-7" tabindex="-1"></a>ax.set_xlim(<span class="fl">0.46</span>, <span class="fl">0.56</span>)</span>
+<span id="cb224-8"><a href="nb10.html#cb224-8" tabindex="-1"></a>ax.set_xlabel(<span class="st">&quot;F1 medio de la clase default (5 folds externos, barras = desv. estándar)&quot;</span>)</span>
+<span id="cb224-9"><a href="nb10.html#cb224-9" tabindex="-1"></a>ax.set_title(<span class="st">&quot;Mejor combinación de cada modelo (dorado: modelos nuevos)&quot;</span>)</span>
+<span id="cb224-10"><a href="nb10.html#cb224-10" tabindex="-1"></a>plt.tight_layout()<span class="op">;</span> plt.show()</span></code></pre></div>
+</details>
+<!-- nb:img cell=6 -->
+<div class="float">
+<img src="figures/10_modelo_original_cs_fof/cell06_1.png" alt="Salida gráfica de la celda 6" />
+<div class="figcaption">Salida gráfica de la celda 6</div>
+</div>
+<!-- nb:md cell=7 -->
+<p>CatBoost (0.5480) y CS-FOF (0.5479) superan al mejor de las 112 por 0.0015 y 0.0014 de F1, y LightGBM (0.5462) queda 0.0004 por debajo. Las tres diferencias son de milésimas, mucho menores que la desviación entre folds (cerca de 0.009).</p>
+<!-- nb:md cell=8 -->
+</div>
+<div id="la-diferencia-de-cs-fof-es-significativa" class="section level2 hasAnchor">
+<h2>3. ¿La diferencia de CS-FOF es significativa?<a href="nb10.html#la-diferencia-de-cs-fof-es-significativa" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Se compara CS-FOF con la mejor combinación de cada rival, fold a fold. Como los 5 folds comparten datos de entrenamiento, el <span class="math inline">\(t\)</span> de Nadeau y Bengio corrige la varianza de la diferencia entre folds. Con <span class="math inline">\(d_i\)</span> la diferencia de F1 en el fold <span class="math inline">\(i\)</span>, <span class="math inline">\(k=5\)</span> folds, <span class="math inline">\(n_1\)</span> y <span class="math inline">\(n_2\)</span> los tamaños de entrenamiento y prueba:</p>
+<p><span class="math display">\[
+t = \frac{\bar d}{\sqrt{\left(\dfrac{1}{k} + \dfrac{n_2}{n_1}\right) s_d^2}} .
+\]</span></p>
+<p>También se reporta el Wilcoxon por pares (con 5 folds su valor mínimo posible es 0.0625) y el delta de Cliff como tamaño de efecto. Ambos <span class="math inline">\(p\)</span>-valores se corrigen con Holm.</p>
+<!-- nb:code cell=9 -->
+<details>
+<summary>
+Código (5 líneas)
+</summary>
+<div class="sourceCode" id="cb225"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb225-1"><a href="nb10.html#cb225-1" tabindex="-1"></a>cmp_ <span class="op">=</span> pd.read_csv(COMP <span class="op">/</span> <span class="st">&quot;cs_fof_vs_modelos.csv&quot;</span>)</span>
+<span id="cb225-2"><a href="nb10.html#cb225-2" tabindex="-1"></a>cmp_ <span class="op">=</span> cmp_.rename(columns<span class="op">=</span>{<span class="st">&quot;modelo&quot;</span>: <span class="st">&quot;rival&quot;</span>, <span class="st">&quot;dif_f1&quot;</span>: <span class="st">&quot;F1 CS-FOF menos rival&quot;</span>, <span class="st">&quot;gana&quot;</span>: <span class="st">&quot;folds que gana CS-FOF (de 5)&quot;</span>,</span>
+<span id="cb225-3"><a href="nb10.html#cb225-3" tabindex="-1"></a>                            <span class="st">&quot;p_nadeau_bengio_holm&quot;</span>: <span class="st">&quot;p Nadeau-Bengio (Holm)&quot;</span>, <span class="st">&quot;p_wilcoxon_holm&quot;</span>: <span class="st">&quot;p Wilcoxon (Holm)&quot;</span>})</span>
+<span id="cb225-4"><a href="nb10.html#cb225-4" tabindex="-1"></a>cmp_[[<span class="st">&quot;rival&quot;</span>, <span class="st">&quot;F1 CS-FOF menos rival&quot;</span>, <span class="st">&quot;folds que gana CS-FOF (de 5)&quot;</span>, <span class="st">&quot;cliff&quot;</span>,</span>
+<span id="cb225-5"><a href="nb10.html#cb225-5" tabindex="-1"></a>      <span class="st">&quot;p_nadeau_bengio&quot;</span>, <span class="st">&quot;p Nadeau-Bengio (Holm)&quot;</span>, <span class="st">&quot;p Wilcoxon (Holm)&quot;</span>]]</span></code></pre></div>
+</details>
+<!-- nb:table cell=9 -->
+<table>
+<colgroup>
+<col width="2%" />
+<col width="14%" />
+<col width="15%" />
+<col width="20%" />
+<col width="5%" />
+<col width="11%" />
+<col width="16%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">rival</th>
+<th align="left">F1 CS-FOF menos rival</th>
+<th align="left">folds que gana CS-FOF (de 5)</th>
+<th align="left">cliff</th>
+<th align="left">p_nadeau_bengio</th>
+<th align="left">p Nadeau-Bengio (Holm)</th>
+<th align="left">p Wilcoxon (Holm)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left">catboost</td>
+<td align="left">-0.0001</td>
+<td align="left">2</td>
+<td align="left">-0.0400</td>
+<td align="left">0.9743</td>
+<td align="left">1.0000</td>
+<td align="left">1.0000</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">xgboost</td>
+<td align="left">0.0014</td>
+<td align="left">4</td>
+<td align="left">0.3600</td>
+<td align="left">0.6266</td>
+<td align="left">1.0000</td>
+<td align="left">1.0000</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">lightgbm</td>
+<td align="left">0.0018</td>
+<td align="left">3</td>
+<td align="left">0.1200</td>
+<td align="left">0.5673</td>
+<td align="left">1.0000</td>
+<td align="left">1.0000</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">random_forest</td>
+<td align="left">0.0027</td>
+<td align="left">4</td>
+<td align="left">0.3600</td>
+<td align="left">0.3093</td>
+<td align="left">1.0000</td>
+<td align="left">0.7500</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left">svm</td>
+<td align="left">0.0092</td>
+<td align="left">5</td>
+<td align="left">0.7600</td>
+<td align="left">0.0023</td>
+<td align="left">0.0141</td>
+<td align="left">0.5625</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="left">knn</td>
+<td align="left">0.0216</td>
+<td align="left">5</td>
+<td align="left">0.9200</td>
+<td align="left">0.0113</td>
+<td align="left">0.0563</td>
+<td align="left">0.5625</td>
+</tr>
+<tr class="odd">
+<td align="left">6</td>
+<td align="left">decision_tree</td>
+<td align="left">0.0225</td>
+<td align="left">5</td>
+<td align="left">1.0000</td>
+<td align="left">0.0004</td>
+<td align="left">0.0033</td>
+<td align="left">0.5625</td>
+</tr>
+<tr class="even">
+<td align="left">7</td>
+<td align="left">logistic_regression</td>
+<td align="left">0.0297</td>
+<td align="left">5</td>
+<td align="left">1.0000</td>
+<td align="left">0.0020</td>
+<td align="left">0.0141</td>
+<td align="left">0.5625</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="left">naive_bayes</td>
+<td align="left">0.0493</td>
+<td align="left">5</td>
+<td align="left">1.0000</td>
+<td align="left">0.0000</td>
+<td align="left">0.0003</td>
+<td align="left">0.5625</td>
+</tr>
+</tbody>
+</table>
+<!-- nb:md cell=10 -->
+<p>Frente a CatBoost, XGBoost, LightGBM y Random Forest las diferencias son menores a 0.003 de F1 y ningún <span class="math inline">\(p\)</span>-valor corregido es significativo: no hay evidencia de que CS-FOF sea mejor, ni peor, que ellos. En cambio, supera a SVM, KNN, árbol de decisión, regresión logística y Naive Bayes (diferencias de 0.009 a 0.049 de F1 y <span class="math inline">\(p\)</span> de Nadeau-Bengio con Holm menor a 0.06 en los cinco, y delta de Cliff de 0.76 a 1). El Wilcoxon con 5 folds no alcanza a ser significativo en ningún caso.</p>
+<!-- nb:md cell=11 -->
+</div>
+<div id="ranking-global-friedman-y-nemenyi" class="section level2 hasAnchor">
+<h2>4. Ranking global: Friedman y Nemenyi<a href="nb10.html#ranking-global-friedman-y-nemenyi" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Se ordenan los 10 modelos (la mejor combinación de cada uno) por rango medio de F1 en los 5 folds. La prueba de Friedman contrasta si todos son equivalentes; si no, la diferencia crítica de Nemenyi indica cuándo dos rangos medios se separan:</p>
+<p><span class="math display">\[
+\mathrm{CD} = q_\alpha \sqrt{\frac{k(k+1)}{6N}}, \qquad k = 10 \text{ modelos},\; N = 5 \text{ folds}.
+\]</span></p>
+<!-- nb:code cell=12 -->
+<details>
+<summary>
+Código (17 líneas)
+</summary>
+<div class="sourceCode" id="cb226"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb226-1"><a href="nb10.html#cb226-1" tabindex="-1"></a>fr <span class="op">=</span> json.load(<span class="bu">open</span>(COMP <span class="op">/</span> <span class="st">&quot;friedman.json&quot;</span>))</span>
+<span id="cb226-2"><a href="nb10.html#cb226-2" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Friedman: chi2 = </span><span class="sc">{</span>fr[<span class="st">&#39;friedman_chi2&#39;</span>]<span class="sc">:.2f}</span><span class="ss">, p = </span><span class="sc">{</span>fr[<span class="st">&#39;friedman_p&#39;</span>]<span class="sc">:.2e}</span><span class="ss">&quot;</span>)</span>
+<span id="cb226-3"><a href="nb10.html#cb226-3" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Diferencia crítica de Nemenyi (CD) = </span><span class="sc">{</span>fr[<span class="st">&#39;nemenyi_cd&#39;</span>]<span class="sc">:.2f}</span><span class="ch">\n</span><span class="ss">&quot;</span>)</span>
+<span id="cb226-4"><a href="nb10.html#cb226-4" tabindex="-1"></a></span>
+<span id="cb226-5"><a href="nb10.html#cb226-5" tabindex="-1"></a>rangos <span class="op">=</span> pd.Series(fr[<span class="st">&quot;rangos&quot;</span>]).sort_values()</span>
+<span id="cb226-6"><a href="nb10.html#cb226-6" tabindex="-1"></a>mejor_rango <span class="op">=</span> rangos.iloc[<span class="dv">0</span>]</span>
+<span id="cb226-7"><a href="nb10.html#cb226-7" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">4.4</span>))</span>
+<span id="cb226-8"><a href="nb10.html#cb226-8" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">&quot;#C9930C&quot;</span> <span class="cf">if</span> m <span class="kw">in</span> NUEVOS <span class="cf">else</span> <span class="st">&quot;#1B3071&quot;</span> <span class="cf">for</span> m <span class="kw">in</span> rangos.index]</span>
+<span id="cb226-9"><a href="nb10.html#cb226-9" tabindex="-1"></a>ax.barh(rangos.index[::<span class="op">-</span><span class="dv">1</span>], rangos.values[::<span class="op">-</span><span class="dv">1</span>], color<span class="op">=</span>cols[::<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb226-10"><a href="nb10.html#cb226-10" tabindex="-1"></a>ax.axvline(mejor_rango <span class="op">+</span> fr[<span class="st">&quot;nemenyi_cd&quot;</span>], color<span class="op">=</span><span class="st">&quot;#0C1A41&quot;</span>, ls<span class="op">=</span><span class="st">&quot;--&quot;</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb226-11"><a href="nb10.html#cb226-11" tabindex="-1"></a>ax.text(mejor_rango <span class="op">+</span> fr[<span class="st">&quot;nemenyi_cd&quot;</span>], <span class="op">-</span><span class="fl">0.9</span>, <span class="st">&quot;mejor rango + CD&quot;</span>, ha<span class="op">=</span><span class="st">&quot;center&quot;</span>, va<span class="op">=</span><span class="st">&quot;top&quot;</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb226-12"><a href="nb10.html#cb226-12" tabindex="-1"></a>ax.set_xlabel(<span class="st">&quot;Rango medio de F1 (menor es mejor)&quot;</span>)</span>
+<span id="cb226-13"><a href="nb10.html#cb226-13" tabindex="-1"></a>ax.set_title(<span class="st">&quot;Ranking de los 10 modelos (Friedman)&quot;</span>)</span>
+<span id="cb226-14"><a href="nb10.html#cb226-14" tabindex="-1"></a>plt.tight_layout()<span class="op">;</span> plt.show()</span>
+<span id="cb226-15"><a href="nb10.html#cb226-15" tabindex="-1"></a></span>
+<span id="cb226-16"><a href="nb10.html#cb226-16" tabindex="-1"></a>dentro <span class="op">=</span> rangos[rangos <span class="op">&lt;=</span> mejor_rango <span class="op">+</span> fr[<span class="st">&quot;nemenyi_cd&quot;</span>]]</span>
+<span id="cb226-17"><a href="nb10.html#cb226-17" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Modelos que Nemenyi no separa del mejor:&quot;</span>, <span class="st">&quot;, &quot;</span>.join(dentro.index))</span></code></pre></div>
+</details>
+<!-- nb:text cell=12 -->
+<pre class="text"><code>Friedman: chi2 = 40.29, p = 6.74e-06
+Diferencia crítica de Nemenyi (CD) = 6.06</code></pre>
+<!-- nb:img cell=12 -->
+<div class="float">
+<img src="figures/10_modelo_original_cs_fof/cell12_1.png" alt="Salida gráfica de la celda 12" />
+<div class="figcaption">Salida gráfica de la celda 12</div>
+</div>
+<!-- nb:text cell=12 -->
+<pre class="text"><code>Modelos que Nemenyi no separa del mejor: catboost, cs_fof, xgboost, random_forest, lightgbm, svm, knn, decision_tree</code></pre>
+<!-- nb:md cell=13 -->
+<p>Friedman es significativo, pero Nemenyi con solo 5 folds es poco potente: solo separa de la cabeza a regresión logística y Naive Bayes. CatBoost, CS-FOF, XGBoost, Random Forest y LightGBM ocupan los cinco primeros rangos, pero entre ellos (y aun frente a SVM, KNN y el árbol de decisión) el orden no es estadísticamente interpretable. Se lee como una comparación descriptiva.</p>
+<!-- nb:md cell=14 -->
+</div>
+<div id="comparación-sobre-las-mismas-predicciones-delong-y-mcnemar" class="section level2 hasAnchor">
+<h2>5. Comparación sobre las mismas predicciones: DeLong y McNemar<a href="nb10.html#comparaci%C3%B3n-sobre-las-mismas-predicciones-delong-y-mcnemar" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Con las probabilidades fuera de muestra (<em>out-of-fold</em>) de cada modelo se comparan sus AUC con la prueba de DeLong y sus aciertos con McNemar (sobre los clientes en que solo uno de los dos falla). Con unos 30,000 clientes, McNemar detecta diferencias minúsculas en los aciertos, por lo que se interpreta junto con el tamaño de la diferencia de F1 de la sección anterior.</p>
+<!-- nb:code cell=15 -->
+<details>
+<summary>
+Código (3 líneas)
+</summary>
+<div class="sourceCode" id="cb229"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb229-1"><a href="nb10.html#cb229-1" tabindex="-1"></a>dm <span class="op">=</span> pd.read_csv(COMP <span class="op">/</span> <span class="st">&quot;delong_mcnemar.csv&quot;</span>)</span>
+<span id="cb229-2"><a href="nb10.html#cb229-2" tabindex="-1"></a>dm[[<span class="st">&quot;rival&quot;</span>, <span class="st">&quot;auc_cs_fof&quot;</span>, <span class="st">&quot;auc_rival&quot;</span>, <span class="st">&quot;delong_p&quot;</span>, <span class="st">&quot;mcnemar_solo_cs_fof_falla&quot;</span>,</span>
+<span id="cb229-3"><a href="nb10.html#cb229-3" tabindex="-1"></a>    <span class="st">&quot;mcnemar_solo_rival_falla&quot;</span>, <span class="st">&quot;f1_oof_cs_fof&quot;</span>, <span class="st">&quot;f1_oof_rival&quot;</span>]]</span></code></pre></div>
+</details>
+<!-- nb:table cell=15 -->
+<table>
+<colgroup>
+<col width="2%" />
+<col width="11%" />
+<col width="8%" />
+<col width="8%" />
+<col width="7%" />
+<col width="20%" />
+<col width="20%" />
+<col width="11%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">rival</th>
+<th align="left">auc_cs_fof</th>
+<th align="left">auc_rival</th>
+<th align="left">delong_p</th>
+<th align="left">mcnemar_solo_cs_fof_falla</th>
+<th align="left">mcnemar_solo_rival_falla</th>
+<th align="left">f1_oof_cs_fof</th>
+<th align="left">f1_oof_rival</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left">catboost</td>
+<td align="left">0.7833</td>
+<td align="left">0.7843</td>
+<td align="left">0.2727</td>
+<td align="left">429</td>
+<td align="left">936</td>
+<td align="left">0.5484</td>
+<td align="left">0.5470</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">xgboost</td>
+<td align="left">0.7833</td>
+<td align="left">0.7827</td>
+<td align="left">0.5606</td>
+<td align="left">434</td>
+<td align="left">827</td>
+<td align="left">0.5484</td>
+<td align="left">0.5448</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">lightgbm</td>
+<td align="left">0.7833</td>
+<td align="left">0.7725</td>
+<td align="left">0.0000</td>
+<td align="left">345</td>
+<td align="left">782</td>
+<td align="left">0.5484</td>
+<td align="left">0.5459</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">random_forest</td>
+<td align="left">0.7833</td>
+<td align="left">0.7822</td>
+<td align="left">0.1714</td>
+<td align="left">313</td>
+<td align="left">615</td>
+<td align="left">0.5484</td>
+<td align="left">0.5434</td>
+</tr>
+</tbody>
+</table>
+<!-- nb:md cell=16 -->
+<p>El AUC de CS-FOF es indistinguible del de CatBoost, XGBoost y Random Forest (DeLong con <span class="math inline">\(p &gt; 0.1\)</span>) y mayor que el de LightGBM (DeLong con <span class="math inline">\(p &lt; 0.001\)</span>). McNemar sí marca diferencias en los aciertos individuales, pero esas diferencias se compensan: el F1 fuera de muestra de CS-FOF y de cada rival difiere en menos de 0.003.</p>
+<!-- nb:md cell=17 -->
+</div>
+<div id="conclusión-parcial" class="section level2 hasAnchor">
+<h2>6. Conclusión (parcial)<a href="nb10.html#conclusi%C3%B3n-parcial" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ul>
+<li>Ningún modelo nuevo supera de forma significativa al mejor de las 112 combinaciones. El mayor F1 medio es de CatBoost (0.5480), seguido de CS-FOF (0.5479); frente al mejor tradicional (XGBoost, 0.5466) la ventaja es de 0.001 a 0.002, menor que la desviación entre folds.</li>
+<li><strong>CS-FOF</strong> es competitivo, con el mayor ROC-AUC medio y la menor variación entre folds entre los cinco primeros, pero empata estadísticamente con CatBoost, XGBoost, LightGBM y Random Forest.</li>
+<li><strong>Estado de las corridas.</strong> Los resultados son parciales: las corridas de los modelos nuevos todavía no terminan (hasta ahora CS-FOF con 4 combinaciones, LightGBM con 16 y CatBoost con 9 de 16). Esta sección y las tablas se actualizan cuando se completen.</li>
+<li><strong>Limitación metodológica.</strong> Con 5 folds las pruebas tienen poca potencia, así que la comparación entre los modelos de cabeza es descriptiva.</li>
+</ul>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="nb09.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="nb12.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,8 @@
+,model,technique,method,f1_mean
+0,xgboost,class_weight,bayesian_optuna,0.5466
+1,random_forest,class_weight,random_search,0.5452
+2,svm,smote,random_search,0.5387
+3,knn,class_weight,random_search,0.5264
+4,decision_tree,class_weight,bayesian_optuna,0.5254
+5,logistic_regression,class_weight,genetic_deap,0.5182
+6,naive_bayes,smote,grid_search,0.4987

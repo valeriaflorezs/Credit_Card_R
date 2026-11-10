@@ -1,0 +1,648 @@
+# 06. Interpretabilidad (SHAP y LIME) {#nb06}
+
+```{r setup-nb06, include=FALSE}
+knitr::opts_chunk$set(python.reticulate = FALSE)
+BASE <- if (file.exists(file.path("R", "portar_notebook.R"))) "." else ".."
+source(file.path(BASE, "R", "portar_notebook.R"))
+```
+
+<!-- nb:md cell=0 -->
+
+SHAP global (summary plot) y local (waterfall, 2 observaciones: una bien clasificada y una con error alto) para la combinación con mayor F1 medio del capítulo 05 (XGBoost, `class_weight`, `bayesian_optuna`), más una comparación LIME vs. SHAP para XGBoost sobre una sola observación.
+
+**Alcance y limitaciones:**
+- Las secciones 1 a 4 interpretan **una** combinación (la de mayor F1 medio: XGBoost, `class_weight`, `bayesian_optuna`) en **un** fold externo (el de mayor F1, elegido a posteriori), sobre 100 filas, y comparan LIME con SHAP en **una** observación. Sirven para ilustrar el método, no para generalizar.
+- Las secciones 5 y 6 corrigen eso: repiten el análisis en los **5 folds externos**, cada uno con el pipeline reajustado con los hiperparámetros que su propio bucle interno eligió, y comparan LIME con SHAP en **200 observaciones por modelo** (10 al azar de cada celda de la matriz de confusión por fold), para Random Forest y XGBoost.
+- Las dos observaciones del waterfall de la sección 4 son casos extremos (probabilidades 0.954 y 0.952), no representativos del conjunto.
+- Se interpretan dos de los siete modelos. Los demás no se explican.
+- Con variables correlacionadas, SHAP reparte la importancia entre ellas de forma arbitraria. Y con modelos entrenados con `class_weight` o SMOTE las probabilidades no están calibradas: el valor base de 0.5 refleja el balanceo y no la prevalencia real (22 %), así que los aportes no se leen como cambios de riesgo reales.
+
+<!-- nb:code cell=1 -->
+<details><summary>Código (32 líneas)</summary>
+
+```{python nb06_c01, eval=FALSE}
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path.cwd().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+import json
+
+import numpy as np
+
+from src import config
+from src.data_loader import load_processed_dataset, split_features_target
+from src.synthetic_data import generate_synthetic_dataset
+from src.preprocessing import remove_duplicate_rows
+from src.models import MODEL_REGISTRY
+from src.experiment_runner import load_master_table
+from src import interpretability as ip
+
+np.random.seed(config.RANDOM_STATE)
+config.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+
+try:
+    df = load_processed_dataset()
+except FileNotFoundError:
+    df = generate_synthetic_dataset()
+df, _ = remove_duplicate_rows(df)
+X, y = split_features_target(df)
+
+table = load_master_table(config.EXPERIMENTS_MASTER_PATH)
+if table.empty:
+    raise RuntimeError("La tabla maestra está vacía. Correr primero 04_run_experiments.ipynb.")
+```
+
+</details>
+
+<!-- nb:md cell=2 -->
+## Elegir el mejor modelo y ajustar su pipeline
+
+El fold externo usado es el de mejor desempeño; SHAP/LIME se calculan sobre ESE fold de prueba.
+
+<!-- nb:code cell=3 -->
+<details><summary>Código (20 líneas)</summary>
+
+```{python nb06_c03, eval=FALSE}
+metric_for_ranking = config.DEFAULT_SCORING
+best_row = table.sort_values(f"{metric_for_ranking}_mean", ascending=False).iloc[0]
+best_model = best_row["model"]
+best_technique = best_row["technique"]
+best_method = best_row["method"]
+
+best_params_per_fold = json.loads(best_row["best_params_per_fold"])
+per_fold_metric = json.loads(best_row[f"{metric_for_ranking}_per_fold"])
+best_fold_idx = int(np.argmax(per_fold_metric))
+best_params = best_params_per_fold[best_fold_idx]
+
+print(f"Mejor modelo: {best_model} | {best_technique} | {best_method} (fold {best_fold_idx})")
+
+spec = MODEL_REGISTRY[best_model]
+fitted = ip.fit_explainable_pipeline(
+    spec, best_technique, best_params, X, y, best_fold_idx,
+    n_outer_folds=int(best_row["n_outer_folds"]),
+)
+model_step = fitted["pipeline"].named_steps["model"]
+print(f"Features post-transformación: {len(fitted['feature_names'])}")
+```
+
+</details>
+
+<!-- nb:text cell=3 -->
+```text
+Mejor modelo: xgboost | class_weight | bayesian_optuna (fold 3)
+Features post-transformación: 25
+```
+
+<!-- nb:md cell=4 -->
+## SHAP global (summary plot)
+
+Sobre una muestra del fold de prueba (limitada por costo computacional para modelos no basados en árboles). Las columnas one-hot de `SEX`/`EDUCATION`/`MARRIAGE` se agregan de vuelta a la variable categórica original.
+
+<!-- nb:code cell=5 -->
+<details><summary>Código (16 líneas)</summary>
+
+```{python nb06_c05, eval=FALSE}
+n_explain = min(ip.DEFAULT_N_EXPLAIN, fitted["X_test_t"].shape[0])
+
+shap_values, base_value = ip.compute_shap_values(
+    best_model, model_step, fitted["X_train_t"], fitted["X_test_t"][:n_explain]
+)
+agg_values, agg_names = ip.aggregate_onehot_shap(shap_values, fitted["feature_names"])
+display_matrix = ip.build_aggregated_display_matrix(
+    fitted["X_test"].iloc[:n_explain], fitted["X_test_t"][:n_explain], fitted["feature_names"]
+)
+
+summary_path = config.FIGURES_DIR / f"shap_summary_{best_model}.png"
+ip.plot_shap_summary(agg_values, display_matrix, agg_names, save_path=str(summary_path))
+
+from IPython.display import Image, display as ipy_display
+
+ipy_display(Image(filename=str(summary_path)))
+```
+
+</details>
+
+<!-- nb:img cell=5 -->
+![Salida gráfica de la celda 5](figures/06_interpretability/cell05_1.png)
+
+<!-- nb:md cell=6 -->
+- **El historial de pagos domina.** `PAY_0` es la variable más importante, con una diferencia clara frente a las demás: sus valores altos (meses de atraso) generan los aportes más grandes hacia *default*, de más de +1 en log-odds. `PAY_2`, `PAY_3`, `PAY_4`, `PAY_5` y `PAY_6` siguen el mismo patrón: más atraso aumenta el riesgo. Esto coincide con el EDA y, en parte, con la regresión logística base: allí `PAY_0` (+0.52) es el mayor coeficiente entre las variables numéricas, pero el mayor en valor absoluto es `EDUCATION_4` (-0.96). Además, coeficientes lineales y SHAP sobre un modelo de árboles no son directamente comparables.
+- **Mayor límite de crédito, menor riesgo.** En `LIMIT_BAL_LOG` los valores altos (rojo) quedan a la izquierda, es decir, reducen la probabilidad de *default*. Esto es coherente con la diferencia de límites entre clientes con y sin *default* encontrada en el EDA.
+- **Montos pagados.** En las variables `PAY_AMT*_LOG`, los clientes que pagaron más (rojo) tienden a tener aportes negativos, o sea menor riesgo. Su efecto individual es moderado.
+- **Facturación.** `BILL_AMT_MEAN_6M_LOG` aparece en tercer lugar en este fold, con algunos aportes grandes hacia *default* (hasta cerca de +1.3) que no siguen un patrón tan claro como el de los pagos, y `BILL_AMT_TREND_6M_LOG` aparece más abajo. En el EDA el monto facturado discriminaba poco entre clases, y en la sección 5 se ve que su posición cambia entre folds.
+
+<!-- nb:md cell=7 -->
+## SHAP local: una observación bien clasificada y una con error alto
+
+<!-- nb:code cell=8 -->
+<details><summary>Código (19 líneas)</summary>
+
+```{python nb06_c08, eval=FALSE}
+y_pred_test = fitted["pipeline"].predict(fitted["X_test"])
+y_proba_test = fitted["pipeline"].predict_proba(fitted["X_test"])[:, 1]
+instances = ip.select_representative_instances(fitted["y_test"].to_numpy(), y_pred_test, y_proba_test)
+print(instances)
+
+for label, pos in instances.items():
+    x_row_t = fitted["X_test_t"][pos : pos + 1]
+    sv, bv = ip.compute_shap_values(best_model, model_step, fitted["X_train_t"], x_row_t)
+    agg_sv, agg_n = ip.aggregate_onehot_shap(sv, fitted["feature_names"])
+    row_display = ip.build_aggregated_display_matrix(
+        fitted["X_test"].iloc[pos : pos + 1], x_row_t, fitted["feature_names"]
+    )
+    waterfall_path = config.FIGURES_DIR / f"shap_waterfall_{best_model}_{label}.png"
+    ip.plot_shap_waterfall(agg_sv[0], bv, row_display[0], agg_n, save_path=str(waterfall_path))
+    print(
+        f"{label}: y_true={fitted['y_test'].iloc[pos]}, y_pred={y_pred_test[pos]}, "
+        f"proba={y_proba_test[pos]:.3f}"
+    )
+    ipy_display(Image(filename=str(waterfall_path)))
+```
+
+</details>
+
+<!-- nb:text cell=8 -->
+```text
+{'well_classified': 2512, 'high_error': 2900}
+well_classified: y_true=1, y_pred=1, proba=0.954
+```
+
+<!-- nb:img cell=8 -->
+![Salida gráfica de la celda 8](figures/06_interpretability/cell08_1.png)
+
+<!-- nb:text cell=8 -->
+```text
+high_error: y_true=0, y_pred=1, proba=0.952
+```
+
+<!-- nb:img cell=8 -->
+![Salida gráfica de la celda 8](figures/06_interpretability/cell08_2.png)
+
+<!-- nb:md cell=9 -->
+Se analizaron dos clientes del fold de prueba (los aportes están en log-odds). El valor base del modelo es 0.5 de probabilidad y cada barra indica cuánto sube o baja el margen.
+
+**1. Cliente bien clasificado** (*default* real = 1, predicho = 1, probabilidad = 0.954)
+
+- Tiene un atraso de 2 meses en `PAY_0` y también en `PAY_2` a `PAY_6`, es decir, atrasos en los seis meses. `PAY_0` aporta +1.42 y `PAY_2` a `PAY_6` suman otros +0.9 aproximadamente.
+- `BILL_AMT_MEAN_6M_LOG` (12.6) aporta +1.07, casi tanto como `PAY_0`.
+- Su límite de crédito (`LIMIT_BAL_LOG` = 12.97) y los pagos de los meses 1 y 5 reducen el riesgo (-0.33, -0.14 y -0.20), pero no alcanzan a compensar.
+
+El modelo acierta con mucha seguridad porque casi todas las señales importantes apuntan en la misma dirección.
+
+**2. Cliente con error alto** (*default* real = 0, predicho = 1, probabilidad = 0.952)
+
+- Es un falso positivo. Tiene atrasos de 2 a 5 meses en todos los meses (`PAY_0` = 3, `PAY_2` = 5, `PAY_3` = 4, `PAY_4` = 3, `PAY_5` = 2) y pagos en cero en tres de los meses (`PAY_AMT1`, `PAY_AMT2`, `PAY_AMT4`).
+- `PAY_0` aporta +1.27 y `BILL_AMT_MEAN_6M_LOG` +0.65. Según su historial, el modelo lo considera casi seguro de caer en *default*.
+- Los atrasos saltan de unos meses a otros (de 5 a 4 a 3), un patrón poco habitual que podría indicar un registro atípico, pero con estos datos no se puede confirmar.
+
+El error no parece venir de una falla del modelo, sino de un cliente que, con ese historial, no incumplió. Esto es consistente con el ruido que ya se había detectado en el EDA: hay clientes con las mismas variables y etiquetas distintas, por lo que ningún modelo puede acertar en todos los casos.
+
+Ambos clientes son casos extremos (probabilidades 0.954 y 0.952), elegidos para ilustrar, y no representan el comportamiento típico del modelo. Como el modelo se entrenó con `class_weight`, esas probabilidades tampoco están calibradas.
+
+<!-- nb:md cell=10 -->
+## LIME vs. SHAP (específicamente para XGBoost)
+
+Si el mejor modelo ya es XGBoost, esta sección reutiliza el mismo ajuste de arriba; si no, ajusta la mejor combinación de XGBoost por separado (el curso pide esta comparación puntualmente para XGBoost, más allá de cuál haya resultado ser el mejor modelo global). Se explica una sola observación (`high_error`), por lo que la comparación es ilustrativa.
+
+<!-- nb:code cell=11 -->
+<details><summary>Código (39 líneas)</summary>
+
+```{python nb06_c11, eval=FALSE}
+xgb_rows = table[table["model"] == "xgboost"]
+
+if xgb_rows.empty:
+    print(
+        "No hay corridas de XGBoost en la tabla maestra todavía: "
+        "correr 04_run_experiments.ipynb incluyendo xgboost para esta sección."
+    )
+else:
+    xgb_best_row = xgb_rows.sort_values(f"{metric_for_ranking}_mean", ascending=False).iloc[0]
+    xgb_technique = xgb_best_row["technique"]
+    xgb_best_params_per_fold = json.loads(xgb_best_row["best_params_per_fold"])
+    xgb_per_fold_metric = json.loads(xgb_best_row[f"{metric_for_ranking}_per_fold"])
+    xgb_fold_idx = int(np.argmax(xgb_per_fold_metric))
+    xgb_best_params = xgb_best_params_per_fold[xgb_fold_idx]
+
+    xgb_spec = MODEL_REGISTRY["xgboost"]
+    xgb_fitted = ip.fit_explainable_pipeline(
+        xgb_spec, xgb_technique, xgb_best_params, X, y, xgb_fold_idx,
+        n_outer_folds=int(xgb_best_row["n_outer_folds"]),
+    )
+    xgb_model_step = xgb_fitted["pipeline"].named_steps["model"]
+
+    xgb_y_pred = xgb_fitted["pipeline"].predict(xgb_fitted["X_test"])
+    xgb_y_proba = xgb_fitted["pipeline"].predict_proba(xgb_fitted["X_test"])[:, 1]
+    xgb_instances = ip.select_representative_instances(
+        xgb_fitted["y_test"].to_numpy(), xgb_y_pred, xgb_y_proba
+    )
+
+    pos = xgb_instances["high_error"]
+    x_row_t = xgb_fitted["X_test_t"][pos : pos + 1]
+
+    lime_exp = ip.explain_with_lime(
+        xgb_model_step, xgb_fitted["X_train_t"], xgb_fitted["feature_names"], x_row_t
+    )
+    sv, bv = ip.compute_shap_values("xgboost", xgb_model_step, xgb_fitted["X_train_t"], x_row_t)
+    comparison_table = ip.compare_shap_lime(sv[0], lime_exp, xgb_fitted["feature_names"])
+
+    print(f"Observación 'high_error' (XGBoost, {xgb_technique}, fold {xgb_fold_idx}):")
+    display(comparison_table)
+```
+
+</details>
+
+<!-- nb:text cell=11 -->
+```text
+Observación 'high_error' (XGBoost, class_weight, fold 3):
+```
+
+<!-- nb:table cell=11 -->
+```{r nb06_t11_1, echo=FALSE}
+mostrar_tabla("06_interpretability", "cell11_1.csv")
+```
+
+<!-- nb:md cell=12 -->
+### Discusión: ¿cuándo divergen LIME y SHAP?
+
+- **LIME** ajusta un modelo sustituto LINEAL (regularizado) sobre muestras perturbadas alrededor de la observación, ponderadas por cercanía: una aproximación local cuya validez depende del ancho del kernel y el número de muestras perturbadas.
+- **SHAP** calcula valores de Shapley (teoría de juegos cooperativos): el aporte marginal promedio de cada feature sobre todas las coaliciones posibles. Para árboles, `TreeExplainer` los calcula de forma EXACTA, y satisface axiomas de consistencia que LIME no garantiza.
+
+**Divergen cuando:**
+1. **Features correlacionadas** (ej. el bloque `BILL_AMT1`-`BILL_AMT6`, VIF alto según el EDA): SHAP reparte el crédito entre ellas; LIME (Lasso) puede anular una y sobre-atribuir a la otra.
+2. **No linealidad local fuerte** (ej. el efecto no lineal de `PAY_0` que el EDA ya detectó): un sustituto lineal como el de LIME la aproxima mal; SHAP (exacto para árboles) la sigue reflejando correctamente.
+3. **Sensibilidad a hiperparámetros de LIME** (ancho del kernel, nº de muestras): puede cambiar el ranking entre corridas; SHAP/TreeExplainer es determinístico.
+
+Limitación de la tabla anterior: es una sola observación de XGBoost, y `shap_value` está en escala de log-odds (margen de XGBoost) mientras que `lime_weight` está en escala de probabilidad, por lo que solo se pueden comparar signos y orden, no magnitudes.
+
+<!-- nb:code cell=13 -->
+<details><summary>Código (14 líneas)</summary>
+
+```{python nb06_c13, eval=FALSE}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from src import interpretability_multi as im
+
+INTERP_DIR = config.RESULTS_DIR / "interpretability"
+MODELS = ("random_forest", "xgboost")
+importance = {m: pd.read_csv(INTERP_DIR / f"shap_importance_by_fold_{m}.csv") for m in MODELS}
+agreement = {m: pd.read_csv(INTERP_DIR / f"lime_vs_shap_{m}.csv") for m in MODELS}
+best_table = pd.read_csv(config.RESULTS_DIR / "best_per_model.csv").set_index("model")
+for m in MODELS:
+    print(f"{m}: combinación {best_table.loc[m, 'technique']} | {best_table.loc[m, 'method']}; "
+          f"{importance[m]['n_explained'].iloc[0]} filas explicadas por fold, "
+          f"{len(agreement[m])} observaciones para LIME vs. SHAP")
+```
+
+</details>
+
+<!-- nb:text cell=13 -->
+```text
+random_forest: combinación class_weight | random_search; 300 filas explicadas por fold, 200 observaciones para LIME vs. SHAP
+xgboost: combinación class_weight | bayesian_optuna; 300 filas explicadas por fold, 200 observaciones para LIME vs. SHAP
+```
+
+<!-- nb:code cell=14 -->
+<details><summary>Código (22 líneas)</summary>
+
+```{python nb06_c14, eval=FALSE}
+fig, axes = plt.subplots(1, len(MODELS), figsize=(6.5 * len(MODELS), 4.8))
+for ax, m in zip(axes, MODELS):
+    imp = importance[m]
+    top = imp.groupby("feature")["mean_abs_shap"].mean().nlargest(8).index[::-1]
+    pivot = imp.pivot(index="feature", columns="fold", values="mean_abs_shap").loc[top]
+    pivot.plot.barh(ax=ax, width=0.8)
+    ax.set_title(m)
+    ax.set_xlabel("Media de |SHAP| (escala del modelo)")
+    ax.set_ylabel("")
+    ax.legend(title="Fold externo", fontsize=8)
+    ax.grid(axis="x", alpha=0.3)
+fig.suptitle("Importancia global SHAP por fold externo (8 variables principales)", y=1.02)
+fig.tight_layout()
+fig.savefig(config.FIGURES_DIR / "shap_importance_by_fold.png", dpi=150, bbox_inches="tight")
+plt.show()
+
+for m in MODELS:
+    st = im.importance_stability(importance[m])
+    print(f"\n{m}: Spearman medio entre folds = {st['spearman_mean_offdiag']:.3f}; "
+          f"Jaccard medio del top-5 = {st['topk_jaccard_mean_offdiag']:.3f}; "
+          f"siempre en el top-5: {st['topk_always']}")
+    display(st["spearman"].round(3))
+```
+
+</details>
+
+<!-- nb:img cell=14 -->
+![Salida gráfica de la celda 14](figures/06_interpretability/cell14_1.png)
+
+<!-- nb:text cell=14 -->
+```text
+
+random_forest: Spearman medio entre folds = 0.963; Jaccard medio del top-5 = 0.767; siempre en el top-5: ['LIMIT_BAL_LOG', 'PAY_0', 'PAY_2', 'PAY_3']
+```
+
+<!-- nb:table cell=14 -->
+```{r nb06_t14_2, echo=FALSE}
+mostrar_tabla("06_interpretability", "cell14_2.csv")
+```
+
+<!-- nb:text cell=14 -->
+```text
+
+xgboost: Spearman medio entre folds = 0.919; Jaccard medio del top-5 = 0.652; siempre en el top-5: ['BILL_AMT_MEAN_6M_LOG', 'LIMIT_BAL_LOG', 'PAY_0']
+```
+
+<!-- nb:table cell=14 -->
+```{r nb06_t14_3, echo=FALSE}
+mostrar_tabla("06_interpretability", "cell14_3.csv")
+```
+
+<!-- nb:code cell=15 -->
+<details><summary>Código (26 líneas)</summary>
+
+```{python nb06_c15, eval=FALSE}
+METRICS = {
+    "spearman_abs": "Spearman de |atribución|",
+    "top5_overlap": "Solapamiento del top-5",
+    "sign_agreement_topk": "Acuerdo de signo (top-5 de SHAP)",
+    "lime_seed_topk_overlap": "Estabilidad de LIME entre semillas (top-5)",
+}
+fig, axes = plt.subplots(len(MODELS), len(METRICS), figsize=(4 * len(METRICS), 3.6 * len(MODELS)), sharey="col")
+order = ["TN", "FP", "FN", "TP"]
+for i, m in enumerate(MODELS):
+    for j, (col, title) in enumerate(METRICS.items()):
+        ax = axes[i, j]
+        data = [agreement[m].loc[agreement[m]["outcome"] == o, col].dropna() for o in order]
+        ax.boxplot(data, tick_labels=order, showmeans=True)
+        ax.set_title(f"{m}\n{title}", fontsize=9)
+        ax.set_ylim(-0.05, 1.05)
+        ax.grid(axis="y", alpha=0.3)
+        if j == 0:
+            ax.set_ylabel("Valor (0 a 1)")
+fig.suptitle("Coincidencia entre LIME y SHAP por tipo de resultado de la observación", y=1.01)
+fig.tight_layout()
+fig.savefig(config.FIGURES_DIR / "lime_vs_shap_agreement.png", dpi=150, bbox_inches="tight")
+plt.show()
+
+for m in MODELS:
+    print(f"\n{m} (n = {len(agreement[m])} observaciones, 3 folds)")
+    display(im.summarize_agreement(agreement[m]).round(3))
+```
+
+</details>
+
+<!-- nb:img cell=15 -->
+![Salida gráfica de la celda 15](figures/06_interpretability/cell15_1.png)
+
+<!-- nb:text cell=15 -->
+```text
+
+random_forest (n = 200 observaciones, 3 folds)
+```
+
+<!-- nb:table cell=15 -->
+```{r nb06_t15_2, echo=FALSE}
+mostrar_tabla("06_interpretability", "cell15_2.csv")
+```
+
+<!-- nb:text cell=15 -->
+```text
+
+xgboost (n = 200 observaciones, 3 folds)
+```
+
+<!-- nb:table cell=15 -->
+```{r nb06_t15_3, echo=FALSE}
+mostrar_tabla("06_interpretability", "cell15_3.csv")
+```
+
+<!-- nb:md cell=16 -->
+<!-- multi-fold -->
+## SHAP y LIME con más de un fold y más de una observación
+
+Explicar un solo fold con 100 filas y comparar LIME con SHAP en una sola observación no permite decir si la explicación es estable ni si los dos métodos coinciden en general. Las dos secciones siguientes responden esas dos preguntas.
+
+Para cada modelo se toma su mejor combinación según la selección del capítulo 08: Random Forest con `class_weight` y `random_search`, y XGBoost con `class_weight` y `bayesian_optuna`.
+
+<!-- nb:code cell=17 -->
+<details><summary>Código (14 líneas)</summary>
+
+```{python nb06_c17, eval=FALSE}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from src import interpretability_multi as im
+
+INTERP_DIR = config.RESULTS_DIR / "interpretability"
+MODELS = ("random_forest", "xgboost")
+importance = {m: pd.read_csv(INTERP_DIR / f"shap_importance_by_fold_{m}.csv") for m in MODELS}
+agreement = {m: pd.read_csv(INTERP_DIR / f"lime_vs_shap_{m}.csv") for m in MODELS}
+best_table = pd.read_csv(config.RESULTS_DIR / "best_per_model.csv").set_index("model")
+for m in MODELS:
+    print(f"{m}: combinación {best_table.loc[m, 'technique']} | {best_table.loc[m, 'method']}; "
+          f"{importance[m]['n_explained'].iloc[0]} filas explicadas por fold, "
+          f"{len(agreement[m])} observaciones para LIME vs. SHAP")
+```
+
+</details>
+
+<!-- nb:text cell=17 -->
+```text
+random_forest: combinación class_weight | random_search; 300 filas explicadas por fold, 200 observaciones para LIME vs. SHAP
+xgboost: combinación class_weight | bayesian_optuna; 300 filas explicadas por fold, 200 observaciones para LIME vs. SHAP
+```
+
+<!-- nb:md cell=18 -->
+<!-- multi-fold -->
+### 5. SHAP global en los 5 folds externos
+
+En cada fold externo se reajusta el pipeline completo con los `best_params` que eligió el bucle interno de ese fold, y se calculan los valores SHAP (`TreeExplainer`, exacto) sobre 300 filas al azar del conjunto de prueba de ese mismo fold. La importancia de una variable es la media de |SHAP| sobre esas filas, y las columnas one-hot de `SEX`, `EDUCATION` y `MARRIAGE` se suman de vuelta a su variable original. Después se mide qué tan parecido queda el ranking entre folds con la correlación de Spearman y con el solapamiento (Jaccard) del top 5.
+
+Las magnitudes de distintos folds no son estrictamente comparables, porque cada fold usa un modelo con hiperparámetros distintos. Por eso la estabilidad se juzga con el orden de las variables y no con el valor absoluto.
+
+<!-- nb:code cell=19 -->
+<details><summary>Código (22 líneas)</summary>
+
+```{python nb06_c19, eval=FALSE}
+fig, axes = plt.subplots(1, len(MODELS), figsize=(6.5 * len(MODELS), 4.8))
+for ax, m in zip(axes, MODELS):
+    imp = importance[m]
+    top = imp.groupby("feature")["mean_abs_shap"].mean().nlargest(8).index[::-1]
+    pivot = imp.pivot(index="feature", columns="fold", values="mean_abs_shap").loc[top]
+    pivot.plot.barh(ax=ax, width=0.8)
+    ax.set_title(m)
+    ax.set_xlabel("Media de |SHAP| (escala del modelo)")
+    ax.set_ylabel("")
+    ax.legend(title="Fold externo", fontsize=8)
+    ax.grid(axis="x", alpha=0.3)
+fig.suptitle("Importancia global SHAP por fold externo (8 variables principales)", y=1.02)
+fig.tight_layout()
+fig.savefig(config.FIGURES_DIR / "shap_importance_by_fold.png", dpi=150, bbox_inches="tight")
+plt.show()
+
+for m in MODELS:
+    st = im.importance_stability(importance[m])
+    print(f"\n{m}: Spearman medio entre folds = {st['spearman_mean_offdiag']:.3f}; "
+          f"Jaccard medio del top-5 = {st['topk_jaccard_mean_offdiag']:.3f}; "
+          f"siempre en el top-5: {st['topk_always']}")
+    display(st["spearman"].round(3))
+```
+
+</details>
+
+<!-- nb:img cell=19 -->
+![Salida gráfica de la celda 19](figures/06_interpretability/cell19_1.png)
+
+<!-- nb:text cell=19 -->
+```text
+
+random_forest: Spearman medio entre folds = 0.963; Jaccard medio del top-5 = 0.767; siempre en el top-5: ['LIMIT_BAL_LOG', 'PAY_0', 'PAY_2', 'PAY_3']
+```
+
+<!-- nb:table cell=19 -->
+```{r nb06_t19_2, echo=FALSE}
+mostrar_tabla("06_interpretability", "cell19_2.csv")
+```
+
+<!-- nb:text cell=19 -->
+```text
+
+xgboost: Spearman medio entre folds = 0.919; Jaccard medio del top-5 = 0.652; siempre en el top-5: ['BILL_AMT_MEAN_6M_LOG', 'LIMIT_BAL_LOG', 'PAY_0']
+```
+
+<!-- nb:table cell=19 -->
+```{r nb06_t19_3, echo=FALSE}
+mostrar_tabla("06_interpretability", "cell19_3.csv")
+```
+
+<!-- nb:md cell=20 -->
+- **Random Forest es estable.** Las cuatro primeras variables son las mismas y en el mismo orden en los cinco folds (`PAY_0`, `PAY_2`, `LIMIT_BAL_LOG`, `PAY_3`); solo la quinta cambia (`PAY_4`, `PAY_AMT*_LOG` o `BILL_AMT_MEAN_6M_LOG`). El Jaccard medio del top 5 es 0.77 y el Spearman medio sobre el ranking completo, 0.96. Los valores de `PAY_0` son casi iguales entre folds (0.073 a 0.081). La conclusión de la sección 3 (el historial de pagos domina) no depende del fold elegido.
+- **XGBoost es estable en lo principal y menos en el resto.** `PAY_0` es la primera variable en los cinco folds y `LIMIT_BAL_LOG` y `BILL_AMT_MEAN_6M_LOG` están siempre en el top 5. Pero el top 5 completo cambia entre folds (Jaccard medio 0.65): `PAY_2` y `PAY_3` salen del top 5 en algunos folds (por ejemplo el 2) y entran `PAY_AMT1_LOG`, `PAY_AMT2_LOG` o `PAY_AMT3_LOG`. El Spearman medio sobre todas las variables es de 0.92.
+- **La magnitud de `PAY_0` en XGBoost varía entre folds** (0.38 a 0.47 en log-odds). Es esperable, porque cada fold eligió hiperparámetros distintos, así que no conviene comparar magnitudes entre folds, solo el orden.
+- **Qué se puede afirmar y qué no.** El historial de pagos (`PAY_0` primero, luego `PAY_2` y `PAY_3`) y el límite de crédito como segundo o tercer factor se sostienen en los cinco folds y en los dos modelos. El orden fino de las variables de montos (`PAY_AMT*_LOG`, `BILL_AMT_MEAN_6M_LOG`) no es estable en XGBoost y no debe interpretarse.
+
+<!-- nb:md cell=21 -->
+<!-- multi-fold -->
+### 6. LIME frente a SHAP en 200 observaciones por modelo
+
+En cada fold externo se toman 10 observaciones al azar de cada celda de la matriz de confusión (verdaderos negativos, falsos positivos, falsos negativos y verdaderos positivos), no solo los casos extremos. Para cada una se calcula el SHAP exacto y la explicación de LIME (10 variables, sobre el mismo espacio transformado que ve el modelo) y se mide:
+
+- **Spearman de |atribución|:** correlación entre el orden de importancia de SHAP y el de LIME sobre todas las variables (las que LIME no reporta valen 0).
+- **Solapamiento del top 5:** fracción de las 5 variables principales de SHAP que también están entre las 5 principales de LIME.
+- **Acuerdo de signo:** entre las variables del top 5 de SHAP que LIME también reporta, fracción en que ambos métodos coinciden en el signo del efecto.
+- **Estabilidad de LIME entre semillas:** LIME se corre con 3 semillas y se mide el solapamiento medio del top 5 entre pares de semillas. Sirve para saber cuánta divergencia con SHAP puede ser simple ruido de LIME.
+
+SHAP está en escala de log-odds (XGBoost) o de probabilidad (Random Forest) y LIME en escala de probabilidad, por eso solo se comparan orden y signo.
+
+<!-- nb:code cell=22 -->
+<details><summary>Código (26 líneas)</summary>
+
+```{python nb06_c22, eval=FALSE}
+METRICS = {
+    "spearman_abs": "Spearman de |atribución|",
+    "top5_overlap": "Solapamiento del top-5",
+    "sign_agreement_topk": "Acuerdo de signo (top-5 de SHAP)",
+    "lime_seed_topk_overlap": "Estabilidad de LIME entre semillas (top-5)",
+}
+fig, axes = plt.subplots(len(MODELS), len(METRICS), figsize=(4 * len(METRICS), 3.6 * len(MODELS)), sharey="col")
+order = ["TN", "FP", "FN", "TP"]
+for i, m in enumerate(MODELS):
+    for j, (col, title) in enumerate(METRICS.items()):
+        ax = axes[i, j]
+        data = [agreement[m].loc[agreement[m]["outcome"] == o, col].dropna() for o in order]
+        ax.boxplot(data, tick_labels=order, showmeans=True)
+        ax.set_title(f"{m}\n{title}", fontsize=9)
+        ax.set_ylim(-0.05, 1.05)
+        ax.grid(axis="y", alpha=0.3)
+        if j == 0:
+            ax.set_ylabel("Valor (0 a 1)")
+fig.suptitle("Coincidencia entre LIME y SHAP por tipo de resultado de la observación", y=1.01)
+fig.tight_layout()
+fig.savefig(config.FIGURES_DIR / "lime_vs_shap_agreement.png", dpi=150, bbox_inches="tight")
+plt.show()
+
+for m in MODELS:
+    print(f"\n{m} (n = {len(agreement[m])} observaciones, 3 folds)")
+    display(im.summarize_agreement(agreement[m]).round(3))
+```
+
+</details>
+
+<!-- nb:img cell=22 -->
+![Salida gráfica de la celda 22](figures/06_interpretability/cell22_1.png)
+
+<!-- nb:text cell=22 -->
+```text
+
+random_forest (n = 200 observaciones, 3 folds)
+```
+
+<!-- nb:table cell=22 -->
+```{r nb06_t22_2, echo=FALSE}
+mostrar_tabla("06_interpretability", "cell22_2.csv")
+```
+
+<!-- nb:text cell=22 -->
+```text
+
+xgboost (n = 200 observaciones, 3 folds)
+```
+
+<!-- nb:table cell=22 -->
+```{r nb06_t22_3, echo=FALSE}
+mostrar_tabla("06_interpretability", "cell22_3.csv")
+```
+
+<!-- nb:md cell=23 -->
+Resultados con 200 observaciones por modelo y 5 folds.
+
+| Medida | Random Forest | XGBoost |
+|---|---|---|
+| Spearman de \|atribución\|, media (desviación) | 0.569 (0.153) | 0.533 (0.138) |
+| Solapamiento del top 5, media | 0.717 | 0.632 |
+| Acuerdo de signo en el top 5, media | 0.993 | 0.995 |
+| Estabilidad de LIME entre semillas (top 5), media | 0.847 | 0.878 |
+
+- **Coinciden casi siempre en la dirección del efecto.** En el 97 % de las observaciones de Random Forest y el 98 % de las de XGBoost el acuerdo de signo es total, y el mínimo observado es 0.67 y 0.75 (una o dos variables de cinco en desacuerdo).
+- **Coinciden menos en el orden.** En promedio comparten entre 3 y 4 de las 5 variables principales (0.72 y 0.63), y la correlación de orden es moderada (cerca de 0.55). En 4.5 % (Random Forest) y 7 % (XGBoost) de las observaciones el Spearman es menor que 0.3, es decir, los dos métodos casi no se parecen.
+- **Una parte de la divergencia es ruido de LIME, pero no toda.** Entre semillas, LIME repite entre 4 y 5 de sus 5 variables principales (0.85 y 0.88). Como el solapamiento con SHAP (0.72 y 0.63) es menor que el de LIME consigo mismo, la diferencia entre métodos no se explica solo por la aleatoriedad de LIME.
+- **Depende del tipo de observación.** El Spearman es más alto en los verdaderos positivos (0.655 y 0.565) y más bajo en los falsos negativos y verdaderos negativos (0.50 en Random Forest y 0.51 a 0.52 en XGBoost). Con 50 observaciones por celda, esas diferencias son descriptivas.
+- **Consistencia entre folds.** El Spearman medio por fold va de 0.51 a 0.64 en Random Forest y de 0.45 a 0.60 en XGBoost: el patrón general se repite, pero con variación apreciable.
+
+Esto ya permite concluir algo que la observación única de la versión anterior no permitía: la discusión de la sección siguiente (cuándo divergen LIME y SHAP) se confirma como tendencia, no como anécdota.
+
+<!-- nb:md cell=24 -->
+<!-- multi-fold -->
+Limitaciones de las secciones 5 y 6.
+- Son dos modelos de siete y un solo conjunto de datos. Los demás modelos no se explican, y SVM queda fuera porque sus explicadores model-agnostic son demasiado costosos con este tamaño de datos.
+- Los cinco folds son los mismos con los que se evaluó el modelo. Reportar cinco valores por medida (por fold) no es una prueba de hipótesis: la variación entre folds es una medida de estabilidad, no un intervalo de confianza.
+- Las observaciones dentro de un mismo fold comparten modelo y datos de entrenamiento, así que no son independientes entre sí.
+- 200 observaciones por modelo son una muestra, no el conjunto de prueba completo: el SHAP global usa 300 filas por fold y LIME usa 40 por fold (10 por celda de la matriz de confusión).
+- LIME depende de su configuración (kernel, número de perturbaciones, número de variables). Se usó la configuración por defecto de la librería, y los resultados podrían cambiar con otra.
+- Con variables correlacionadas, ni SHAP ni LIME identifican causas: describen cómo usa el modelo sus entradas.
+
+<!-- nb:extra -->
+## Figuras guardadas en results/figures
+
+Imágenes que el experimento guardó como archivo. Algunas repiten gráficos mostrados arriba.
+
+<!-- nb:extraimg -->
+![shap_summary_random_forest.png](figures/results/shap_summary_random_forest.png)
+
+<!-- nb:extraimg -->
+![shap_summary_xgboost.png](figures/results/shap_summary_xgboost.png)
+
+<!-- nb:extraimg -->
+![shap_waterfall_random_forest_high_error.png](figures/results/shap_waterfall_random_forest_high_error.png)
+
+<!-- nb:extraimg -->
+![shap_waterfall_random_forest_well_classified.png](figures/results/shap_waterfall_random_forest_well_classified.png)
+
+<!-- nb:extraimg -->
+![shap_waterfall_xgboost_high_error.png](figures/results/shap_waterfall_xgboost_high_error.png)
+
+<!-- nb:extraimg -->
+![shap_waterfall_xgboost_well_classified.png](figures/results/shap_waterfall_xgboost_well_classified.png)

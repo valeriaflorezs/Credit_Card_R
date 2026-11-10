@@ -1,0 +1,112 @@
+# 02. Verificación del protocolo experimental {#nb02}
+
+```{r setup-nb02, include=FALSE}
+knitr::opts_chunk$set(python.reticulate = FALSE)
+BASE <- if (file.exists(file.path("R", "portar_notebook.R"))) "." else ".."
+source(file.path(BASE, "R", "portar_notebook.R"))
+```
+
+<!-- nb:md cell=0 -->
+
+El protocolo usa semilla aleatoria 42 (para que los resultados se puedan reproducir) y validación cruzada anidada con 5 pliegues externos y 5 internos, y la variable objetivo es `default_payment_next_month`. Se probó la separación de variables y objetivo con un conjunto sintético de 5,000 filas (22.46 % de clase positiva) y se confirmó que el objetivo es binario. Finalmente, se verificó que el conjunto de datos real procesado (29,965 filas y 21 columnas) contiene el objetivo y las columnas categóricas definidas en el protocolo.
+
+<!-- nb:code cell=1 -->
+<details><summary>Código (17 líneas)</summary>
+
+```{python nb02_c01, eval=FALSE}
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path.cwd().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+import numpy as np
+import pandas as pd
+
+from src import config
+from src.synthetic_data import generate_synthetic_dataset
+from src.data_loader import split_features_target
+
+print('RANDOM_STATE:', config.RANDOM_STATE)
+print('TARGET_COLUMN:', config.TARGET_COLUMN)
+print('N_OUTER_FOLDS / N_INNER_FOLDS:', config.N_OUTER_FOLDS, '/', config.N_INNER_FOLDS)
+```
+
+</details>
+
+<!-- nb:text cell=1 -->
+```text
+RANDOM_STATE: 42
+TARGET_COLUMN: default_payment_next_month
+N_OUTER_FOLDS / N_INNER_FOLDS: 3 / 3
+```
+
+<!-- nb:code cell=2 -->
+<details><summary>Código (6 líneas)</summary>
+
+```{python nb02_c02, eval=FALSE}
+np.random.seed(config.RANDOM_STATE)
+
+df = generate_synthetic_dataset()
+print(df.shape)
+print(df[config.TARGET_COLUMN].value_counts(normalize=True))
+df.head()
+```
+
+</details>
+
+<!-- nb:text cell=2 -->
+```text
+(5000, 21)
+default_payment_next_month
+0    0.7754
+1    0.2246
+Name: proportion, dtype: float64
+```
+
+<!-- nb:table cell=2 -->
+```{r nb02_t02_1, echo=FALSE}
+mostrar_tabla("02_setup_check", "cell02_1.csv")
+```
+
+<!-- nb:code cell=3 -->
+<details><summary>Código (5 líneas)</summary>
+
+```{python nb02_c03, eval=FALSE}
+X, y = split_features_target(df)
+print('X shape:', X.shape)
+print('y shape:', y.shape)
+assert set(y.unique()) == {0, 1}, 'El target debe ser binario'
+print('OK: target binario, X/y separados correctamente.')
+```
+
+</details>
+
+<!-- nb:text cell=3 -->
+```text
+X shape: (5000, 20)
+y shape: (5000,)
+OK: target binario, X/y separados correctamente.
+```
+
+<!-- nb:code cell=4 -->
+<details><summary>Código (7 líneas)</summary>
+
+```{python nb02_c04, eval=FALSE}
+from src.data_loader import load_processed_dataset
+
+df_real = load_processed_dataset()
+print('Dataset real encontrado:', df_real.shape)
+assert config.TARGET_COLUMN in df_real.columns
+assert set(config.CATEGORICAL_COLUMNS) <= set(df_real.columns)
+print('OK: target y columnas categóricas de config.py presentes en el dataset real.')
+```
+
+</details>
+
+<!-- nb:text cell=4 -->
+```text
+Dataset real encontrado: (29965, 21)
+OK: target y columnas categóricas de config.py presentes en el dataset real.
+```

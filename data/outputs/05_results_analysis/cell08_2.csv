@@ -1,0 +1,5 @@
+technique,f1_mean,precision_mean,recall_mean,roc_auc_mean,pr_auc_posthoc_mean
+class_weight,0.5243,0.4635,0.6065,0.7623,0.5190
+smote,0.5166,0.4912,0.5643,0.7544,0.5096
+adasyn,0.5098,0.4779,0.5767,0.7503,0.5031
+none,0.4575,0.6206,0.3781,0.7585,0.5160

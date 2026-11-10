@@ -1,44 +1,196 @@
 ---
-title: "Evaluación de Preprocesamiento, Análisis Exploratorio y Comparación Sistemática de Modelos para la Predicción de Incumplimiento de Pago en Tarjetas de Crédito"
-author: "Katherin Barrera y Valeria Florez"
+title: "Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning"
+author: "Katherin Barrera López y Valeria Florez Sarmiento"
 date: "`r format(Sys.Date(), '%d/%m/%Y')`"
 site: bookdown::bookdown_site
 documentclass: book
-description: "Libro interactivo (R bookdown) con la portada, el marco del proyecto y el análisis exploratorio del dataset Default of Credit Card Clients."
+bibliography: references.bib
+link-citations: yes
+description: "Libro interactivo (R bookdown) con la portada, el marco del proyecto y los notebooks del proyecto Default of Credit Card Clients."
 ---
+
+```{r setup-index, include=FALSE}
+knitr::opts_chunk$set(python.reticulate = FALSE)  # el código de Python solo se muestra, no se ejecuta
+```
 
 # Portada {-}
 
-<div class="portada">
+<div class="cc-hero">
+<div class="cc-card">
+<div class="cc-card-top"><span>Riesgo de crédito</span><span>&#9678;</span></div>
+<div class="cc-chip-ic"></div>
+<div class="cc-number">&bull;&bull;&bull;&bull; &nbsp;&bull;&bull;&bull;&bull; &nbsp;&bull;&bull;&bull;&bull; &nbsp;2005</div>
+<div class="cc-card-bottom"><div><small>Titulares</small><strong>Katherin Barrera</strong><br><strong>Valeria Florez</strong></div><div style="text-align:right"><small>Periodo de datos</small><strong>Abr 2005 a Sep 2005</strong></div></div>
+</div>
+<div class="cc-hero-text">
+<p class="cc-kicker">Proyecto de análisis y modelado</p>
+<p class="cc-names">Katherin Barrera López y Valeria Florez Sarmiento</p>
+<p>Departamento de Matemáticas, Física y Ciencia de Datos<br>Universidad del Norte, Barranquilla, Colombia</p>
+<p>lkatherin@uninorte.edu.co<br>florezvaleria@uninorte.edu.co</p>
+<a class="cc-btn" href="https://dash-credit-kv.onrender.com">Abrir el tablero interactivo</a>
+</div>
+</div>
 
-<p class="portada-titulo">Evaluación de Preprocesamiento, Análisis Exploratorio y Comparación Sistemática de Modelos para la Predicción de Incumplimiento de Pago en Tarjetas de Crédito</p>
+<div class="cc-grid">
 
-<p class="portada-autoras"><strong>Autoras:</strong> Katherin Barrera y Valeria Florez</p>
 
-<p class="portada-inst">Departamento de Matemáticas, Física y Ciencia de Datos<br>Universidad del Norte, Barranquilla, Colombia</p>
+<div class="cc-gcard cc-kpi">
+
+
+<p class="kpi-label">Clientes analizados</p>
+<p class="kpi-value">29,965</p>
+<p class="kpi-note">tras eliminar 35 duplicados</p>
 
 </div>
 
-## Resumen del proyecto {-}
 
-Este trabajo presenta un flujo completo de aprendizaje automático para la predicción del incumplimiento de pago (*default*) de clientes de tarjetas de crédito, utilizando el conjunto de datos público *Default of Credit Card Clients* del repositorio UCI, compuesto originalmente por 30,000 observaciones y 23 variables predictoras. El estudio integra el proceso de extracción, transformación y carga (ETL), un análisis exploratorio de datos (EDA) y una evaluación sistemática de modelos de clasificación.
+<div class="cc-gcard cc-kpi">
 
-El EDA incluyó estadística descriptiva, diagnóstico de valores faltantes y duplicados, análisis de la forma de las distribuciones, detección de valores atípicos, comparación formal de grupos mediante pruebas no paramétricas y de independencia, y evaluación de multicolinealidad mediante correlaciones y el Factor de Inflación de la Varianza (VIF). Se eliminaron 35 registros duplicados desde el ETL, se encontraron categorías no oficiales en `EDUCATION` y `MARRIAGE`, y se halló una multicolinealidad severa entre las variables de facturación mensual, que se abordó con una variable de facturación promedio (`BILL_AVG`). La variable `PAY_0` destacó como la señal individual más discriminante. La variable objetivo presenta un desbalance moderado: 77.9% sin *default* y 22.1% con *default*.
 
-Como línea base se entrenó una regresión logística con partición estratificada 80/20, que obtuvo un *accuracy* de 81.34% y un AUC-ROC de 0.7184, pero identificó correctamente solo el 25.2% de los casos de *default*. Después se evaluaron 112 configuraciones mediante un diseño factorial (7 familias de algoritmos, 2 representaciones de las variables `PAY_x`, 2 estrategias para `BILL_AMT` y 4 estrategias de balanceo). La mejor configuración por AUC-ROC fue XGBoost con ponderación balanceada de clases (AUC-ROC de 0.7812), que en la partición de prueba alcanzó un *recall* de 62.37% y redujo los falsos negativos de 992 a 499. Con el F1-score de la clase *default* como métrica principal, la mejor configuración fue un Random Forest con ponderación de clases y búsqueda genética de hiperparámetros (F1 de 0.546 y *recall* de 60.4%).
+<p class="kpi-label">Tasa de default</p>
+<p class="kpi-value">22.1 %</p>
+<p class="kpi-note">6,630 clientes</p>
 
-**Palabras clave:** aprendizaje automático, análisis exploratorio de datos, preprocesamiento, clasificación binaria, riesgo crediticio, desbalance de clases, XGBoost, F1-score, validación cruzada.
+</div>
 
-### Resultados en cifras {-}
 
-| Modelo | AUC-ROC | *Recall* clase *default* | Falsos negativos |
-|---|---|---|---|
-| Regresión logística (línea base) | 0.7184 | 25.2% | 992 |
-| XGBoost con ponderación de clases | 0.7812 | 62.37% | 499 |
+<div class="cc-gcard cc-kpi">
 
-*Cifras sobre la partición de prueba independiente (n = 5,993).*
 
-### Contenido del libro {-}
+<p class="kpi-label">Configuraciones</p>
+<p class="kpi-value">112</p>
+<p class="kpi-note">7 modelos x 4 balanceos x 4 optimizadores</p>
 
-- **Marco del proyecto:** introducción, planteamiento del problema, objetivos y metodología.
-- **EDA:** análisis exploratorio interactivo del conjunto de datos, con gráficos y su interpretación.
+</div>
+
+
+<div class="cc-gcard cc-kpi">
+
+
+<p class="kpi-label">Mejor F1 de las 112</p>
+<p class="kpi-value">0.547</p>
+<p class="kpi-note">XGBoost, validación anidada 5 x 5</p>
+
+</div>
+
+
+</div>
+
+
+## Resumen
+
+<div class="cc-box cc-resumen">
+
+El incumplimiento de pago en tarjetas de crédito genera pérdidas, costos de cobranza y exigencias de capital para las
+entidades financieras; anticiparlo permite ajustar cupos, priorizar la cobranza y reducir la exposición al riesgo. En
+el conjunto de datos de clientes de Taiwán se han usado modelos estadísticos, ensambles de árboles, remuestreo y redes
+profundas; sus resultados son muy similares, las redes pierden interpretabilidad y los árboles solo dividen el espacio
+en paralelo a los ejes. Se propone el *Cost-Sensitive Fisher Oblique Forest* (CS-FOF), un bosque aleatorio
+implementado desde cero cuyos nodos pueden cortar por la dirección discriminante de Fisher ponderada por el costo del
+incumplimiento; se basa en los árboles oblicuos y se evalúa con validación cruzada anidada y pruebas de hipótesis. En
+un experimento piloto, CS-FOF obtuvo el mayor F1 de la clase *default* entre seis modelos (0.547 frente a 0.546, una
+mejora relativa de 0.3%) con un AUC-ROC de 0.780; se espera que la validación final confirme esta ventaja de forma
+significativa. El aporte es un clasificador interpretable y no neuronal que lleva los cortes oblicuos al riesgo
+crediticio, con garantías teóricas sobre la calidad de cada partición.
+
+<div class="cc-chips"><span class="cc-chip">riesgo crediticio</span><span class="cc-chip">incumplimiento de pago</span><span class="cc-chip">tarjetas de crédito</span><span class="cc-chip">árboles de decisión oblicuos</span><span class="cc-chip">bosques aleatorios</span><span class="cc-chip">discriminante de Fisher</span><span class="cc-chip">aprendizaje sensible al costo</span><span class="cc-chip">desbalance de clases</span></div>
+
+</div>
+
+
+## Resultados en cifras
+
+| Modelo | F1 de la clase *default* |
+|---|---|
+| Regresión logística (línea base, partición 80/20) | cerca de 0.38 |
+| Mejores combinaciones con balanceo (validación anidada 5 x 5) | entre 0.52 y 0.55 |
+| XGBoost con `class_weight` y optimización bayesiana | 0.547 |
+
+<div class="admonition cc-limites">
+
+<p class="admonition-title">Qué se concluye</p>
+
+
+- La mejora sobre la línea base proviene en buena parte del balanceo, que desplaza el umbral de decisión; el ROC-AUC casi no cambia entre técnicas.
+- Con 5 folds, la prueba post-hoc de Nemenyi solo separa combinaciones muy alejadas en el ranking (224 de 6,216 pares); entre las combinaciones de cabeza no hay diferencias significativas, por lo que esa comparación es descriptiva.
+- La interpretabilidad se aborda con SHAP en los 5 folds (Random Forest y XGBoost) y una comparación LIME frente a SHAP.
+
+</div>
+
+
+## Contenido del libro
+
+<div class="cc-grid">
+
+
+<div class="cc-gcard cc-step sd-card-hover">
+
+<p class="cc-gtitle"><a href="marco.html">1. Marco del proyecto</a></p>
+
+
+Introducción, problema, hipótesis, objetivos, marco teórico y metodología.
+
+</div>
+
+
+<div class="cc-gcard cc-step sd-card-hover">
+
+<p class="cc-gtitle"><a href="nb00.html">2. Análisis exploratorio</a></p>
+
+
+EDA y construcción del dataset final.
+
+</div>
+
+
+<div class="cc-gcard cc-step sd-card-hover">
+
+<p class="cc-gtitle"><a href="nb01.html">3. Modelo base</a></p>
+
+
+Regresión logística con partición 80/20.
+
+</div>
+
+
+<div class="cc-gcard cc-step sd-card-hover">
+
+<p class="cc-gtitle"><a href="nb03.html">4. Pipeline y experimentos</a></p>
+
+
+Desarrollo del pipeline y corrida de las combinaciones.
+
+</div>
+
+
+<div class="cc-gcard cc-step sd-card-hover">
+
+<p class="cc-gtitle"><a href="nb05.html">5. Análisis de resultados</a></p>
+
+
+Tabla de las 112 combinaciones, comparación estadística, calibración y complejidad.
+
+</div>
+
+
+<div class="cc-gcard cc-step sd-card-hover">
+
+<p class="cc-gtitle"><a href="nb06.html">6. Interpretabilidad</a></p>
+
+
+SHAP y LIME.
+
+</div>
+
+
+<div class="cc-gcard cc-step sd-card-hover">
+
+<p class="cc-gtitle"><a href="nb10.html">7. Modelo original</a></p>
+
+
+CS-FOF, LightGBM y CatBoost frente al mejor F1 de las 112 combinaciones.
+
+</div>
+
+
+</div>

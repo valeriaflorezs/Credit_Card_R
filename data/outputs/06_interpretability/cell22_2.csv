@@ -1,0 +1,6 @@
+,spearman_abs / mean,spearman_abs / std,spearman_abs / median,top5_overlap / mean,top5_overlap / std,top5_overlap / median,sign_agreement_topk / mean,sign_agreement_topk / std,sign_agreement_topk / median,lime_seed_topk_overlap / mean,lime_seed_topk_overlap / std,lime_seed_topk_overlap / median
+FN,0.497,0.130,0.515,0.664,0.148,0.6,0.995,0.035,1.0,0.811,0.102,0.833
+FP,0.623,0.145,0.663,0.732,0.143,0.8,0.993,0.047,1.0,0.865,0.124,0.867
+TN,0.498,0.136,0.515,0.676,0.133,0.6,0.986,0.056,1.0,0.819,0.117,0.833
+TP,0.655,0.135,0.682,0.796,0.174,0.8,0.996,0.028,1.0,0.892,0.102,0.867
+ALL,0.569,0.153,0.586,0.717,0.158,0.8,0.993,0.043,1.0,0.847,0.116,0.867

@@ -1,0 +1,8 @@
+model,F1 medio,rango medio
+random_forest,0.5207,2.000
+xgboost,0.5202,2.250
+svm,0.5110,3.000
+decision_tree,0.5059,4.250
+naive_bayes,0.4962,5.250
+knn,0.4910,5.625
+logistic_regression,0.4781,5.625

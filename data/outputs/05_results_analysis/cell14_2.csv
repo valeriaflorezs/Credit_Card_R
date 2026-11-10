@@ -1,0 +1,4 @@
+,combo_a,combo_b,cliffs_delta,interpretation
+0,xgboost|class_weight|bayesian_optuna,random_forest|class_weight|random_search,0.04,despreciable
+1,xgboost|class_weight|bayesian_optuna,random_forest|class_weight|grid_search,0.04,despreciable
+2,random_forest|class_weight|random_search,random_forest|class_weight|grid_search,-0.12,despreciable

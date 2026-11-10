@@ -1,0 +1,8 @@
+,model,technique,method,f1_mean_std,roc_auc_mean_std,gap_to_runner_up,runner_up,within_nemenyi_cd_of_global_best,is_global_best,source
+0,xgboost,class_weight,bayesian_optuna,0.5466 ± 0.0091,0.7828 ± 0.0089,0.0037,class_weight|grid_search,True,True,local_cpu_sklearn
+1,random_forest,class_weight,random_search,0.5452 ± 0.0077,0.7831 ± 0.0095,0.0005,class_weight|grid_search,True,False,local_cpu_sklearn
+2,svm,smote,random_search,0.5387 ± 0.0048,0.7638 ± 0.0096,0.0001,class_weight|genetic_deap,True,False,colab_gpu_cuml
+3,knn,class_weight,random_search,0.5264 ± 0.0122,0.7629 ± 0.0081,0.0012,class_weight|grid_search,True,False,colab_gpu_cuml
+4,decision_tree,class_weight,bayesian_optuna,0.5254 ± 0.0043,0.7569 ± 0.0101,0.0003,class_weight|genetic_deap,True,False,local_cpu_sklearn
+5,logistic_regression,class_weight,genetic_deap,0.5182 ± 0.0104,0.7449 ± 0.0147,0.0017,class_weight|bayesian_optuna,True,False,local_cpu_sklearn
+6,naive_bayes,smote,grid_search,0.4987 ± 0.0078,0.7454 ± 0.0115,0.0001,smote|bayesian_optuna,True,False,local_cpu_sklearn
