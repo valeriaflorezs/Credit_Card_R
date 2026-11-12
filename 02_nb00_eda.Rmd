@@ -10,7 +10,7 @@ Este conjunto de datos Default of Credit Card Clients (UCI Machine Learning Repo
 
 La variable objetivo es `default payment next month`, que indica si el cliente incurrió **(1)** o no **(0)** en incumplimiento de pago al mes siguiente. Esto permite plantear el problema como una tarea de **clasificación binaria**.
 
-Este EDA revisa explícitamente los duplicados (y los **elimina**), trata las categorías no oficiales, controla los outliers antes de calcular correlación y VIF, y cada gráfico interactivo va acompañado de su interpretación, con una versión **básica** (palabras sencillas) y una **técnica**. En la Parte 5 se aplica y se guarda el preprocesamiento que resuelve todos los hallazgos, de modo que el dataset que reciben los modelos ya sale limpio de aquí.
+Este EDA revisa explícitamente los duplicados (y los **elimina**), trata las categorías no oficiales, controla los outliers antes de calcular correlación y VIF, y cada gráfico interactivo va acompañado de su interpretación, con una versión **básica** (palabras sencillas) y una **técnica**. En la Parte 4 se aplica y se guarda el preprocesamiento que resuelve todos los hallazgos, de modo que el dataset que reciben los modelos ya sale limpio de aquí.
 
 ```{r libs}
 # install.packages(c("tidyverse", "readxl", "plotly", "htmltools", "htmlwidgets",
@@ -201,7 +201,7 @@ kable(tabla_neg, format.args = list(big.mark = ","))
 ```
 
 <!-- nb:md cell=15 -->
-Cada mes, entre el **2.0% y el 2.3%** de los registros tiene un monto de facturación (`BILL_AMT`) **negativo**, y en total **6.4% de los clientes** (1,930 filas) tiene al menos un mes negativo. Esto **no se trata como un error**: un saldo negativo en un estado de cuenta de tarjeta de crédito es económicamente válido y suele indicar que el cliente pagó de más el mes anterior (saldo a favor). No se elimina ni se corrige; en la Parte 5 queda resumido en la variable derivada `N_CREDIT_BALANCE_MONTHS` (número de meses con saldo a favor).
+Cada mes, entre el **2.0% y el 2.3%** de los registros tiene un monto de facturación (`BILL_AMT`) **negativo**, y en total **6.4% de los clientes** (1,930 filas) tiene al menos un mes negativo. Esto **no se trata como un error**: un saldo negativo en un estado de cuenta de tarjeta de crédito es económicamente válido y suele indicar que el cliente pagó de más el mes anterior (saldo a favor). No se elimina ni se corrige; en la Parte 4 queda resumido en la variable derivada `N_CREDIT_BALANCE_MONTHS` (número de meses con saldo a favor).
 
 Verificación en R de los datos hasta este punto, contra los valores reportados en el notebook de Python:
 
@@ -845,7 +845,7 @@ show_with_interpretation(fig, INTERP_BIV_CAT_BASICA, INTERP_BIV_CAT_TECNICA)
 <!-- nb:md cell=43 -->
 ### 3.1 Matriz de correlación
 
-Antes de calcular la correlación se **capan (winsorizan) los percentiles 1 y 99** de cada variable numérica. Esto evita que un puñado de valores extremos (p. ej. `BILL_AMT` o `LIMIT_BAL` en la cola superior) distorsione el coeficiente de correlación. La winsorización se aplica a todas las numéricas, incluidas las `PAY_x` ordinales (y, en la sección 5.2, `N_CREDIT_BALANCE_MONTHS`), y solo para correlación y VIF: el modelo no ve datos winsorizados.
+Antes de calcular la correlación se **capan (winsorizan) los percentiles 1 y 99** de cada variable numérica. Esto evita que un puñado de valores extremos (p. ej. `BILL_AMT` o `LIMIT_BAL` en la cola superior) distorsione el coeficiente de correlación. La winsorización se aplica a todas las numéricas, incluidas las `PAY_x` ordinales (y, en la sección 4.2, `N_CREDIT_BALANCE_MONTHS`), y solo para correlación y VIF: el modelo no ve datos winsorizados.
 
 
 La medida principal es la correlación de Spearman, que es la correlación de Pearson aplicada a los rangos y por eso mide asociación monótona, no exige linealidad ni normalidad y resiste valores extremos:
@@ -957,7 +957,7 @@ kable(data.frame(variable = vif_data$variable, VIF = formatC(vif_data$VIF, forma
 <!-- nb:md cell=48 -->
 El VIF confirma lo que insinuaba la matriz de correlación: **`BILL_AMT2` a `BILL_AMT5` superan un VIF de 20**, muy por encima del umbral habitual de 10, y `BILL_AMT1`/`BILL_AMT6` rondan 13-15, evidencia fuerte de multicolinealidad severa entre las seis variables de facturación. Las variables `PAY_x` tienen un VIF moderado (3-4.5), por debajo del umbral de alerta pero mostrando cierta redundancia entre sí. El resto de variables (`LIMIT_BAL`, `AGE`, `PAY_AMT*`) tiene VIF cercano a 1-2, sin problema relevante.
 
-Para un modelo lineal (regresión logística), conviene **no usar las seis `BILL_AMT` por separado**: alternativas razonables son quedarse solo con `BILL_AMT1` (el más reciente), construir un promedio o una pendiente/tendencia de los 6 meses, o aplicar una reducción de dimensionalidad (PCA) sobre ese bloque de variables. Para modelos basados en árboles (como el Random Forest usado en la Parte 4), la multicolinealidad afecta menos la performance predictiva, aunque sigue diluyendo la importancia atribuida a cada variable individual.
+Para un modelo lineal (regresión logística), conviene **no usar las seis `BILL_AMT` por separado**: alternativas razonables son quedarse solo con `BILL_AMT1` (el más reciente), construir un promedio o una pendiente/tendencia de los 6 meses, o aplicar una reducción de dimensionalidad (PCA) sobre ese bloque de variables. Para modelos basados en árboles (Random Forest, Gradient Boosting), la multicolinealidad afecta menos la performance predictiva, aunque sigue diluyendo la importancia atribuida a cada variable individual.
 
 <!-- nb:md cell=49 -->
 ### 3.3 Coordenadas paralelas: interacción conjunta entre las variables de facturación
@@ -994,198 +994,8 @@ mostrar_plotly_json("cell50_plotly.json")
 <!-- nb:md cell=51 -->
 El gráfico de coordenadas paralelas confirma visualmente el hallazgo del VIF: las líneas se mueven de forma casi paralela entre `BILL_AMT1` y `BILL_AMT6`, es decir, un cliente con saldo alto en un mes casi siempre lo tiene alto en los meses adyacentes. No se observa un patrón de color (default vs no default) claramente diferenciado a lo largo de estas seis variables, lo que refuerza el insight bivariado de que el **monto adeudado por sí solo discrimina poco** entre clientes que caen en default y los que no; lo que sí discrimina, como se vio en la Parte 2, es el estado de pago (`PAY_x`).
 
-<!-- nb:md cell=52 -->
-## PARTE 4: Interpretabilidad Avanzada con SHAP
-
-Las secciones 4.1 a 4.3 se calculan en Python (SHAP con `TreeExplainer` sobre un Random Forest de 200 árboles): no hay en R un equivalente con los paquetes del proyecto. El código de Python se muestra plegado y los gráficos interactivos son los de la salida del notebook, con los mismos datos.
-
-<!-- nb:code cell=53 -->
-<details><summary>Código de Python (30 líneas)</summary>
-
-```{python nb00_c53, eval=FALSE}
-feature_cols = num_cols + cat_cols
-X = df[feature_cols].copy()
-y = df[target].copy()
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
-
-modelo_rf = RandomForestClassifier(
-    n_estimators=200, max_depth=6, min_samples_leaf=50,
-    class_weight="balanced", random_state=42, n_jobs=-1,
-)
-modelo_rf.fit(X_train, y_train)
-
-# Muestra para SHAP (el cálculo exacto sobre 30,000 filas es costoso; una muestra representativa basta para el EDA)
-X_shap = X_test.sample(n=2000, random_state=42)
-
-explainer = shap.TreeExplainer(modelo_rf)
-shap_values = explainer.shap_values(X_shap)
-
-# shap_values puede venir como lista [clase0, clase1] o como array 3D según la versión de shap/sklearn
-if isinstance(shap_values, list):
-    sv_clase1 = shap_values[1]
-elif shap_values.ndim == 3:
-    sv_clase1 = shap_values[:, :, 1]
-else:
-    sv_clase1 = shap_values
-
-sv_df = pd.DataFrame(sv_clase1, columns=feature_cols, index=X_shap.index)
-pd.DataFrame({"Filas explicadas": [sv_df.shape[0]], "Variables": [sv_df.shape[1]]}, index=["Valores SHAP (clase default)"])
-```
-
-</details>
-
-
-<!-- nb:table cell=53 -->
-```{r nb00_tcell53_1, echo=FALSE}
-mostrar_tabla("00_eda", "cell53_1.csv")
-```
-
-<!-- nb:md cell=54 -->
-### 4.1 Importancia global (mean |SHAP|)
-
-<!-- nb:code cell=55 -->
-<details><summary>Código de Python (13 líneas)</summary>
-
-```{python nb00_c55, eval=FALSE}
-importancia = sv_df.abs().mean().sort_values(ascending=True)
-
-fig = go.Figure(go.Bar(
-    x=importancia.values, y=importancia.index, orientation="h",
-    marker_color=DEEP_NAVY,
-    hovertemplate="%{y}<br>|SHAP| medio: %{x:.4f}<extra></extra>",
-))
-fig.update_layout(
-    title="Importancia global de variables (media de |SHAP|)",
-    height=650, width=800, xaxis_title="Media de |Valor SHAP|", yaxis_title="",
-)
-fig.show()
-```
-
-</details>
-
-
-<!-- nb:plotly cell=55 -->
-```{r nb00_cell55, echo=FALSE}
-mostrar_plotly_json("cell55_plotly.json")
-```
-
-<!-- nb:md cell=56 -->
-`PAY_0` (estado de pago del mes más reciente) domina claramente el ranking de importancia, muy por encima de cualquier otra variable, coherente con lo observado en el análisis bivariado. Le siguen a distancia `PAY_2`, `PAY_3`, `PAY_4` (estado de pago de meses anteriores) y `LIMIT_BAL`. Las variables de facturación (`BILL_AMT*`) y las demográficas (`AGE`, `SEX`, `EDUCATION`, `MARRIAGE`) aportan comparativamente poco al modelo. Esto sugiere que, si se buscara un modelo más simple, priorizar las variables `PAY_x` y `LIMIT_BAL` capturaría la mayor parte de la señal predictiva.
-
-<!-- nb:md cell=57 -->
-### 4.2 Beeswarm interactivo (todas las variables)
-
-<!-- nb:code cell=58 -->
-<details><summary>Código de Python (34 líneas)</summary>
-
-```{python nb00_c58, eval=FALSE}
-orden = importancia.index[::-1]  # de mayor a menor importancia
-
-rng = np.random.default_rng(42)
-fig = go.Figure()
-for i, col in enumerate(orden):
-    vals = X_shap[col].values.astype(float)
-    if np.nanstd(vals) > 0:
-        percentil = pd.Series(vals).rank(pct=True).values
-    else:
-        percentil = np.full(len(vals), 0.5)
-    y_base = len(orden) - i
-    jitter = (rng.random(len(vals)) - 0.5) * 0.7
-    fig.add_trace(go.Scatter(
-        x=sv_df[col].values, y=y_base + jitter,
-        mode="markers",
-        marker=dict(
-            size=4, color=percentil, colorscale=[[0, NAVY], [1, WARM_GOLD]],
-            showscale=(i == 0),
-            colorbar=dict(title="Valor de la<br>variable (percentil)", x=1.02) if i == 0 else None,
-            opacity=0.65, line=dict(width=0),
-        ),
-        name=col, showlegend=False,
-        hovertemplate=col + "<br>SHAP: %{x:.4f}<extra></extra>",
-    ))
-
-fig.update_layout(
-    title="Beeswarm SHAP: importancia y dirección del efecto por variable",
-    height=750, width=900,
-    yaxis=dict(tickvals=list(range(len(orden), 0, -1)), ticktext=list(orden), title=""),
-    xaxis_title="Valor SHAP (impacto en la probabilidad de default)",
-)
-fig.add_vline(x=0, line_dash="dash", line_color="gray")
-fig.show()
-```
-
-</details>
-
-
-<!-- nb:plotly cell=58 -->
-```{r nb00_cell58, echo=FALSE}
-mostrar_plotly_json("cell58_plotly.json")
-```
-
-<!-- nb:md cell=59 -->
-El beeswarm añade la *dirección* del efecto al ranking de importancia: los puntos dorados (valores altos de la variable) de `PAY_0`, `PAY_2` y `PAY_3` se concentran del lado derecho (SHAP positivo: empujan hacia default), mientras que los puntos azul marino (valores bajos/negativos, es decir, pagos al día) se concentran del lado izquierdo (SHAP negativo: empujan hacia no-default). En `LIMIT_BAL` el patrón es inverso: valores altos (dorado) empujan hacia SHAP negativo (menor riesgo), consistente con el insight de negocio de la sección bivariada. Para las variables de facturación y las demográficas, la nube de puntos está mucho más concentrada cerca de cero y sin un patrón de color claro, confirmando su bajo poder predictivo individual.
-
-<!-- nb:md cell=60 -->
-### 4.3 Gráfico de dependencia
-
-<!-- nb:code cell=61 -->
-<details><summary>Código de Python (32 líneas)</summary>
-
-```{python nb00_c61, eval=FALSE}
-fig = go.Figure()
-n_vars = len(num_cols)
-
-for i, col in enumerate(num_cols):
-    corrs = corr_pearson[col].drop(col).abs()
-    col_interaccion = corrs.idxmax()
-    fig.add_trace(go.Scatter(
-        x=X_shap[col], y=sv_df[col],
-        mode="markers",
-        marker=dict(size=6, color=X_shap[col_interaccion], colorscale=[[0, NAVY], [1, WARM_GOLD]],
-                    showscale=True, colorbar=dict(title=col_interaccion)),
-        customdata=X_shap[col_interaccion],
-        hovertemplate=(col + ": %{x:.2f}<br>SHAP: %{y:.4f}<br>" +
-                        col_interaccion + ": %{customdata:.2f}<extra></extra>"),
-        visible=(i == 0), name=col,
-    ))
-
-botones = []
-for i, col in enumerate(num_cols):
-    vis = [False] * n_vars
-    vis[i] = True
-    botones.append(dict(label=col, method="update", args=[{"visible": vis}, {"xaxis.title": col}]))
-
-fig.update_layout(
-    title=f"SHAP dependence plot: {num_cols[0]}",
-    height=550, width=950,
-    xaxis_title=num_cols[0], yaxis_title="Valor SHAP",
-    updatemenus=[dict(buttons=botones, direction="down", x=1.2, y=1.0, showactive=True)],
-)
-fig.add_hline(y=0, line_dash="dash", line_color="gray")
-fig.show()
-```
-
-</details>
-
-
-<!-- nb:plotly cell=61 -->
-```{r nb00_cell61, echo=FALSE}
-mostrar_plotly_json("cell61_plotly.json")
-```
-
-<!-- nb:md cell=62 -->
-### 4.4 Interpretabilidad
-
-- El ranking de importancia SHAP confirma lo observado en el análisis bivariado: el **estado de pago más reciente (`PAY_0`)** y sus rezagos (`PAY_2`, `PAY_3`, `PAY_4`) son, con diferencia, las variables que más empujan la predicción de default, seguidas de `LIMIT_BAL`.
-- El beeswarm permite ver la *dirección* del efecto: atrasos (valores altos, en dorado) en las variables `PAY_x` empujan el SHAP hacia la derecha (mayor probabilidad de default), mientras que valores altos de `LIMIT_BAL` lo empujan hacia la izquierda (menor riesgo).
-- Los gráficos de dependencia permiten detectar **no linealidades**: el efecto marginal de pasar de "al día" (0 o -1) a "1 mes de atraso" en `PAY_0` es mucho mayor que el de pasar de 4 a 5 meses de atraso, información que un coeficiente lineal único (como en una regresión logística simple sobre la variable sin transformar) no podría capturar, y que justifica tratar `PAY_x` como variable categórica/ordinal con dummies, o usar modelos no lineales.
-- Las variables de facturación (`BILL_AMT*`) muestran valores SHAP cercanos a cero en casi todo su rango, reforzando la recomendación de la Parte 3 de no usarlas todas por separado en un modelo lineal: aportan poca señal individual y además están fuertemente correlacionadas entre sí.
-
 <!-- nb:md cell=63 -->
-## PARTE 5: Preprocesamiento: resolución de los hallazgos
+## PARTE 4: Preprocesamiento: resolución de los hallazgos
 
 Cada hallazgo de las partes anteriores se resuelve aquí con una decisión explícita. El resultado es el conjunto de datos final que reciben los capítulos de modelado.
 
@@ -1199,16 +1009,16 @@ Cada hallazgo de las partes anteriores se resuelve aquí con una decisión expl�
 | 6 | Desbalance de clases (77.9% / 22.1%) | No se toca el dataset: se maneja dentro de la validación cruzada (`class_weight`, SMOTE, ADASYN) y se evalúa con F1 y AUC-ROC |
 | 7 | Variables categóricas sin codificar (`SEX`, `EDUCATION`, `MARRIAGE`) y escalas muy distintas | One-hot y `StandardScaler` (solo para KNN, SVM y regresión logística), ajustados únicamente con el fold de entrenamiento |
 | 8 | Códigos -2 y 0 de `PAY_x` con definición ambigua en la fuente | Se conservan tal cual (decisión del EDA); queda documentado como limitación |
-| 9 | Relación no lineal entre `PAY_x` y el riesgo | `PAY_x` se mantiene como variable ordinal y se compara con modelos que capturan no linealidad (árboles, Random Forest, XGBoost, SVM, KNN) |
+| 9 | `PAY_x` es el predictor dominante y su relación con el riesgo puede no ser lineal (el EDA no la caracteriza; se estudia con el mejor modelo en el capítulo 06) | `PAY_x` se mantiene como variable ordinal y se compara con modelos que capturan no linealidad (árboles, Random Forest, XGBoost, SVM, KNN) |
 | 10 | Grupos de filas con las mismas variables pero distinto resultado | 21 grupos (42 filas, 0.14%), lo que queda tras quitar ya las copias idénticas: se cuantifica y se documenta, no se corrige; no es un techo natural del desempeño |
 | 11 | Sin valores nulos | No se requiere imputación |
 
-Los puntos 1 a 5 se transforman en el dataset. Limitación del punto 4: `BILL_AMT_MEAN_6M_LOG` queda con asimetría -2.47 (mínimo -10.9) tras el log con signo, y la verificación de la sección 5.3 no la cubre (solo revisa `LIMIT_BAL_LOG` y `PAY_AMT*_LOG`). El 6 y el 7 deben ir dentro del pipeline de validación porque aprenden de los datos y, si se aplicaran antes de partir, filtrarían información del fold de validación.
+Los puntos 1 a 5 se transforman en el dataset. Limitación del punto 4: `BILL_AMT_MEAN_6M_LOG` queda con asimetría -2.47 (mínimo -10.9) tras el log con signo, y la verificación de la sección 4.3 no la cubre (solo revisa `LIMIT_BAL_LOG` y `PAY_AMT*_LOG`). El 6 y el 7 deben ir dentro del pipeline de validación porque aprenden de los datos y, si se aplicaran antes de partir, filtrarían información del fold de validación.
 
 <!-- nb:md cell=64 -->
-### 5.1 Construcción del dataset final
+### 4.1 Construcción del dataset final
 
-Las secciones 5.1 a 5.3 usan `src/preprocessing.py` (`build_final_dataset`), que no está en este proyecto, así que sus resultados (tablas y gráfico) son las salidas del notebook de Python, con el código plegado.
+Las secciones 4.1 a 4.3 usan `src/preprocessing.py` (`build_final_dataset`), que no está en este proyecto, así que sus resultados (tablas y gráfico) son las salidas del notebook de Python, con el código plegado.
 
 <!-- nb:code cell=65 -->
 <details><summary>Código de Python (17 líneas)</summary>
@@ -1242,7 +1052,7 @@ mostrar_tabla("00_eda", "cell65_1.csv")
 ```
 
 <!-- nb:md cell=66 -->
-### 5.2 Efecto de las transformaciones
+### 4.2 Efecto de las transformaciones
 
 <!-- nb:code cell=67 -->
 <details><summary>Código de Python (11 líneas)</summary>
@@ -1334,7 +1144,7 @@ mostrar_tabla("00_eda", "cell69_2.csv")
 ```
 
 <!-- nb:md cell=70 -->
-### 5.3 Verificación de que cada hallazgo quedó resuelto
+### 4.3 Verificación de que cada hallazgo quedó resuelto
 
 <!-- nb:code cell=71 -->
 <details><summary>Código de Python (29 líneas)</summary>
@@ -1410,11 +1220,11 @@ mostrar_tabla("00_eda", "cell73_2.csv")
 ```
 
 <!-- nb:md cell=74 -->
-### 5.4 Qué recibe el modelado
+### 4.4 Qué recibe el modelado
 
 El dataset final tiene **29,965 filas y 21 columnas**: 20 variables predictoras y el target (`default_payment_next_month`, siempre la última columna).
 
-Conviene no confundir esta cifra con las 24 columnas del dataset limpio de las partes 1 a 4 (23 variables predictoras y el target, con `ID` como índice). La diferencia sale de la sección 5.1: las seis columnas `BILL_AMT1` a `BILL_AMT6` se reemplazan por tres variables derivadas, así que 23 - 6 + 3 = 20 predictoras, más el target.
+Conviene no confundir esta cifra con las 24 columnas del dataset limpio de las partes 1 a 4 (23 variables predictoras y el target, con `ID` como índice). La diferencia sale de la sección 4.1: las seis columnas `BILL_AMT1` a `BILL_AMT6` se reemplazan por tres variables derivadas, así que 23 - 6 + 3 = 20 predictoras, más el target.
 
 - **Categóricas** (`SEX`, `EDUCATION`, `MARRIAGE`): se mantienen como enteros y el pipeline las convierte a one-hot dentro de la validación cruzada.
 - **Numéricas originales sin cambios**: `AGE` y `PAY_0`, `PAY_2` a `PAY_6`.
@@ -1429,10 +1239,10 @@ Dos cosas que conviene tener presentes al modelar: (1) los códigos -2 y 0 de `P
 - **Calidad de datos**: el dataset no tiene valores nulos. Las 35 copias excedentes se eliminan y las categorías no oficiales de `EDUCATION` y `MARRIAGE` se reagrupan en "Otros" (decisión de modelado, no respaldada semánticamente). Los códigos -2 y 0 de las variables `PAY_x` tienen una definición ambigua en la fuente original, una limitación a tener en cuenta al comunicar resultados.
 - **Desbalance de clases**: aprox. 78% no-default vs aprox. 22% default. Se aborda en el modelamiento, dentro de la validación cruzada (`class_weight`, remuestreo), con métricas robustas al desbalance.
 - **Mejor variable predictora, por lejos**: el estado de pago del mes más reciente (`PAY_0`), seguido de los meses anteriores y del límite de crédito (`LIMIT_BAL`). Las variables demográficas (`AGE`, `SEX`, `EDUCATION`, `MARRIAGE`) aportan señal, pero mucho más débil.
-- **Multicolinealidad severa** entre las seis variables de facturación (`BILL_AMT1`-`BILL_AMT6`, VIF hasta aprox. 25): se resuelven reemplazándolas por su nivel medio y su tendencia, con lo que el VIF máximo del dataset final queda por debajo de 10 (Parte 5).
-- **Variables asimétricas**: `PAY_AMT*` (muy asimétricas) y `LIMIT_BAL` (moderada, 0.99, que pasa a -0.51) se transforman con log con signo (Parte 5). `BILL_AMT_MEAN_6M_LOG` queda con asimetría -2.47 (mínimo -10.9) y la verificación de la sección 5.3 no la cubre.
-- **Recomendación para el modelamiento**: dada la relación no lineal entre atrasos y riesgo (vista en los dependence plots), un modelo basado en árboles (Random Forest, Gradient Boosting) es una opción natural, como ya lo sugiere el buen desempeño del Random Forest usado para SHAP (AUC aprox. 0.77 en test). Si se prefiere un modelo lineal por interpretabilidad, conviene categorizar/discretizar `PAY_x`.
-- **Resultado final**: el dataset preprocesado queda listo para el modelado y todas las verificaciones de la sección 5.3 pasan.
+- **Multicolinealidad severa** entre las seis variables de facturación (`BILL_AMT1`-`BILL_AMT6`, VIF hasta aprox. 25): se resuelven reemplazándolas por su nivel medio y su tendencia, con lo que el VIF máximo del dataset final queda por debajo de 10 (Parte 4).
+- **Variables asimétricas**: `PAY_AMT*` (muy asimétricas) y `LIMIT_BAL` (moderada, 0.99, que pasa a -0.51) se transforman con log con signo (Parte 4). `BILL_AMT_MEAN_6M_LOG` queda con asimetría -2.47 (mínimo -10.9) y la verificación de la sección 4.3 no la cubre.
+- **Recomendación para el modelamiento**: dado que los atrasos (`PAY_x`) dominan la señal y su relación con el riesgo puede no ser lineal, un modelo basado en árboles (Random Forest, Gradient Boosting) es una opción natural. La interpretabilidad (SHAP y LIME) se hace después, con el mejor modelo, en el capítulo de interpretabilidad. Si se prefiere un modelo lineal por interpretabilidad, conviene categorizar/discretizar `PAY_x`.
+- **Resultado final**: el dataset preprocesado queda listo para el modelado y todas las verificaciones de la sección 4.3 pasan.
 
 ---
 
