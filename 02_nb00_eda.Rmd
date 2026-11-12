@@ -1224,7 +1224,7 @@ mostrar_tabla("00_eda", "cell73_2.csv")
 
 El dataset final tiene **29,965 filas y 21 columnas**: 20 variables predictoras y el target (`default_payment_next_month`, siempre la última columna).
 
-Conviene no confundir esta cifra con las 24 columnas del dataset limpio de las partes 1 a 4 (23 variables predictoras y el target, con `ID` como índice). La diferencia sale de la sección 4.1: las seis columnas `BILL_AMT1` a `BILL_AMT6` se reemplazan por tres variables derivadas, así que 23 - 6 + 3 = 20 predictoras, más el target.
+Conviene no confundir esta cifra con las 24 columnas del dataset limpio de las partes 1 a 3 (23 variables predictoras y el target, con `ID` como índice). La diferencia sale de la sección 4.1: las seis columnas `BILL_AMT1` a `BILL_AMT6` se reemplazan por tres variables derivadas, así que 23 - 6 + 3 = 20 predictoras, más el target.
 
 - **Categóricas** (`SEX`, `EDUCATION`, `MARRIAGE`): se mantienen como enteros y el pipeline las convierte a one-hot dentro de la validación cruzada.
 - **Numéricas originales sin cambios**: `AGE` y `PAY_0`, `PAY_2` a `PAY_6`.
