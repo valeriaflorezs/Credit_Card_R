@@ -448,7 +448,7 @@ RANDOM_STATE = 42
 
 df = pd.read_csv(DATASET_PATH)
 print(f"Dataset cargado: {df.shape}")
-assert df.shape == (29965, 21), f"forma inesperada: {df.shape} (se esperaba (29965, 21): dataset_final.csv de la Parte 5 del EDA)"
+assert df.shape == (29965, 21), f"forma inesperada: {df.shape} (se esperaba (29965, 21): dataset_final.csv de la Parte 4 del EDA)"
 
 n_before = len(df)
 df = df.drop_duplicates(subset=None, keep="first").reset_index(drop=True)

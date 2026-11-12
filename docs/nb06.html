@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>06. Interpretabilidad (SHAP y LIME) | Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning</title>
   <meta name="description" content="Libro interactivo (R bookdown) con la portada, el marco del proyecto y los notebooks del proyecto Default of Credit Card Clients." />
-  <meta name="generator" content="bookdown 0.48 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
 
   <meta property="og:title" content="06. Interpretabilidad (SHAP y LIME) | Predicción del Incumplimiento de Pago en Tarjetas de Crédito usando Machine Learning" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Katherin Barrera López y Valeria Florez Sarmiento" />
 
 
-<meta name="date" content="2026-09-11" />
+<meta name="date" content="2026-12-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,7 +32,7 @@
   
 <link rel="prev" href="nb05.html"/>
 <link rel="next" href="nb07.html"/>
-<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="libs/jquery-3.6.1/jquery-3.6.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -53,18 +53,17 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
-<script src="libs/plotly-binding-4.12.1/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.4/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
-<link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
-<script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<link href="libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
-html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -178,32 +177,32 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html"><i class="fa fa-check"></i>Marco del proyecto</a>
 <ul>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#introducci%C3%B3n"><i class="fa fa-check"></i>Introducción</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#introducción"><i class="fa fa-check"></i>Introducción</a></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#planteamiento-del-problema"><i class="fa fa-check"></i>Planteamiento del problema</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#hip%C3%B3tesis-exploratorias"><i class="fa fa-check"></i>Hipótesis exploratorias</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#justificaci%C3%B3n"><i class="fa fa-check"></i>Justificación</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#hipótesis-exploratorias"><i class="fa fa-check"></i>Hipótesis exploratorias</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#justificación"><i class="fa fa-check"></i>Justificación</a></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#objetivos"><i class="fa fa-check"></i>Objetivos</a></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#alcance-y-limitaciones"><i class="fa fa-check"></i>Alcance y limitaciones</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#marco-te%C3%B3rico"><i class="fa fa-check"></i>Marco teórico</a>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#marco-teórico"><i class="fa fa-check"></i>Marco teórico</a>
 <ul>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#riesgo-de-cr%C3%A9dito-y-default"><i class="fa fa-check"></i>Riesgo de crédito y <em>default</em></a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#an%C3%A1lisis-exploratorio-de-datos"><i class="fa fa-check"></i>Análisis exploratorio de datos</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#valores-at%C3%ADpicos-y-asimetr%C3%ADa"><i class="fa fa-check"></i>Valores atípicos y asimetría</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#riesgo-de-crédito-y-default"><i class="fa fa-check"></i>Riesgo de crédito y <em>default</em></a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#análisis-exploratorio-de-datos"><i class="fa fa-check"></i>Análisis exploratorio de datos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#valores-atípicos-y-asimetría"><i class="fa fa-check"></i>Valores atípicos y asimetría</a></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#desbalance-de-clases"><i class="fa fa-check"></i>Desbalance de clases</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#correlaci%C3%B3n-de-spearman-y-multicolinealidad"><i class="fa fa-check"></i>Correlación de Spearman y multicolinealidad</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#asociaci%C3%B3n-y-comparaci%C3%B3n-de-grupos"><i class="fa fa-check"></i>Asociación y comparación de grupos</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#calibraci%C3%B3n-de-probabilidades"><i class="fa fa-check"></i>Calibración de probabilidades</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#correlación-de-spearman-y-multicolinealidad"><i class="fa fa-check"></i>Correlación de Spearman y multicolinealidad</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#asociación-y-comparación-de-grupos"><i class="fa fa-check"></i>Asociación y comparación de grupos</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#calibración-de-probabilidades"><i class="fa fa-check"></i>Calibración de probabilidades</a></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#antecedentes"><i class="fa fa-check"></i>Antecedentes</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#diccionario-de-variables"><i class="fa fa-check"></i>Diccionario de variables</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#metodolog%C3%ADa"><i class="fa fa-check"></i>Metodología</a>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#metodología"><i class="fa fa-check"></i>Metodología</a>
 <ul>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#datos"><i class="fa fa-check"></i>Datos</a></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#etl"><i class="fa fa-check"></i>ETL</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#an%C3%A1lisis-exploratorio"><i class="fa fa-check"></i>Análisis exploratorio</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#análisis-exploratorio"><i class="fa fa-check"></i>Análisis exploratorio</a></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#modelo-base"><i class="fa fa-check"></i>Modelo base</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#dise%C3%B1o-experimental"><i class="fa fa-check"></i>Diseño experimental</a></li>
-<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#modelo-original-y-m%C3%A9todos-recientes"><i class="fa fa-check"></i>Modelo original y métodos recientes</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#diseño-experimental"><i class="fa fa-check"></i>Diseño experimental</a></li>
+<li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#modelo-original-y-métodos-recientes"><i class="fa fa-check"></i>Modelo original y métodos recientes</a></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#interpretabilidad"><i class="fa fa-check"></i>Interpretabilidad</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="marco.html"><a href="marco.html#estructura-del-libro"><i class="fa fa-check"></i>Estructura del libro</a></li>
@@ -211,109 +210,100 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html"><i class="fa fa-check"></i>EDA: Análisis Exploratorio de Datos</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#tipo-y-descripci%C3%B3n-de-las-variables"><i class="fa fa-check"></i>Tipo y descripción de las variables</a>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#tipo-y-descripción-de-las-variables"><i class="fa fa-check"></i>Tipo y descripción de las variables</a>
 <ul>
 <li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#valores-nulos-y-duplicados"><i class="fa fa-check"></i>Valores nulos y duplicados</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#categor%C3%ADas-no-documentadas-valores-centinela"><i class="fa fa-check"></i>Categorías no documentadas / valores centinela</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#montos-de-facturaci%C3%B3n-negativos"><i class="fa fa-check"></i>Montos de facturación negativos</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#categorías-no-documentadas-valores-centinela"><i class="fa fa-check"></i>Categorías no documentadas / valores centinela</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#montos-de-facturación-negativos"><i class="fa fa-check"></i>Montos de facturación negativos</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#an%C3%A1lisis-de-la-variable-objetivo"><i class="fa fa-check"></i>Análisis de la variable objetivo</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#an%C3%A1lisis-univariado"><i class="fa fa-check"></i>Análisis Univariado</a>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#análisis-de-la-variable-objetivo"><i class="fa fa-check"></i>Análisis de la variable objetivo</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#análisis-univariado"><i class="fa fa-check"></i>Análisis Univariado</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#estad%C3%ADsticos-descriptivos-completos"><i class="fa fa-check"></i>1.1 Estadísticos descriptivos completos</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#visualizaci%C3%B3n-interactiva"><i class="fa fa-check"></i>1.2 Visualización interactiva</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#estadísticos-descriptivos-completos"><i class="fa fa-check"></i>1.1 Estadísticos descriptivos completos</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#visualización-interactiva"><i class="fa fa-check"></i>1.2 Visualización interactiva</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#an%C3%A1lisis-bivariado"><i class="fa fa-check"></i>Análisis Bivariado</a>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#análisis-bivariado"><i class="fa fa-check"></i>Análisis Bivariado</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#pruebas-de-hip%C3%B3tesis-y-comparaci%C3%B3n-de-grupos"><i class="fa fa-check"></i>2.1 Pruebas de hipótesis y comparación de grupos</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#pruebas-de-hipótesis-y-comparación-de-grupos"><i class="fa fa-check"></i>2.1 Pruebas de hipótesis y comparación de grupos</a></li>
 <li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#visualizaciones-segmentadas-por-default"><i class="fa fa-check"></i>2.2 Visualizaciones segmentadas por default</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#multicolinealidad"><i class="fa fa-check"></i>Multicolinealidad</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#matriz-de-correlaci%C3%B3n"><i class="fa fa-check"></i>3.1 Matriz de correlación</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#factor-de-inflaci%C3%B3n-de-la-varianza-vif"><i class="fa fa-check"></i>3.2 Factor de Inflación de la Varianza (VIF)</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#coordenadas-paralelas-interacci%C3%B3n-conjunta-entre-las-variables-de-facturaci%C3%B3n"><i class="fa fa-check"></i>3.3 Coordenadas paralelas: interacción conjunta entre las variables de facturación</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#matriz-de-correlación"><i class="fa fa-check"></i>3.1 Matriz de correlación</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#factor-de-inflación-de-la-varianza-vif"><i class="fa fa-check"></i>3.2 Factor de Inflación de la Varianza (VIF)</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#coordenadas-paralelas-interacción-conjunta-entre-las-variables-de-facturación"><i class="fa fa-check"></i>3.3 Coordenadas paralelas: interacción conjunta entre las variables de facturación</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#parte-4-interpretabilidad-avanzada-con-shap"><i class="fa fa-check"></i>PARTE 4: Interpretabilidad Avanzada con SHAP</a>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#parte-4-preprocesamiento-resolución-de-los-hallazgos"><i class="fa fa-check"></i>PARTE 4: Preprocesamiento: resolución de los hallazgos</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#importancia-global-mean-shap"><i class="fa fa-check"></i>4.1 Importancia global (mean |SHAP|)</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#beeswarm-interactivo-todas-las-variables"><i class="fa fa-check"></i>4.2 Beeswarm interactivo (todas las variables)</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#gr%C3%A1fico-de-dependencia"><i class="fa fa-check"></i>4.3 Gráfico de dependencia</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#interpretabilidad-1"><i class="fa fa-check"></i>4.4 Interpretabilidad</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#parte-5-preprocesamiento-resoluci%C3%B3n-de-los-hallazgos"><i class="fa fa-check"></i>PARTE 5: Preprocesamiento: resolución de los hallazgos</a>
-<ul>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#construcci%C3%B3n-del-dataset-final"><i class="fa fa-check"></i>5.1 Construcción del dataset final</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#efecto-de-las-transformaciones"><i class="fa fa-check"></i>5.2 Efecto de las transformaciones</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#verificaci%C3%B3n-de-que-cada-hallazgo-qued%C3%B3-resuelto"><i class="fa fa-check"></i>5.3 Verificación de que cada hallazgo quedó resuelto</a></li>
-<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#qu%C3%A9-recibe-el-modelado"><i class="fa fa-check"></i>5.4 Qué recibe el modelado</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#construcción-del-dataset-final"><i class="fa fa-check"></i>4.1 Construcción del dataset final</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#efecto-de-las-transformaciones"><i class="fa fa-check"></i>4.2 Efecto de las transformaciones</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#verificación-de-que-cada-hallazgo-quedó-resuelto"><i class="fa fa-check"></i>4.3 Verificación de que cada hallazgo quedó resuelto</a></li>
+<li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#qué-recibe-el-modelado"><i class="fa fa-check"></i>4.4 Qué recibe el modelado</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb00.html"><a href="nb00.html#conclusiones-generales-del-eda"><i class="fa fa-check"></i>Conclusiones generales del EDA</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html"><i class="fa fa-check"></i>01. Modelo base: Regresión Logística</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#preparaci%C3%B3n-de-los-datos"><i class="fa fa-check"></i>1. Preparación de los datos</a>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#preparación-de-los-datos"><i class="fa fa-check"></i>1. Preparación de los datos</a>
 <ul>
 <li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#carga-del-dataset-final"><i class="fa fa-check"></i>1.1 Carga del dataset final</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#divisi%C3%B3n-traintest-encoding-y-escalado"><i class="fa fa-check"></i>2. División train/test, encoding y escalado</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#división-traintest-encoding-y-escalado"><i class="fa fa-check"></i>2. División train/test, encoding y escalado</a></li>
 <li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#ajuste-del-modelo"><i class="fa fa-check"></i>3. Ajuste del modelo</a></li>
-<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#evaluaci%C3%B3n-score-error-y-auc-roc"><i class="fa fa-check"></i>4. Evaluación: score, error y AUC-ROC</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#evaluación-score-error-y-auc-roc"><i class="fa fa-check"></i>4. Evaluación: score, error y AUC-ROC</a></li>
 <li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#coeficientes-del-modelo"><i class="fa fa-check"></i>5. Coeficientes del modelo</a></li>
-<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#matriz-de-confusi%C3%B3n-reporte-de-clasificaci%C3%B3n-y-curva-roc"><i class="fa fa-check"></i>6. Matriz de confusión, reporte de clasificación y curva ROC</a></li>
-<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#s%C3%ADntesis"><i class="fa fa-check"></i>7. Síntesis</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#matriz-de-confusión-reporte-de-clasificación-y-curva-roc"><i class="fa fa-check"></i>6. Matriz de confusión, reporte de clasificación y curva ROC</a></li>
+<li class="chapter" data-level="" data-path="nb01.html"><a href="nb01.html#síntesis"><i class="fa fa-check"></i>7. Síntesis</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb02.html"><a href="nb02.html"><i class="fa fa-check"></i>02. Verificación del protocolo experimental</a></li>
 <li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html"><i class="fa fa-check"></i>03. Desarrollo y prueba del pipeline completo</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#datos-sint%C3%A9ticos"><i class="fa fa-check"></i>1. Datos sintéticos</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#datos-sintéticos"><i class="fa fa-check"></i>1. Datos sintéticos</a></li>
 <li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#preprocesamiento-encoding-scaling-condicional"><i class="fa fa-check"></i>2. Preprocesamiento: encoding + scaling condicional</a></li>
 <li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#balanceo-compatibilidad-por-modelo"><i class="fa fa-check"></i>3. Balanceo: compatibilidad por modelo</a></li>
-<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#modelos-base-y-espacios-de-b%C3%BAsqueda"><i class="fa fa-check"></i>4. Modelos base y espacios de búsqueda</a></li>
-<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#optimizaci%C3%B3n-los-4-m%C3%A9todos-en-miniatura"><i class="fa fa-check"></i>5. Optimización: los 4 métodos, en miniatura</a></li>
-<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#validaci%C3%B3n-cruzada-anidada-inner-vs.-outer"><i class="fa fa-check"></i>6. Validación cruzada anidada: inner vs. outer</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#modelos-base-y-espacios-de-búsqueda"><i class="fa fa-check"></i>4. Modelos base y espacios de búsqueda</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#optimización-los-4-métodos-en-miniatura"><i class="fa fa-check"></i>5. Optimización: los 4 métodos, en miniatura</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#validación-cruzada-anidada-inner-vs.-outer"><i class="fa fa-check"></i>6. Validación cruzada anidada: inner vs. outer</a></li>
 <li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#orquestador-unas-pocas-combinaciones"><i class="fa fa-check"></i>7. Orquestador: unas pocas combinaciones</a></li>
-<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#complejidad-computacional-est%C3%A1ndar-vs.-optimizado"><i class="fa fa-check"></i>8. Complejidad computacional: estándar vs. optimizado</a></li>
-<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#evaluaci%C3%B3n-y-calibraci%C3%B3n"><i class="fa fa-check"></i>9. Evaluación y calibración</a></li>
-<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#interpretabilidad-shap-r%C3%A1pido"><i class="fa fa-check"></i>10. Interpretabilidad: SHAP rápido</a></li>
-<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#comparaci%C3%B3n-estad%C3%ADstica-jer%C3%A1rquica"><i class="fa fa-check"></i>11. Comparación estadística jerárquica</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#complejidad-computacional-estándar-vs.-optimizado"><i class="fa fa-check"></i>8. Complejidad computacional: estándar vs. optimizado</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#evaluación-y-calibración"><i class="fa fa-check"></i>9. Evaluación y calibración</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#interpretabilidad-shap-rápido"><i class="fa fa-check"></i>10. Interpretabilidad: SHAP rápido</a></li>
+<li class="chapter" data-level="" data-path="nb03.html"><a href="nb03.html#comparación-estadística-jerárquica"><i class="fa fa-check"></i>11. Comparación estadística jerárquica</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html"><i class="fa fa-check"></i>04. Ejecutar experimentos</a>
 <ul>
 <li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#cargar-datos"><i class="fa fa-check"></i>Cargar datos</a></li>
-<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#configuraci%C3%B3n-de-la-corrida"><i class="fa fa-check"></i>Configuración de la corrida</a></li>
+<li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#configuración-de-la-corrida"><i class="fa fa-check"></i>Configuración de la corrida</a></li>
 <li class="chapter" data-level="" data-path="nb04.html"><a href="nb04.html#resultado"><i class="fa fa-check"></i>Resultado</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html"><i class="fa fa-check"></i>05. Análisis de resultados</a>
 <ul>
 <li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#objetivo-prioritario"><i class="fa fa-check"></i>Objetivo prioritario:</a></li>
 <li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#cargar-datos-y-tabla-maestra"><i class="fa fa-check"></i>Cargar datos y tabla maestra</a></li>
-<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#tabla-de-m%C3%A9tricas-media-y-desviaci%C3%B3n-est%C3%A1ndar-outer-loop"><i class="fa fa-check"></i>Tabla de métricas (media y desviación estándar, outer loop)</a></li>
-<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#m%C3%A9tricas-complementarias-independientes-del-umbral"><i class="fa fa-check"></i>Métricas complementarias (independientes del umbral)</a></li>
-<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#cobertura-de-la-grilla-112-combinaciones-te%C3%B3ricas"><i class="fa fa-check"></i>Cobertura de la grilla: 112 combinaciones teóricas</a></li>
-<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#comparaci%C3%B3n-estad%C3%ADstica-jer%C3%A1rquica-1"><i class="fa fa-check"></i>Comparación estadística jerárquica</a></li>
-<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#comparaci%C3%B3n-por-factor-del-dise%C3%B1o-t%C3%A9cnica-m%C3%A9todo-de-optimizaci%C3%B3n-modelo"><i class="fa fa-check"></i>Comparación por factor del diseño (técnica, método de optimización, modelo)</a></li>
-<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#combinaci%C3%B3n-con-mayor-f1-medio-matriz-de-confusi%C3%B3n-y-curva-roc"><i class="fa fa-check"></i>Combinación con mayor F1 medio: matriz de confusión y curva ROC</a></li>
-<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#calibraci%C3%B3n-brier-ece-reliability-diagram-recalibraci%C3%B3n-si-corresponde"><i class="fa fa-check"></i>Calibración: Brier, ECE, reliability diagram (+ recalibración si corresponde)</a></li>
-<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#complejidad-computacional-est%C3%A1ndar-vs.-optimizado-1"><i class="fa fa-check"></i>Complejidad computacional: estándar vs. optimizado</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#tabla-de-métricas-media-y-desviación-estándar-outer-loop"><i class="fa fa-check"></i>Tabla de métricas (media y desviación estándar, outer loop)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#métricas-complementarias-independientes-del-umbral"><i class="fa fa-check"></i>Métricas complementarias (independientes del umbral)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#cobertura-de-la-grilla-112-combinaciones-teóricas"><i class="fa fa-check"></i>Cobertura de la grilla: 112 combinaciones teóricas</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#comparación-estadística-jerárquica-1"><i class="fa fa-check"></i>Comparación estadística jerárquica</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#comparación-por-factor-del-diseño-técnica-método-de-optimización-modelo"><i class="fa fa-check"></i>Comparación por factor del diseño (técnica, método de optimización, modelo)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#combinación-con-mayor-f1-medio-matriz-de-confusión-y-curva-roc"><i class="fa fa-check"></i>Combinación con mayor F1 medio: matriz de confusión y curva ROC</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#calibración-brier-ece-reliability-diagram-recalibración-si-corresponde"><i class="fa fa-check"></i>Calibración: Brier, ECE, reliability diagram (+ recalibración si corresponde)</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#complejidad-computacional-estándar-vs.-optimizado-1"><i class="fa fa-check"></i>Complejidad computacional: estándar vs. optimizado</a></li>
 <li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#siguiente-paso"><i class="fa fa-check"></i>Siguiente Paso</a></li>
-<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#siguiente-paso-modelo-original-y-m%C3%A9todos-recientes"><i class="fa fa-check"></i>Siguiente paso: modelo original y métodos recientes</a></li>
+<li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#siguiente-paso-modelo-original-y-métodos-recientes"><i class="fa fa-check"></i>Siguiente paso: modelo original y métodos recientes</a></li>
 <li class="chapter" data-level="" data-path="nb05.html"><a href="nb05.html#figuras-guardadas-en-resultsfigures"><i class="fa fa-check"></i>Figuras guardadas en results/figures</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html"><i class="fa fa-check"></i>06. Interpretabilidad (SHAP y LIME)</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#elegir-el-mejor-modelo-y-ajustar-su-pipeline"><i class="fa fa-check"></i>Elegir el mejor modelo y ajustar su pipeline</a></li>
-<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-global-summary-plot"><i class="fa fa-check"></i>SHAP global (summary plot)</a></li>
-<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-local-una-observaci%C3%B3n-bien-clasificada-y-una-con-error-alto"><i class="fa fa-check"></i>SHAP local: una observación bien clasificada y una con error alto</a></li>
-<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#lime-vs.-shap-espec%C3%ADficamente-para-xgboost"><i class="fa fa-check"></i>LIME vs. SHAP (específicamente para XGBoost)</a>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#elegir-el-mejor-modelo-y-ajustar-su-pipeline"><i class="fa fa-check"></i>1. Elegir el mejor modelo y ajustar su pipeline</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-global-summary-plot"><i class="fa fa-check"></i>2. SHAP global (summary plot)</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-local-una-observación-bien-clasificada-y-una-con-error-alto"><i class="fa fa-check"></i>3. SHAP local: una observación bien clasificada y una con error alto</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#lime-vs.-shap-específicamente-para-xgboost"><i class="fa fa-check"></i>4. LIME vs. SHAP (específicamente para XGBoost)</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#discusi%C3%B3n-cu%C3%A1ndo-divergen-lime-y-shap"><i class="fa fa-check"></i>Discusión: ¿cuándo divergen LIME y SHAP?</a></li>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#discusión-cuándo-divergen-lime-y-shap"><i class="fa fa-check"></i>4.1 Discusión: ¿cuándo divergen LIME y SHAP?</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-y-lime-con-m%C3%A1s-de-un-fold-y-m%C3%A1s-de-una-observaci%C3%B3n"><i class="fa fa-check"></i>SHAP y LIME con más de un fold y más de una observación</a>
-<ul>
+<li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-y-lime-con-más-de-un-fold-y-más-de-una-observación-secciones-5-y-6"><i class="fa fa-check"></i>SHAP y LIME con más de un fold y más de una observación (secciones 5 y 6)</a></li>
 <li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#shap-global-en-los-5-folds-externos"><i class="fa fa-check"></i>5. SHAP global en los 5 folds externos</a></li>
 <li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#lime-frente-a-shap-en-200-observaciones-por-modelo"><i class="fa fa-check"></i>6. LIME frente a SHAP en 200 observaciones por modelo</a></li>
-</ul></li>
 <li class="chapter" data-level="" data-path="nb06.html"><a href="nb06.html#figuras-guardadas-en-resultsfigures-1"><i class="fa fa-check"></i>Figuras guardadas en results/figures</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html"><i class="fa fa-check"></i>SVM + RBF acelerado por GPU (cuML/RAPIDS)</a>
@@ -321,51 +311,51 @@ div.csl-indent {
 <li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#verificar-gpu-asignada"><i class="fa fa-check"></i>1. Verificar GPU asignada</a></li>
 <li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#instalar-rapids-cuml"><i class="fa fa-check"></i>2. Instalar RAPIDS cuML</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#b.-instalaci%C3%B3n-alternativa-de-cuml-solo-si-la-instalaci%C3%B3n-de-la-secci%C3%B3n-2-fall%C3%B3"><i class="fa fa-check"></i>2b. Instalación alternativa de cuML (solo si la instalación de la sección 2 falló)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#b.-instalación-alternativa-de-cuml-solo-si-la-instalación-de-la-sección-2-falló"><i class="fa fa-check"></i>2b. Instalación alternativa de cuML (solo si la instalación de la sección 2 falló)</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#imports-chequeo-de-versiones"><i class="fa fa-check"></i>3. Imports + chequeo de versiones</a></li>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#chequeo-de-compatibilidad-cuml-correr-antes-de-cualquier-combinaci%C3%B3n-real"><i class="fa fa-check"></i>4. Chequeo de compatibilidad cuML (correr ANTES de cualquier combinación real)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#chequeo-de-compatibilidad-cuml-correr-antes-de-cualquier-combinación-real"><i class="fa fa-check"></i>4. Chequeo de compatibilidad cuML (correr ANTES de cualquier combinación real)</a></li>
 <li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#subir-dataset_final.csv"><i class="fa fa-check"></i>5. Subir <code>dataset_final.csv</code></a></li>
 <li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#cargar-verificar-y-separar-xy"><i class="fa fa-check"></i>6. Cargar, verificar y separar X/y</a></li>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#configuraci%C3%B3n-id%C3%A9ntica-a-srcconfig.py"><i class="fa fa-check"></i>7. Configuración (idéntica a <code>src/config.py</code>)</a></li>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#espacio-de-b%C3%BAsqueda-de-svm-id%C3%A9ntico-a-models.pymodel_registrysvm"><i class="fa fa-check"></i>8. Espacio de búsqueda de SVM (idéntico a <code>models.py::MODEL_REGISTRY["svm"]</code>)</a></li>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#preprocesamiento-id%C3%A9ntico-a-preprocessing.py-con-salida-densa"><i class="fa fa-check"></i>9. Preprocesamiento (idéntico a <code>preprocessing.py</code>, con salida densa)</a></li>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#balanceo-id%C3%A9ntico-a-balancing.py-f%C3%A1brica-del-modelo-cuml"><i class="fa fa-check"></i>10. Balanceo (idéntico a <code>balancing.py</code>) + fábrica del modelo cuML</a></li>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#los-4-m%C3%A9todos-de-optimizaci%C3%B3n-id%C3%A9nticos-a-optimization.py"><i class="fa fa-check"></i>11. Los 4 métodos de optimización (idénticos a <code>optimization.py</code>)</a></li>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#validaci%C3%B3n-cruzada-anidada-id%C3%A9ntica-a-nested_cv.py"><i class="fa fa-check"></i>12. Validación cruzada anidada (idéntica a <code>nested_cv.py</code>)</a></li>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#selecci%C3%B3n-de-combinaciones-a-correr"><i class="fa fa-check"></i>13. Selección de combinaciones a correr</a></li>
-<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#ejecutar-guardado-incremental-una-fila-apenas-termina-cada-combinaci%C3%B3n"><i class="fa fa-check"></i>14. Ejecutar: guardado incremental (una fila apenas termina cada combinación)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#configuración-idéntica-a-srcconfig.py"><i class="fa fa-check"></i>7. Configuración (idéntica a <code>src/config.py</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#espacio-de-búsqueda-de-svm-idéntico-a-models.pymodel_registrysvm"><i class="fa fa-check"></i>8. Espacio de búsqueda de SVM (idéntico a <code>models.py::MODEL_REGISTRY["svm"]</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#preprocesamiento-idéntico-a-preprocessing.py-con-salida-densa"><i class="fa fa-check"></i>9. Preprocesamiento (idéntico a <code>preprocessing.py</code>, con salida densa)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#balanceo-idéntico-a-balancing.py-fábrica-del-modelo-cuml"><i class="fa fa-check"></i>10. Balanceo (idéntico a <code>balancing.py</code>) + fábrica del modelo cuML</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#los-4-métodos-de-optimización-idénticos-a-optimization.py"><i class="fa fa-check"></i>11. Los 4 métodos de optimización (idénticos a <code>optimization.py</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#validación-cruzada-anidada-idéntica-a-nested_cv.py"><i class="fa fa-check"></i>12. Validación cruzada anidada (idéntica a <code>nested_cv.py</code>)</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#selección-de-combinaciones-a-correr"><i class="fa fa-check"></i>13. Selección de combinaciones a correr</a></li>
+<li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#ejecutar-guardado-incremental-una-fila-apenas-termina-cada-combinación"><i class="fa fa-check"></i>14. Ejecutar: guardado incremental (una fila apenas termina cada combinación)</a></li>
 <li class="chapter" data-level="" data-path="nb07.html"><a href="nb07.html#resultado-final-descarga"><i class="fa fa-check"></i>15. Resultado final + descarga</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html"><i class="fa fa-check"></i>08. Tabla maestra consolidada y comparabilidad del SVM</a>
 <ul>
 <li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#tabla-maestra-de-las-112-combinaciones"><i class="fa fa-check"></i>1. Tabla maestra de las 112 combinaciones</a></li>
-<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#mejor-combinaci%C3%B3n-por-modelo-y-motivo-de-la-selecci%C3%B3n"><i class="fa fa-check"></i>2. Mejor combinación por modelo y motivo de la selección</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#mejor-combinación-por-modelo-y-motivo-de-la-selección"><i class="fa fa-check"></i>2. Mejor combinación por modelo y motivo de la selección</a></li>
 <li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#son-comparables-las-16-filas-de-svm"><i class="fa fa-check"></i>3. ¿Son comparables las 16 filas de SVM?</a></li>
-<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#sensibilidad-de-la-comparaci%C3%B3n-estad%C3%ADstica-al-tratamiento-de-svm"><i class="fa fa-check"></i>4. Sensibilidad de la comparación estadística al tratamiento de SVM</a></li>
+<li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#sensibilidad-de-la-comparación-estadística-al-tratamiento-de-svm"><i class="fa fa-check"></i>4. Sensibilidad de la comparación estadística al tratamiento de SVM</a></li>
 <li class="chapter" data-level="" data-path="nb08.html"><a href="nb08.html#limitaciones"><i class="fa fa-check"></i>Limitaciones</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html"><i class="fa fa-check"></i>09. Curvas anytime y multi-fidelidad</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#curvas-anytime-arrepentimiento-frente-al-n%C3%BAmero-de-evaluaciones"><i class="fa fa-check"></i>1. Curvas anytime: arrepentimiento frente al número de evaluaciones</a></li>
-<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#curvas-anytime-frente-al-costo-de-c%C3%B3mputo"><i class="fa fa-check"></i>2. Curvas anytime frente al costo de cómputo</a></li>
-<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#resumen-costo-para-acercarse-al-mejor-score-y-desempe%C3%B1o-en-el-fold-externo"><i class="fa fa-check"></i>3. Resumen: costo para acercarse al mejor score y desempeño en el fold externo</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#curvas-anytime-arrepentimiento-frente-al-número-de-evaluaciones"><i class="fa fa-check"></i>1. Curvas anytime: arrepentimiento frente al número de evaluaciones</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#curvas-anytime-frente-al-costo-de-cómputo"><i class="fa fa-check"></i>2. Curvas anytime frente al costo de cómputo</a></li>
+<li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#resumen-costo-para-acercarse-al-mejor-score-y-desempeño-en-el-fold-externo"><i class="fa fa-check"></i>3. Resumen: costo para acercarse al mejor score y desempeño en el fold externo</a></li>
 <li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#multi-fidelidad-hyperband-frente-a-random-search-con-un-costo-comparable"><i class="fa fa-check"></i>4. Multi-fidelidad: Hyperband frente a Random Search con un costo comparable</a></li>
 <li class="chapter" data-level="" data-path="nb09.html"><a href="nb09.html#limitaciones-1"><i class="fa fa-check"></i>Limitaciones</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html"><i class="fa fa-check"></i>10. Modelo original (CS-FOF) y métodos recientes</a>
 <ul>
 <li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#la-idea-de-cs-fof"><i class="fa fa-check"></i>1. La idea de CS-FOF</a></li>
-<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#mejor-combinaci%C3%B3n-de-cada-modelo"><i class="fa fa-check"></i>2. Mejor combinación de cada modelo</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#mejor-combinación-de-cada-modelo"><i class="fa fa-check"></i>2. Mejor combinación de cada modelo</a></li>
 <li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#la-diferencia-de-cs-fof-es-significativa"><i class="fa fa-check"></i>3. ¿La diferencia de CS-FOF es significativa?</a></li>
 <li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#ranking-global-friedman-y-nemenyi"><i class="fa fa-check"></i>4. Ranking global: Friedman y Nemenyi</a></li>
-<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#comparaci%C3%B3n-sobre-las-mismas-predicciones-delong-y-mcnemar"><i class="fa fa-check"></i>5. Comparación sobre las mismas predicciones: DeLong y McNemar</a></li>
-<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#conclusi%C3%B3n-parcial"><i class="fa fa-check"></i>6. Conclusión (parcial)</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#comparación-sobre-las-mismas-predicciones-delong-y-mcnemar"><i class="fa fa-check"></i>5. Comparación sobre las mismas predicciones: DeLong y McNemar</a></li>
+<li class="chapter" data-level="" data-path="nb10.html"><a href="nb10.html#conclusión-parcial"><i class="fa fa-check"></i>6. Conclusión (parcial)</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html"><i class="fa fa-check"></i>12. Corrida 5 x 5 en Colab (todos los modelos con el mismo código)</a>
 <ul>
-<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html#resultado-de-esta-sesi%C3%B3n"><i class="fa fa-check"></i>Resultado de esta sesión</a></li>
-<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html#despu%C3%A9s-de-que-terminen-todas-las-sesiones"><i class="fa fa-check"></i>Después de que terminen todas las sesiones</a></li>
+<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html#resultado-de-esta-sesión"><i class="fa fa-check"></i>Resultado de esta sesión</a></li>
+<li class="chapter" data-level="" data-path="nb12.html"><a href="nb12.html#después-de-que-terminen-todas-las-sesiones"><i class="fa fa-check"></i>Después de que terminen todas las sesiones</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
@@ -393,7 +383,7 @@ div.csl-indent {
 <p><strong>Alcance y limitaciones:</strong>
 - Las secciones 1 a 4 interpretan <strong>una</strong> combinación (la de mayor F1 medio: XGBoost, <code>class_weight</code>, <code>bayesian_optuna</code>) en <strong>un</strong> fold externo (el de mayor F1, elegido a posteriori), sobre 100 filas, y comparan LIME con SHAP en <strong>una</strong> observación. Sirven para ilustrar el método, no para generalizar.
 - Las secciones 5 y 6 corrigen eso: repiten el análisis en los <strong>5 folds externos</strong>, cada uno con el pipeline reajustado con los hiperparámetros que su propio bucle interno eligió, y comparan LIME con SHAP en <strong>200 observaciones por modelo</strong> (10 al azar de cada celda de la matriz de confusión por fold), para Random Forest y XGBoost.
-- Las dos observaciones del waterfall de la sección 4 son casos extremos (probabilidades 0.954 y 0.952), no representativos del conjunto.
+- Las dos observaciones del waterfall de la sección 3 son casos extremos (probabilidades 0.954 y 0.952), no representativos del conjunto.
 - Se interpretan dos de los siete modelos. Los demás no se explican.
 - Con variables correlacionadas, SHAP reparte la importancia entre ellas de forma arbitraria. Y con modelos entrenados con <code>class_weight</code> o SMOTE las probabilidades no están calibradas: el valor base de 0.5 refleja el balanceo y no la prevalencia real (22 %), así que los aportes no se leen como cambios de riesgo reales.</p>
 <!-- nb:code cell=1 -->
@@ -401,68 +391,68 @@ div.csl-indent {
 <summary>
 Código (32 líneas)
 </summary>
-<div class="sourceCode" id="cb135"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb135-1"><a href="nb06.html#cb135-1" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb135-2"><a href="nb06.html#cb135-2" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb135-3"><a href="nb06.html#cb135-3" tabindex="-1"></a></span>
-<span id="cb135-4"><a href="nb06.html#cb135-4" tabindex="-1"></a>PROJECT_ROOT <span class="op">=</span> Path.cwd().parent</span>
-<span id="cb135-5"><a href="nb06.html#cb135-5" tabindex="-1"></a><span class="cf">if</span> <span class="bu">str</span>(PROJECT_ROOT) <span class="kw">not</span> <span class="kw">in</span> sys.path:</span>
-<span id="cb135-6"><a href="nb06.html#cb135-6" tabindex="-1"></a>    sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(PROJECT_ROOT))</span>
-<span id="cb135-7"><a href="nb06.html#cb135-7" tabindex="-1"></a></span>
-<span id="cb135-8"><a href="nb06.html#cb135-8" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb135-9"><a href="nb06.html#cb135-9" tabindex="-1"></a></span>
-<span id="cb135-10"><a href="nb06.html#cb135-10" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb135-11"><a href="nb06.html#cb135-11" tabindex="-1"></a></span>
-<span id="cb135-12"><a href="nb06.html#cb135-12" tabindex="-1"></a><span class="im">from</span> src <span class="im">import</span> config</span>
-<span id="cb135-13"><a href="nb06.html#cb135-13" tabindex="-1"></a><span class="im">from</span> src.data_loader <span class="im">import</span> load_processed_dataset, split_features_target</span>
-<span id="cb135-14"><a href="nb06.html#cb135-14" tabindex="-1"></a><span class="im">from</span> src.synthetic_data <span class="im">import</span> generate_synthetic_dataset</span>
-<span id="cb135-15"><a href="nb06.html#cb135-15" tabindex="-1"></a><span class="im">from</span> src.preprocessing <span class="im">import</span> remove_duplicate_rows</span>
-<span id="cb135-16"><a href="nb06.html#cb135-16" tabindex="-1"></a><span class="im">from</span> src.models <span class="im">import</span> MODEL_REGISTRY</span>
-<span id="cb135-17"><a href="nb06.html#cb135-17" tabindex="-1"></a><span class="im">from</span> src.experiment_runner <span class="im">import</span> load_master_table</span>
-<span id="cb135-18"><a href="nb06.html#cb135-18" tabindex="-1"></a><span class="im">from</span> src <span class="im">import</span> interpretability <span class="im">as</span> ip</span>
-<span id="cb135-19"><a href="nb06.html#cb135-19" tabindex="-1"></a></span>
-<span id="cb135-20"><a href="nb06.html#cb135-20" tabindex="-1"></a>np.random.seed(config.RANDOM_STATE)</span>
-<span id="cb135-21"><a href="nb06.html#cb135-21" tabindex="-1"></a>config.FIGURES_DIR.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb135-22"><a href="nb06.html#cb135-22" tabindex="-1"></a></span>
-<span id="cb135-23"><a href="nb06.html#cb135-23" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb135-24"><a href="nb06.html#cb135-24" tabindex="-1"></a>    df <span class="op">=</span> load_processed_dataset()</span>
-<span id="cb135-25"><a href="nb06.html#cb135-25" tabindex="-1"></a><span class="cf">except</span> <span class="pp">FileNotFoundError</span>:</span>
-<span id="cb135-26"><a href="nb06.html#cb135-26" tabindex="-1"></a>    df <span class="op">=</span> generate_synthetic_dataset()</span>
-<span id="cb135-27"><a href="nb06.html#cb135-27" tabindex="-1"></a>df, _ <span class="op">=</span> remove_duplicate_rows(df)</span>
-<span id="cb135-28"><a href="nb06.html#cb135-28" tabindex="-1"></a>X, y <span class="op">=</span> split_features_target(df)</span>
-<span id="cb135-29"><a href="nb06.html#cb135-29" tabindex="-1"></a></span>
-<span id="cb135-30"><a href="nb06.html#cb135-30" tabindex="-1"></a>table <span class="op">=</span> load_master_table(config.EXPERIMENTS_MASTER_PATH)</span>
-<span id="cb135-31"><a href="nb06.html#cb135-31" tabindex="-1"></a><span class="cf">if</span> table.empty:</span>
-<span id="cb135-32"><a href="nb06.html#cb135-32" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="st">&quot;La tabla maestra está vacía. Correr primero 04_run_experiments.ipynb.&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb131"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb131-1"><a href="nb06.html#cb131-1" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb131-2"><a href="nb06.html#cb131-2" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb131-3"><a href="nb06.html#cb131-3" tabindex="-1"></a></span>
+<span id="cb131-4"><a href="nb06.html#cb131-4" tabindex="-1"></a>PROJECT_ROOT <span class="op">=</span> Path.cwd().parent</span>
+<span id="cb131-5"><a href="nb06.html#cb131-5" tabindex="-1"></a><span class="cf">if</span> <span class="bu">str</span>(PROJECT_ROOT) <span class="kw">not</span> <span class="kw">in</span> sys.path:</span>
+<span id="cb131-6"><a href="nb06.html#cb131-6" tabindex="-1"></a>    sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(PROJECT_ROOT))</span>
+<span id="cb131-7"><a href="nb06.html#cb131-7" tabindex="-1"></a></span>
+<span id="cb131-8"><a href="nb06.html#cb131-8" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb131-9"><a href="nb06.html#cb131-9" tabindex="-1"></a></span>
+<span id="cb131-10"><a href="nb06.html#cb131-10" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb131-11"><a href="nb06.html#cb131-11" tabindex="-1"></a></span>
+<span id="cb131-12"><a href="nb06.html#cb131-12" tabindex="-1"></a><span class="im">from</span> src <span class="im">import</span> config</span>
+<span id="cb131-13"><a href="nb06.html#cb131-13" tabindex="-1"></a><span class="im">from</span> src.data_loader <span class="im">import</span> load_processed_dataset, split_features_target</span>
+<span id="cb131-14"><a href="nb06.html#cb131-14" tabindex="-1"></a><span class="im">from</span> src.synthetic_data <span class="im">import</span> generate_synthetic_dataset</span>
+<span id="cb131-15"><a href="nb06.html#cb131-15" tabindex="-1"></a><span class="im">from</span> src.preprocessing <span class="im">import</span> remove_duplicate_rows</span>
+<span id="cb131-16"><a href="nb06.html#cb131-16" tabindex="-1"></a><span class="im">from</span> src.models <span class="im">import</span> MODEL_REGISTRY</span>
+<span id="cb131-17"><a href="nb06.html#cb131-17" tabindex="-1"></a><span class="im">from</span> src.experiment_runner <span class="im">import</span> load_master_table</span>
+<span id="cb131-18"><a href="nb06.html#cb131-18" tabindex="-1"></a><span class="im">from</span> src <span class="im">import</span> interpretability <span class="im">as</span> ip</span>
+<span id="cb131-19"><a href="nb06.html#cb131-19" tabindex="-1"></a></span>
+<span id="cb131-20"><a href="nb06.html#cb131-20" tabindex="-1"></a>np.random.seed(config.RANDOM_STATE)</span>
+<span id="cb131-21"><a href="nb06.html#cb131-21" tabindex="-1"></a>config.FIGURES_DIR.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb131-22"><a href="nb06.html#cb131-22" tabindex="-1"></a></span>
+<span id="cb131-23"><a href="nb06.html#cb131-23" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb131-24"><a href="nb06.html#cb131-24" tabindex="-1"></a>    df <span class="op">=</span> load_processed_dataset()</span>
+<span id="cb131-25"><a href="nb06.html#cb131-25" tabindex="-1"></a><span class="cf">except</span> <span class="pp">FileNotFoundError</span>:</span>
+<span id="cb131-26"><a href="nb06.html#cb131-26" tabindex="-1"></a>    df <span class="op">=</span> generate_synthetic_dataset()</span>
+<span id="cb131-27"><a href="nb06.html#cb131-27" tabindex="-1"></a>df, _ <span class="op">=</span> remove_duplicate_rows(df)</span>
+<span id="cb131-28"><a href="nb06.html#cb131-28" tabindex="-1"></a>X, y <span class="op">=</span> split_features_target(df)</span>
+<span id="cb131-29"><a href="nb06.html#cb131-29" tabindex="-1"></a></span>
+<span id="cb131-30"><a href="nb06.html#cb131-30" tabindex="-1"></a>table <span class="op">=</span> load_master_table(config.EXPERIMENTS_MASTER_PATH)</span>
+<span id="cb131-31"><a href="nb06.html#cb131-31" tabindex="-1"></a><span class="cf">if</span> table.empty:</span>
+<span id="cb131-32"><a href="nb06.html#cb131-32" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="st">&quot;La tabla maestra está vacía. Correr primero 04_run_experiments.ipynb.&quot;</span>)</span></code></pre></div>
 </details>
 <!-- nb:md cell=2 -->
 <div id="elegir-el-mejor-modelo-y-ajustar-su-pipeline" class="section level2 hasAnchor">
-<h2>Elegir el mejor modelo y ajustar su pipeline<a href="nb06.html#elegir-el-mejor-modelo-y-ajustar-su-pipeline" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<h2>1. Elegir el mejor modelo y ajustar su pipeline<a href="nb06.html#elegir-el-mejor-modelo-y-ajustar-su-pipeline" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>El fold externo usado es el de mejor desempeño; SHAP/LIME se calculan sobre ESE fold de prueba.</p>
 <!-- nb:code cell=3 -->
 <details>
 <summary>
 Código (20 líneas)
 </summary>
-<div class="sourceCode" id="cb136"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb136-1"><a href="nb06.html#cb136-1" tabindex="-1"></a>metric_for_ranking <span class="op">=</span> config.DEFAULT_SCORING</span>
-<span id="cb136-2"><a href="nb06.html#cb136-2" tabindex="-1"></a>best_row <span class="op">=</span> table.sort_values(<span class="ss">f&quot;</span><span class="sc">{</span>metric_for_ranking<span class="sc">}</span><span class="ss">_mean&quot;</span>, ascending<span class="op">=</span><span class="va">False</span>).iloc[<span class="dv">0</span>]</span>
-<span id="cb136-3"><a href="nb06.html#cb136-3" tabindex="-1"></a>best_model <span class="op">=</span> best_row[<span class="st">&quot;model&quot;</span>]</span>
-<span id="cb136-4"><a href="nb06.html#cb136-4" tabindex="-1"></a>best_technique <span class="op">=</span> best_row[<span class="st">&quot;technique&quot;</span>]</span>
-<span id="cb136-5"><a href="nb06.html#cb136-5" tabindex="-1"></a>best_method <span class="op">=</span> best_row[<span class="st">&quot;method&quot;</span>]</span>
-<span id="cb136-6"><a href="nb06.html#cb136-6" tabindex="-1"></a></span>
-<span id="cb136-7"><a href="nb06.html#cb136-7" tabindex="-1"></a>best_params_per_fold <span class="op">=</span> json.loads(best_row[<span class="st">&quot;best_params_per_fold&quot;</span>])</span>
-<span id="cb136-8"><a href="nb06.html#cb136-8" tabindex="-1"></a>per_fold_metric <span class="op">=</span> json.loads(best_row[<span class="ss">f&quot;</span><span class="sc">{</span>metric_for_ranking<span class="sc">}</span><span class="ss">_per_fold&quot;</span>])</span>
-<span id="cb136-9"><a href="nb06.html#cb136-9" tabindex="-1"></a>best_fold_idx <span class="op">=</span> <span class="bu">int</span>(np.argmax(per_fold_metric))</span>
-<span id="cb136-10"><a href="nb06.html#cb136-10" tabindex="-1"></a>best_params <span class="op">=</span> best_params_per_fold[best_fold_idx]</span>
-<span id="cb136-11"><a href="nb06.html#cb136-11" tabindex="-1"></a></span>
-<span id="cb136-12"><a href="nb06.html#cb136-12" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Mejor modelo: </span><span class="sc">{</span>best_model<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>best_technique<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>best_method<span class="sc">}</span><span class="ss"> (fold </span><span class="sc">{</span>best_fold_idx<span class="sc">}</span><span class="ss">)&quot;</span>)</span>
-<span id="cb136-13"><a href="nb06.html#cb136-13" tabindex="-1"></a></span>
-<span id="cb136-14"><a href="nb06.html#cb136-14" tabindex="-1"></a>spec <span class="op">=</span> MODEL_REGISTRY[best_model]</span>
-<span id="cb136-15"><a href="nb06.html#cb136-15" tabindex="-1"></a>fitted <span class="op">=</span> ip.fit_explainable_pipeline(</span>
-<span id="cb136-16"><a href="nb06.html#cb136-16" tabindex="-1"></a>    spec, best_technique, best_params, X, y, best_fold_idx,</span>
-<span id="cb136-17"><a href="nb06.html#cb136-17" tabindex="-1"></a>    n_outer_folds<span class="op">=</span><span class="bu">int</span>(best_row[<span class="st">&quot;n_outer_folds&quot;</span>]),</span>
-<span id="cb136-18"><a href="nb06.html#cb136-18" tabindex="-1"></a>)</span>
-<span id="cb136-19"><a href="nb06.html#cb136-19" tabindex="-1"></a>model_step <span class="op">=</span> fitted[<span class="st">&quot;pipeline&quot;</span>].named_steps[<span class="st">&quot;model&quot;</span>]</span>
-<span id="cb136-20"><a href="nb06.html#cb136-20" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Features post-transformación: </span><span class="sc">{</span><span class="bu">len</span>(fitted[<span class="st">&#39;feature_names&#39;</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb132"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb132-1"><a href="nb06.html#cb132-1" tabindex="-1"></a>metric_for_ranking <span class="op">=</span> config.DEFAULT_SCORING</span>
+<span id="cb132-2"><a href="nb06.html#cb132-2" tabindex="-1"></a>best_row <span class="op">=</span> table.sort_values(<span class="ss">f&quot;</span><span class="sc">{</span>metric_for_ranking<span class="sc">}</span><span class="ss">_mean&quot;</span>, ascending<span class="op">=</span><span class="va">False</span>).iloc[<span class="dv">0</span>]</span>
+<span id="cb132-3"><a href="nb06.html#cb132-3" tabindex="-1"></a>best_model <span class="op">=</span> best_row[<span class="st">&quot;model&quot;</span>]</span>
+<span id="cb132-4"><a href="nb06.html#cb132-4" tabindex="-1"></a>best_technique <span class="op">=</span> best_row[<span class="st">&quot;technique&quot;</span>]</span>
+<span id="cb132-5"><a href="nb06.html#cb132-5" tabindex="-1"></a>best_method <span class="op">=</span> best_row[<span class="st">&quot;method&quot;</span>]</span>
+<span id="cb132-6"><a href="nb06.html#cb132-6" tabindex="-1"></a></span>
+<span id="cb132-7"><a href="nb06.html#cb132-7" tabindex="-1"></a>best_params_per_fold <span class="op">=</span> json.loads(best_row[<span class="st">&quot;best_params_per_fold&quot;</span>])</span>
+<span id="cb132-8"><a href="nb06.html#cb132-8" tabindex="-1"></a>per_fold_metric <span class="op">=</span> json.loads(best_row[<span class="ss">f&quot;</span><span class="sc">{</span>metric_for_ranking<span class="sc">}</span><span class="ss">_per_fold&quot;</span>])</span>
+<span id="cb132-9"><a href="nb06.html#cb132-9" tabindex="-1"></a>best_fold_idx <span class="op">=</span> <span class="bu">int</span>(np.argmax(per_fold_metric))</span>
+<span id="cb132-10"><a href="nb06.html#cb132-10" tabindex="-1"></a>best_params <span class="op">=</span> best_params_per_fold[best_fold_idx]</span>
+<span id="cb132-11"><a href="nb06.html#cb132-11" tabindex="-1"></a></span>
+<span id="cb132-12"><a href="nb06.html#cb132-12" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Mejor modelo: </span><span class="sc">{</span>best_model<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>best_technique<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>best_method<span class="sc">}</span><span class="ss"> (fold </span><span class="sc">{</span>best_fold_idx<span class="sc">}</span><span class="ss">)&quot;</span>)</span>
+<span id="cb132-13"><a href="nb06.html#cb132-13" tabindex="-1"></a></span>
+<span id="cb132-14"><a href="nb06.html#cb132-14" tabindex="-1"></a>spec <span class="op">=</span> MODEL_REGISTRY[best_model]</span>
+<span id="cb132-15"><a href="nb06.html#cb132-15" tabindex="-1"></a>fitted <span class="op">=</span> ip.fit_explainable_pipeline(</span>
+<span id="cb132-16"><a href="nb06.html#cb132-16" tabindex="-1"></a>    spec, best_technique, best_params, X, y, best_fold_idx,</span>
+<span id="cb132-17"><a href="nb06.html#cb132-17" tabindex="-1"></a>    n_outer_folds<span class="op">=</span><span class="bu">int</span>(best_row[<span class="st">&quot;n_outer_folds&quot;</span>]),</span>
+<span id="cb132-18"><a href="nb06.html#cb132-18" tabindex="-1"></a>)</span>
+<span id="cb132-19"><a href="nb06.html#cb132-19" tabindex="-1"></a>model_step <span class="op">=</span> fitted[<span class="st">&quot;pipeline&quot;</span>].named_steps[<span class="st">&quot;model&quot;</span>]</span>
+<span id="cb132-20"><a href="nb06.html#cb132-20" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Features post-transformación: </span><span class="sc">{</span><span class="bu">len</span>(fitted[<span class="st">&#39;feature_names&#39;</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
 </details>
 <!-- nb:text cell=3 -->
 <pre class="text"><code>Mejor modelo: xgboost | class_weight | bayesian_optuna (fold 3)
@@ -470,29 +460,29 @@ Features post-transformación: 25</code></pre>
 <!-- nb:md cell=4 -->
 </div>
 <div id="shap-global-summary-plot" class="section level2 hasAnchor">
-<h2>SHAP global (summary plot)<a href="nb06.html#shap-global-summary-plot" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<h2>2. SHAP global (summary plot)<a href="nb06.html#shap-global-summary-plot" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Sobre una muestra del fold de prueba (limitada por costo computacional para modelos no basados en árboles). Las columnas one-hot de <code>SEX</code>/<code>EDUCATION</code>/<code>MARRIAGE</code> se agregan de vuelta a la variable categórica original.</p>
 <!-- nb:code cell=5 -->
 <details>
 <summary>
 Código (16 líneas)
 </summary>
-<div class="sourceCode" id="cb138"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb138-1"><a href="nb06.html#cb138-1" tabindex="-1"></a>n_explain <span class="op">=</span> <span class="bu">min</span>(ip.DEFAULT_N_EXPLAIN, fitted[<span class="st">&quot;X_test_t&quot;</span>].shape[<span class="dv">0</span>])</span>
-<span id="cb138-2"><a href="nb06.html#cb138-2" tabindex="-1"></a></span>
-<span id="cb138-3"><a href="nb06.html#cb138-3" tabindex="-1"></a>shap_values, base_value <span class="op">=</span> ip.compute_shap_values(</span>
-<span id="cb138-4"><a href="nb06.html#cb138-4" tabindex="-1"></a>    best_model, model_step, fitted[<span class="st">&quot;X_train_t&quot;</span>], fitted[<span class="st">&quot;X_test_t&quot;</span>][:n_explain]</span>
-<span id="cb138-5"><a href="nb06.html#cb138-5" tabindex="-1"></a>)</span>
-<span id="cb138-6"><a href="nb06.html#cb138-6" tabindex="-1"></a>agg_values, agg_names <span class="op">=</span> ip.aggregate_onehot_shap(shap_values, fitted[<span class="st">&quot;feature_names&quot;</span>])</span>
-<span id="cb138-7"><a href="nb06.html#cb138-7" tabindex="-1"></a>display_matrix <span class="op">=</span> ip.build_aggregated_display_matrix(</span>
-<span id="cb138-8"><a href="nb06.html#cb138-8" tabindex="-1"></a>    fitted[<span class="st">&quot;X_test&quot;</span>].iloc[:n_explain], fitted[<span class="st">&quot;X_test_t&quot;</span>][:n_explain], fitted[<span class="st">&quot;feature_names&quot;</span>]</span>
-<span id="cb138-9"><a href="nb06.html#cb138-9" tabindex="-1"></a>)</span>
-<span id="cb138-10"><a href="nb06.html#cb138-10" tabindex="-1"></a></span>
-<span id="cb138-11"><a href="nb06.html#cb138-11" tabindex="-1"></a>summary_path <span class="op">=</span> config.FIGURES_DIR <span class="op">/</span> <span class="ss">f&quot;shap_summary_</span><span class="sc">{</span>best_model<span class="sc">}</span><span class="ss">.png&quot;</span></span>
-<span id="cb138-12"><a href="nb06.html#cb138-12" tabindex="-1"></a>ip.plot_shap_summary(agg_values, display_matrix, agg_names, save_path<span class="op">=</span><span class="bu">str</span>(summary_path))</span>
-<span id="cb138-13"><a href="nb06.html#cb138-13" tabindex="-1"></a></span>
-<span id="cb138-14"><a href="nb06.html#cb138-14" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> Image, display <span class="im">as</span> ipy_display</span>
-<span id="cb138-15"><a href="nb06.html#cb138-15" tabindex="-1"></a></span>
-<span id="cb138-16"><a href="nb06.html#cb138-16" tabindex="-1"></a>ipy_display(Image(filename<span class="op">=</span><span class="bu">str</span>(summary_path)))</span></code></pre></div>
+<div class="sourceCode" id="cb134"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb134-1"><a href="nb06.html#cb134-1" tabindex="-1"></a>n_explain <span class="op">=</span> <span class="bu">min</span>(ip.DEFAULT_N_EXPLAIN, fitted[<span class="st">&quot;X_test_t&quot;</span>].shape[<span class="dv">0</span>])</span>
+<span id="cb134-2"><a href="nb06.html#cb134-2" tabindex="-1"></a></span>
+<span id="cb134-3"><a href="nb06.html#cb134-3" tabindex="-1"></a>shap_values, base_value <span class="op">=</span> ip.compute_shap_values(</span>
+<span id="cb134-4"><a href="nb06.html#cb134-4" tabindex="-1"></a>    best_model, model_step, fitted[<span class="st">&quot;X_train_t&quot;</span>], fitted[<span class="st">&quot;X_test_t&quot;</span>][:n_explain]</span>
+<span id="cb134-5"><a href="nb06.html#cb134-5" tabindex="-1"></a>)</span>
+<span id="cb134-6"><a href="nb06.html#cb134-6" tabindex="-1"></a>agg_values, agg_names <span class="op">=</span> ip.aggregate_onehot_shap(shap_values, fitted[<span class="st">&quot;feature_names&quot;</span>])</span>
+<span id="cb134-7"><a href="nb06.html#cb134-7" tabindex="-1"></a>display_matrix <span class="op">=</span> ip.build_aggregated_display_matrix(</span>
+<span id="cb134-8"><a href="nb06.html#cb134-8" tabindex="-1"></a>    fitted[<span class="st">&quot;X_test&quot;</span>].iloc[:n_explain], fitted[<span class="st">&quot;X_test_t&quot;</span>][:n_explain], fitted[<span class="st">&quot;feature_names&quot;</span>]</span>
+<span id="cb134-9"><a href="nb06.html#cb134-9" tabindex="-1"></a>)</span>
+<span id="cb134-10"><a href="nb06.html#cb134-10" tabindex="-1"></a></span>
+<span id="cb134-11"><a href="nb06.html#cb134-11" tabindex="-1"></a>summary_path <span class="op">=</span> config.FIGURES_DIR <span class="op">/</span> <span class="ss">f&quot;shap_summary_</span><span class="sc">{</span>best_model<span class="sc">}</span><span class="ss">.png&quot;</span></span>
+<span id="cb134-12"><a href="nb06.html#cb134-12" tabindex="-1"></a>ip.plot_shap_summary(agg_values, display_matrix, agg_names, save_path<span class="op">=</span><span class="bu">str</span>(summary_path))</span>
+<span id="cb134-13"><a href="nb06.html#cb134-13" tabindex="-1"></a></span>
+<span id="cb134-14"><a href="nb06.html#cb134-14" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> Image, display <span class="im">as</span> ipy_display</span>
+<span id="cb134-15"><a href="nb06.html#cb134-15" tabindex="-1"></a></span>
+<span id="cb134-16"><a href="nb06.html#cb134-16" tabindex="-1"></a>ipy_display(Image(filename<span class="op">=</span><span class="bu">str</span>(summary_path)))</span></code></pre></div>
 </details>
 <!-- nb:img cell=5 -->
 <div class="float">
@@ -509,31 +499,31 @@ Código (16 líneas)
 <!-- nb:md cell=7 -->
 </div>
 <div id="shap-local-una-observación-bien-clasificada-y-una-con-error-alto" class="section level2 hasAnchor">
-<h2>SHAP local: una observación bien clasificada y una con error alto<a href="nb06.html#shap-local-una-observaci%C3%B3n-bien-clasificada-y-una-con-error-alto" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<h2>3. SHAP local: una observación bien clasificada y una con error alto<a href="nb06.html#shap-local-una-observación-bien-clasificada-y-una-con-error-alto" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <!-- nb:code cell=8 -->
 <details>
 <summary>
 Código (19 líneas)
 </summary>
-<div class="sourceCode" id="cb139"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb139-1"><a href="nb06.html#cb139-1" tabindex="-1"></a>y_pred_test <span class="op">=</span> fitted[<span class="st">&quot;pipeline&quot;</span>].predict(fitted[<span class="st">&quot;X_test&quot;</span>])</span>
-<span id="cb139-2"><a href="nb06.html#cb139-2" tabindex="-1"></a>y_proba_test <span class="op">=</span> fitted[<span class="st">&quot;pipeline&quot;</span>].predict_proba(fitted[<span class="st">&quot;X_test&quot;</span>])[:, <span class="dv">1</span>]</span>
-<span id="cb139-3"><a href="nb06.html#cb139-3" tabindex="-1"></a>instances <span class="op">=</span> ip.select_representative_instances(fitted[<span class="st">&quot;y_test&quot;</span>].to_numpy(), y_pred_test, y_proba_test)</span>
-<span id="cb139-4"><a href="nb06.html#cb139-4" tabindex="-1"></a><span class="bu">print</span>(instances)</span>
-<span id="cb139-5"><a href="nb06.html#cb139-5" tabindex="-1"></a></span>
-<span id="cb139-6"><a href="nb06.html#cb139-6" tabindex="-1"></a><span class="cf">for</span> label, pos <span class="kw">in</span> instances.items():</span>
-<span id="cb139-7"><a href="nb06.html#cb139-7" tabindex="-1"></a>    x_row_t <span class="op">=</span> fitted[<span class="st">&quot;X_test_t&quot;</span>][pos : pos <span class="op">+</span> <span class="dv">1</span>]</span>
-<span id="cb139-8"><a href="nb06.html#cb139-8" tabindex="-1"></a>    sv, bv <span class="op">=</span> ip.compute_shap_values(best_model, model_step, fitted[<span class="st">&quot;X_train_t&quot;</span>], x_row_t)</span>
-<span id="cb139-9"><a href="nb06.html#cb139-9" tabindex="-1"></a>    agg_sv, agg_n <span class="op">=</span> ip.aggregate_onehot_shap(sv, fitted[<span class="st">&quot;feature_names&quot;</span>])</span>
-<span id="cb139-10"><a href="nb06.html#cb139-10" tabindex="-1"></a>    row_display <span class="op">=</span> ip.build_aggregated_display_matrix(</span>
-<span id="cb139-11"><a href="nb06.html#cb139-11" tabindex="-1"></a>        fitted[<span class="st">&quot;X_test&quot;</span>].iloc[pos : pos <span class="op">+</span> <span class="dv">1</span>], x_row_t, fitted[<span class="st">&quot;feature_names&quot;</span>]</span>
-<span id="cb139-12"><a href="nb06.html#cb139-12" tabindex="-1"></a>    )</span>
-<span id="cb139-13"><a href="nb06.html#cb139-13" tabindex="-1"></a>    waterfall_path <span class="op">=</span> config.FIGURES_DIR <span class="op">/</span> <span class="ss">f&quot;shap_waterfall_</span><span class="sc">{</span>best_model<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">.png&quot;</span></span>
-<span id="cb139-14"><a href="nb06.html#cb139-14" tabindex="-1"></a>    ip.plot_shap_waterfall(agg_sv[<span class="dv">0</span>], bv, row_display[<span class="dv">0</span>], agg_n, save_path<span class="op">=</span><span class="bu">str</span>(waterfall_path))</span>
-<span id="cb139-15"><a href="nb06.html#cb139-15" tabindex="-1"></a>    <span class="bu">print</span>(</span>
-<span id="cb139-16"><a href="nb06.html#cb139-16" tabindex="-1"></a>        <span class="ss">f&quot;</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">: y_true=</span><span class="sc">{</span>fitted[<span class="st">&#39;y_test&#39;</span>]<span class="sc">.</span>iloc[pos]<span class="sc">}</span><span class="ss">, y_pred=</span><span class="sc">{</span>y_pred_test[pos]<span class="sc">}</span><span class="ss">, &quot;</span></span>
-<span id="cb139-17"><a href="nb06.html#cb139-17" tabindex="-1"></a>        <span class="ss">f&quot;proba=</span><span class="sc">{</span>y_proba_test[pos]<span class="sc">:.3f}</span><span class="ss">&quot;</span></span>
-<span id="cb139-18"><a href="nb06.html#cb139-18" tabindex="-1"></a>    )</span>
-<span id="cb139-19"><a href="nb06.html#cb139-19" tabindex="-1"></a>    ipy_display(Image(filename<span class="op">=</span><span class="bu">str</span>(waterfall_path)))</span></code></pre></div>
+<div class="sourceCode" id="cb135"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb135-1"><a href="nb06.html#cb135-1" tabindex="-1"></a>y_pred_test <span class="op">=</span> fitted[<span class="st">&quot;pipeline&quot;</span>].predict(fitted[<span class="st">&quot;X_test&quot;</span>])</span>
+<span id="cb135-2"><a href="nb06.html#cb135-2" tabindex="-1"></a>y_proba_test <span class="op">=</span> fitted[<span class="st">&quot;pipeline&quot;</span>].predict_proba(fitted[<span class="st">&quot;X_test&quot;</span>])[:, <span class="dv">1</span>]</span>
+<span id="cb135-3"><a href="nb06.html#cb135-3" tabindex="-1"></a>instances <span class="op">=</span> ip.select_representative_instances(fitted[<span class="st">&quot;y_test&quot;</span>].to_numpy(), y_pred_test, y_proba_test)</span>
+<span id="cb135-4"><a href="nb06.html#cb135-4" tabindex="-1"></a><span class="bu">print</span>(instances)</span>
+<span id="cb135-5"><a href="nb06.html#cb135-5" tabindex="-1"></a></span>
+<span id="cb135-6"><a href="nb06.html#cb135-6" tabindex="-1"></a><span class="cf">for</span> label, pos <span class="kw">in</span> instances.items():</span>
+<span id="cb135-7"><a href="nb06.html#cb135-7" tabindex="-1"></a>    x_row_t <span class="op">=</span> fitted[<span class="st">&quot;X_test_t&quot;</span>][pos : pos <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb135-8"><a href="nb06.html#cb135-8" tabindex="-1"></a>    sv, bv <span class="op">=</span> ip.compute_shap_values(best_model, model_step, fitted[<span class="st">&quot;X_train_t&quot;</span>], x_row_t)</span>
+<span id="cb135-9"><a href="nb06.html#cb135-9" tabindex="-1"></a>    agg_sv, agg_n <span class="op">=</span> ip.aggregate_onehot_shap(sv, fitted[<span class="st">&quot;feature_names&quot;</span>])</span>
+<span id="cb135-10"><a href="nb06.html#cb135-10" tabindex="-1"></a>    row_display <span class="op">=</span> ip.build_aggregated_display_matrix(</span>
+<span id="cb135-11"><a href="nb06.html#cb135-11" tabindex="-1"></a>        fitted[<span class="st">&quot;X_test&quot;</span>].iloc[pos : pos <span class="op">+</span> <span class="dv">1</span>], x_row_t, fitted[<span class="st">&quot;feature_names&quot;</span>]</span>
+<span id="cb135-12"><a href="nb06.html#cb135-12" tabindex="-1"></a>    )</span>
+<span id="cb135-13"><a href="nb06.html#cb135-13" tabindex="-1"></a>    waterfall_path <span class="op">=</span> config.FIGURES_DIR <span class="op">/</span> <span class="ss">f&quot;shap_waterfall_</span><span class="sc">{</span>best_model<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">.png&quot;</span></span>
+<span id="cb135-14"><a href="nb06.html#cb135-14" tabindex="-1"></a>    ip.plot_shap_waterfall(agg_sv[<span class="dv">0</span>], bv, row_display[<span class="dv">0</span>], agg_n, save_path<span class="op">=</span><span class="bu">str</span>(waterfall_path))</span>
+<span id="cb135-15"><a href="nb06.html#cb135-15" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb135-16"><a href="nb06.html#cb135-16" tabindex="-1"></a>        <span class="ss">f&quot;</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">: y_true=</span><span class="sc">{</span>fitted[<span class="st">&#39;y_test&#39;</span>]<span class="sc">.</span>iloc[pos]<span class="sc">}</span><span class="ss">, y_pred=</span><span class="sc">{</span>y_pred_test[pos]<span class="sc">}</span><span class="ss">, &quot;</span></span>
+<span id="cb135-17"><a href="nb06.html#cb135-17" tabindex="-1"></a>        <span class="ss">f&quot;proba=</span><span class="sc">{</span>y_proba_test[pos]<span class="sc">:.3f}</span><span class="ss">&quot;</span></span>
+<span id="cb135-18"><a href="nb06.html#cb135-18" tabindex="-1"></a>    )</span>
+<span id="cb135-19"><a href="nb06.html#cb135-19" tabindex="-1"></a>    ipy_display(Image(filename<span class="op">=</span><span class="bu">str</span>(waterfall_path)))</span></code></pre></div>
 </details>
 <!-- nb:text cell=8 -->
 <pre class="text"><code>{&#39;well_classified&#39;: 2512, &#39;high_error&#39;: 2900}
@@ -570,52 +560,52 @@ well_classified: y_true=1, y_pred=1, proba=0.954</code></pre>
 <!-- nb:md cell=10 -->
 </div>
 <div id="lime-vs.-shap-específicamente-para-xgboost" class="section level2 hasAnchor">
-<h2>LIME vs. SHAP (específicamente para XGBoost)<a href="nb06.html#lime-vs.-shap-espec%C3%ADficamente-para-xgboost" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<h2>4. LIME vs. SHAP (específicamente para XGBoost)<a href="nb06.html#lime-vs.-shap-específicamente-para-xgboost" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Si el mejor modelo ya es XGBoost, esta sección reutiliza el mismo ajuste de arriba; si no, ajusta la mejor combinación de XGBoost por separado (el curso pide esta comparación puntualmente para XGBoost, más allá de cuál haya resultado ser el mejor modelo global). Se explica una sola observación (<code>high_error</code>), por lo que la comparación es ilustrativa.</p>
 <!-- nb:code cell=11 -->
 <details>
 <summary>
 Código (39 líneas)
 </summary>
-<div class="sourceCode" id="cb142"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb142-1"><a href="nb06.html#cb142-1" tabindex="-1"></a>xgb_rows <span class="op">=</span> table[table[<span class="st">&quot;model&quot;</span>] <span class="op">==</span> <span class="st">&quot;xgboost&quot;</span>]</span>
-<span id="cb142-2"><a href="nb06.html#cb142-2" tabindex="-1"></a></span>
-<span id="cb142-3"><a href="nb06.html#cb142-3" tabindex="-1"></a><span class="cf">if</span> xgb_rows.empty:</span>
-<span id="cb142-4"><a href="nb06.html#cb142-4" tabindex="-1"></a>    <span class="bu">print</span>(</span>
-<span id="cb142-5"><a href="nb06.html#cb142-5" tabindex="-1"></a>        <span class="st">&quot;No hay corridas de XGBoost en la tabla maestra todavía: &quot;</span></span>
-<span id="cb142-6"><a href="nb06.html#cb142-6" tabindex="-1"></a>        <span class="st">&quot;correr 04_run_experiments.ipynb incluyendo xgboost para esta sección.&quot;</span></span>
-<span id="cb142-7"><a href="nb06.html#cb142-7" tabindex="-1"></a>    )</span>
-<span id="cb142-8"><a href="nb06.html#cb142-8" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb142-9"><a href="nb06.html#cb142-9" tabindex="-1"></a>    xgb_best_row <span class="op">=</span> xgb_rows.sort_values(<span class="ss">f&quot;</span><span class="sc">{</span>metric_for_ranking<span class="sc">}</span><span class="ss">_mean&quot;</span>, ascending<span class="op">=</span><span class="va">False</span>).iloc[<span class="dv">0</span>]</span>
-<span id="cb142-10"><a href="nb06.html#cb142-10" tabindex="-1"></a>    xgb_technique <span class="op">=</span> xgb_best_row[<span class="st">&quot;technique&quot;</span>]</span>
-<span id="cb142-11"><a href="nb06.html#cb142-11" tabindex="-1"></a>    xgb_best_params_per_fold <span class="op">=</span> json.loads(xgb_best_row[<span class="st">&quot;best_params_per_fold&quot;</span>])</span>
-<span id="cb142-12"><a href="nb06.html#cb142-12" tabindex="-1"></a>    xgb_per_fold_metric <span class="op">=</span> json.loads(xgb_best_row[<span class="ss">f&quot;</span><span class="sc">{</span>metric_for_ranking<span class="sc">}</span><span class="ss">_per_fold&quot;</span>])</span>
-<span id="cb142-13"><a href="nb06.html#cb142-13" tabindex="-1"></a>    xgb_fold_idx <span class="op">=</span> <span class="bu">int</span>(np.argmax(xgb_per_fold_metric))</span>
-<span id="cb142-14"><a href="nb06.html#cb142-14" tabindex="-1"></a>    xgb_best_params <span class="op">=</span> xgb_best_params_per_fold[xgb_fold_idx]</span>
-<span id="cb142-15"><a href="nb06.html#cb142-15" tabindex="-1"></a></span>
-<span id="cb142-16"><a href="nb06.html#cb142-16" tabindex="-1"></a>    xgb_spec <span class="op">=</span> MODEL_REGISTRY[<span class="st">&quot;xgboost&quot;</span>]</span>
-<span id="cb142-17"><a href="nb06.html#cb142-17" tabindex="-1"></a>    xgb_fitted <span class="op">=</span> ip.fit_explainable_pipeline(</span>
-<span id="cb142-18"><a href="nb06.html#cb142-18" tabindex="-1"></a>        xgb_spec, xgb_technique, xgb_best_params, X, y, xgb_fold_idx,</span>
-<span id="cb142-19"><a href="nb06.html#cb142-19" tabindex="-1"></a>        n_outer_folds<span class="op">=</span><span class="bu">int</span>(xgb_best_row[<span class="st">&quot;n_outer_folds&quot;</span>]),</span>
-<span id="cb142-20"><a href="nb06.html#cb142-20" tabindex="-1"></a>    )</span>
-<span id="cb142-21"><a href="nb06.html#cb142-21" tabindex="-1"></a>    xgb_model_step <span class="op">=</span> xgb_fitted[<span class="st">&quot;pipeline&quot;</span>].named_steps[<span class="st">&quot;model&quot;</span>]</span>
-<span id="cb142-22"><a href="nb06.html#cb142-22" tabindex="-1"></a></span>
-<span id="cb142-23"><a href="nb06.html#cb142-23" tabindex="-1"></a>    xgb_y_pred <span class="op">=</span> xgb_fitted[<span class="st">&quot;pipeline&quot;</span>].predict(xgb_fitted[<span class="st">&quot;X_test&quot;</span>])</span>
-<span id="cb142-24"><a href="nb06.html#cb142-24" tabindex="-1"></a>    xgb_y_proba <span class="op">=</span> xgb_fitted[<span class="st">&quot;pipeline&quot;</span>].predict_proba(xgb_fitted[<span class="st">&quot;X_test&quot;</span>])[:, <span class="dv">1</span>]</span>
-<span id="cb142-25"><a href="nb06.html#cb142-25" tabindex="-1"></a>    xgb_instances <span class="op">=</span> ip.select_representative_instances(</span>
-<span id="cb142-26"><a href="nb06.html#cb142-26" tabindex="-1"></a>        xgb_fitted[<span class="st">&quot;y_test&quot;</span>].to_numpy(), xgb_y_pred, xgb_y_proba</span>
-<span id="cb142-27"><a href="nb06.html#cb142-27" tabindex="-1"></a>    )</span>
-<span id="cb142-28"><a href="nb06.html#cb142-28" tabindex="-1"></a></span>
-<span id="cb142-29"><a href="nb06.html#cb142-29" tabindex="-1"></a>    pos <span class="op">=</span> xgb_instances[<span class="st">&quot;high_error&quot;</span>]</span>
-<span id="cb142-30"><a href="nb06.html#cb142-30" tabindex="-1"></a>    x_row_t <span class="op">=</span> xgb_fitted[<span class="st">&quot;X_test_t&quot;</span>][pos : pos <span class="op">+</span> <span class="dv">1</span>]</span>
-<span id="cb142-31"><a href="nb06.html#cb142-31" tabindex="-1"></a></span>
-<span id="cb142-32"><a href="nb06.html#cb142-32" tabindex="-1"></a>    lime_exp <span class="op">=</span> ip.explain_with_lime(</span>
-<span id="cb142-33"><a href="nb06.html#cb142-33" tabindex="-1"></a>        xgb_model_step, xgb_fitted[<span class="st">&quot;X_train_t&quot;</span>], xgb_fitted[<span class="st">&quot;feature_names&quot;</span>], x_row_t</span>
-<span id="cb142-34"><a href="nb06.html#cb142-34" tabindex="-1"></a>    )</span>
-<span id="cb142-35"><a href="nb06.html#cb142-35" tabindex="-1"></a>    sv, bv <span class="op">=</span> ip.compute_shap_values(<span class="st">&quot;xgboost&quot;</span>, xgb_model_step, xgb_fitted[<span class="st">&quot;X_train_t&quot;</span>], x_row_t)</span>
-<span id="cb142-36"><a href="nb06.html#cb142-36" tabindex="-1"></a>    comparison_table <span class="op">=</span> ip.compare_shap_lime(sv[<span class="dv">0</span>], lime_exp, xgb_fitted[<span class="st">&quot;feature_names&quot;</span>])</span>
-<span id="cb142-37"><a href="nb06.html#cb142-37" tabindex="-1"></a></span>
-<span id="cb142-38"><a href="nb06.html#cb142-38" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Observación &#39;high_error&#39; (XGBoost, </span><span class="sc">{</span>xgb_technique<span class="sc">}</span><span class="ss">, fold </span><span class="sc">{</span>xgb_fold_idx<span class="sc">}</span><span class="ss">):&quot;</span>)</span>
-<span id="cb142-39"><a href="nb06.html#cb142-39" tabindex="-1"></a>    display(comparison_table)</span></code></pre></div>
+<div class="sourceCode" id="cb138"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb138-1"><a href="nb06.html#cb138-1" tabindex="-1"></a>xgb_rows <span class="op">=</span> table[table[<span class="st">&quot;model&quot;</span>] <span class="op">==</span> <span class="st">&quot;xgboost&quot;</span>]</span>
+<span id="cb138-2"><a href="nb06.html#cb138-2" tabindex="-1"></a></span>
+<span id="cb138-3"><a href="nb06.html#cb138-3" tabindex="-1"></a><span class="cf">if</span> xgb_rows.empty:</span>
+<span id="cb138-4"><a href="nb06.html#cb138-4" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb138-5"><a href="nb06.html#cb138-5" tabindex="-1"></a>        <span class="st">&quot;No hay corridas de XGBoost en la tabla maestra todavía: &quot;</span></span>
+<span id="cb138-6"><a href="nb06.html#cb138-6" tabindex="-1"></a>        <span class="st">&quot;correr 04_run_experiments.ipynb incluyendo xgboost para esta sección.&quot;</span></span>
+<span id="cb138-7"><a href="nb06.html#cb138-7" tabindex="-1"></a>    )</span>
+<span id="cb138-8"><a href="nb06.html#cb138-8" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb138-9"><a href="nb06.html#cb138-9" tabindex="-1"></a>    xgb_best_row <span class="op">=</span> xgb_rows.sort_values(<span class="ss">f&quot;</span><span class="sc">{</span>metric_for_ranking<span class="sc">}</span><span class="ss">_mean&quot;</span>, ascending<span class="op">=</span><span class="va">False</span>).iloc[<span class="dv">0</span>]</span>
+<span id="cb138-10"><a href="nb06.html#cb138-10" tabindex="-1"></a>    xgb_technique <span class="op">=</span> xgb_best_row[<span class="st">&quot;technique&quot;</span>]</span>
+<span id="cb138-11"><a href="nb06.html#cb138-11" tabindex="-1"></a>    xgb_best_params_per_fold <span class="op">=</span> json.loads(xgb_best_row[<span class="st">&quot;best_params_per_fold&quot;</span>])</span>
+<span id="cb138-12"><a href="nb06.html#cb138-12" tabindex="-1"></a>    xgb_per_fold_metric <span class="op">=</span> json.loads(xgb_best_row[<span class="ss">f&quot;</span><span class="sc">{</span>metric_for_ranking<span class="sc">}</span><span class="ss">_per_fold&quot;</span>])</span>
+<span id="cb138-13"><a href="nb06.html#cb138-13" tabindex="-1"></a>    xgb_fold_idx <span class="op">=</span> <span class="bu">int</span>(np.argmax(xgb_per_fold_metric))</span>
+<span id="cb138-14"><a href="nb06.html#cb138-14" tabindex="-1"></a>    xgb_best_params <span class="op">=</span> xgb_best_params_per_fold[xgb_fold_idx]</span>
+<span id="cb138-15"><a href="nb06.html#cb138-15" tabindex="-1"></a></span>
+<span id="cb138-16"><a href="nb06.html#cb138-16" tabindex="-1"></a>    xgb_spec <span class="op">=</span> MODEL_REGISTRY[<span class="st">&quot;xgboost&quot;</span>]</span>
+<span id="cb138-17"><a href="nb06.html#cb138-17" tabindex="-1"></a>    xgb_fitted <span class="op">=</span> ip.fit_explainable_pipeline(</span>
+<span id="cb138-18"><a href="nb06.html#cb138-18" tabindex="-1"></a>        xgb_spec, xgb_technique, xgb_best_params, X, y, xgb_fold_idx,</span>
+<span id="cb138-19"><a href="nb06.html#cb138-19" tabindex="-1"></a>        n_outer_folds<span class="op">=</span><span class="bu">int</span>(xgb_best_row[<span class="st">&quot;n_outer_folds&quot;</span>]),</span>
+<span id="cb138-20"><a href="nb06.html#cb138-20" tabindex="-1"></a>    )</span>
+<span id="cb138-21"><a href="nb06.html#cb138-21" tabindex="-1"></a>    xgb_model_step <span class="op">=</span> xgb_fitted[<span class="st">&quot;pipeline&quot;</span>].named_steps[<span class="st">&quot;model&quot;</span>]</span>
+<span id="cb138-22"><a href="nb06.html#cb138-22" tabindex="-1"></a></span>
+<span id="cb138-23"><a href="nb06.html#cb138-23" tabindex="-1"></a>    xgb_y_pred <span class="op">=</span> xgb_fitted[<span class="st">&quot;pipeline&quot;</span>].predict(xgb_fitted[<span class="st">&quot;X_test&quot;</span>])</span>
+<span id="cb138-24"><a href="nb06.html#cb138-24" tabindex="-1"></a>    xgb_y_proba <span class="op">=</span> xgb_fitted[<span class="st">&quot;pipeline&quot;</span>].predict_proba(xgb_fitted[<span class="st">&quot;X_test&quot;</span>])[:, <span class="dv">1</span>]</span>
+<span id="cb138-25"><a href="nb06.html#cb138-25" tabindex="-1"></a>    xgb_instances <span class="op">=</span> ip.select_representative_instances(</span>
+<span id="cb138-26"><a href="nb06.html#cb138-26" tabindex="-1"></a>        xgb_fitted[<span class="st">&quot;y_test&quot;</span>].to_numpy(), xgb_y_pred, xgb_y_proba</span>
+<span id="cb138-27"><a href="nb06.html#cb138-27" tabindex="-1"></a>    )</span>
+<span id="cb138-28"><a href="nb06.html#cb138-28" tabindex="-1"></a></span>
+<span id="cb138-29"><a href="nb06.html#cb138-29" tabindex="-1"></a>    pos <span class="op">=</span> xgb_instances[<span class="st">&quot;high_error&quot;</span>]</span>
+<span id="cb138-30"><a href="nb06.html#cb138-30" tabindex="-1"></a>    x_row_t <span class="op">=</span> xgb_fitted[<span class="st">&quot;X_test_t&quot;</span>][pos : pos <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb138-31"><a href="nb06.html#cb138-31" tabindex="-1"></a></span>
+<span id="cb138-32"><a href="nb06.html#cb138-32" tabindex="-1"></a>    lime_exp <span class="op">=</span> ip.explain_with_lime(</span>
+<span id="cb138-33"><a href="nb06.html#cb138-33" tabindex="-1"></a>        xgb_model_step, xgb_fitted[<span class="st">&quot;X_train_t&quot;</span>], xgb_fitted[<span class="st">&quot;feature_names&quot;</span>], x_row_t</span>
+<span id="cb138-34"><a href="nb06.html#cb138-34" tabindex="-1"></a>    )</span>
+<span id="cb138-35"><a href="nb06.html#cb138-35" tabindex="-1"></a>    sv, bv <span class="op">=</span> ip.compute_shap_values(<span class="st">&quot;xgboost&quot;</span>, xgb_model_step, xgb_fitted[<span class="st">&quot;X_train_t&quot;</span>], x_row_t)</span>
+<span id="cb138-36"><a href="nb06.html#cb138-36" tabindex="-1"></a>    comparison_table <span class="op">=</span> ip.compare_shap_lime(sv[<span class="dv">0</span>], lime_exp, xgb_fitted[<span class="st">&quot;feature_names&quot;</span>])</span>
+<span id="cb138-37"><a href="nb06.html#cb138-37" tabindex="-1"></a></span>
+<span id="cb138-38"><a href="nb06.html#cb138-38" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Observación &#39;high_error&#39; (XGBoost, </span><span class="sc">{</span>xgb_technique<span class="sc">}</span><span class="ss">, fold </span><span class="sc">{</span>xgb_fold_idx<span class="sc">}</span><span class="ss">):&quot;</span>)</span>
+<span id="cb138-39"><a href="nb06.html#cb138-39" tabindex="-1"></a>    display(comparison_table)</span></code></pre></div>
 </details>
 <!-- nb:text cell=11 -->
 <pre class="text"><code>Observación &#39;high_error&#39; (XGBoost, class_weight, fold 3):</code></pre>
@@ -694,14 +684,14 @@ Código (39 líneas)
 </table>
 <!-- nb:md cell=12 -->
 <div id="discusión-cuándo-divergen-lime-y-shap" class="section level3 hasAnchor">
-<h3>Discusión: ¿cuándo divergen LIME y SHAP?<a href="nb06.html#discusi%C3%B3n-cu%C3%A1ndo-divergen-lime-y-shap" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<h3>4.1 Discusión: ¿cuándo divergen LIME y SHAP?<a href="nb06.html#discusión-cuándo-divergen-lime-y-shap" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><strong>LIME</strong> ajusta un modelo sustituto LINEAL (regularizado) sobre muestras perturbadas alrededor de la observación, ponderadas por cercanía: una aproximación local cuya validez depende del ancho del kernel y el número de muestras perturbadas.</li>
 <li><strong>SHAP</strong> calcula valores de Shapley (teoría de juegos cooperativos): el aporte marginal promedio de cada feature sobre todas las coaliciones posibles. Para árboles, <code>TreeExplainer</code> los calcula de forma EXACTA, y satisface axiomas de consistencia que LIME no garantiza.</li>
 </ul>
 <p><strong>Divergen cuando:</strong>
 1. <strong>Features correlacionadas</strong> (ej. el bloque <code>BILL_AMT1</code>-<code>BILL_AMT6</code>, VIF alto según el EDA): SHAP reparte el crédito entre ellas; LIME (Lasso) puede anular una y sobre-atribuir a la otra.
-2. <strong>No linealidad local fuerte</strong> (ej. el efecto no lineal de <code>PAY_0</code> que el EDA ya detectó): un sustituto lineal como el de LIME la aproxima mal; SHAP (exacto para árboles) la sigue reflejando correctamente.
+2. <strong>No linealidad local fuerte</strong> (ej. un efecto no lineal de <code>PAY_0</code>, plausible porque los modelos de árboles lo capturan): un sustituto lineal como el de LIME la aproxima mal; SHAP (exacto para árboles) la sigue reflejando correctamente.
 3. <strong>Sensibilidad a hiperparámetros de LIME</strong> (ancho del kernel, nº de muestras): puede cambiar el ranking entre corridas; SHAP/TreeExplainer es determinístico.</p>
 <p>Limitación de la tabla anterior: es una sola observación de XGBoost, y <code>shap_value</code> está en escala de log-odds (margen de XGBoost) mientras que <code>lime_weight</code> está en escala de probabilidad, por lo que solo se pueden comparar signos y orden, no magnitudes.</p>
 <!-- nb:code cell=13 -->
@@ -709,20 +699,20 @@ Código (39 líneas)
 <summary>
 Código (14 líneas)
 </summary>
-<div class="sourceCode" id="cb144"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb144-1"><a href="nb06.html#cb144-1" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb144-2"><a href="nb06.html#cb144-2" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb144-3"><a href="nb06.html#cb144-3" tabindex="-1"></a></span>
-<span id="cb144-4"><a href="nb06.html#cb144-4" tabindex="-1"></a><span class="im">from</span> src <span class="im">import</span> interpretability_multi <span class="im">as</span> im</span>
-<span id="cb144-5"><a href="nb06.html#cb144-5" tabindex="-1"></a></span>
-<span id="cb144-6"><a href="nb06.html#cb144-6" tabindex="-1"></a>INTERP_DIR <span class="op">=</span> config.RESULTS_DIR <span class="op">/</span> <span class="st">&quot;interpretability&quot;</span></span>
-<span id="cb144-7"><a href="nb06.html#cb144-7" tabindex="-1"></a>MODELS <span class="op">=</span> (<span class="st">&quot;random_forest&quot;</span>, <span class="st">&quot;xgboost&quot;</span>)</span>
-<span id="cb144-8"><a href="nb06.html#cb144-8" tabindex="-1"></a>importance <span class="op">=</span> {m: pd.read_csv(INTERP_DIR <span class="op">/</span> <span class="ss">f&quot;shap_importance_by_fold_</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">.csv&quot;</span>) <span class="cf">for</span> m <span class="kw">in</span> MODELS}</span>
-<span id="cb144-9"><a href="nb06.html#cb144-9" tabindex="-1"></a>agreement <span class="op">=</span> {m: pd.read_csv(INTERP_DIR <span class="op">/</span> <span class="ss">f&quot;lime_vs_shap_</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">.csv&quot;</span>) <span class="cf">for</span> m <span class="kw">in</span> MODELS}</span>
-<span id="cb144-10"><a href="nb06.html#cb144-10" tabindex="-1"></a>best_table <span class="op">=</span> pd.read_csv(config.RESULTS_DIR <span class="op">/</span> <span class="st">&quot;best_per_model.csv&quot;</span>).set_index(<span class="st">&quot;model&quot;</span>)</span>
-<span id="cb144-11"><a href="nb06.html#cb144-11" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
-<span id="cb144-12"><a href="nb06.html#cb144-12" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">: combinación </span><span class="sc">{</span>best_table<span class="sc">.</span>loc[m, <span class="st">&#39;technique&#39;</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>best_table<span class="sc">.</span>loc[m, <span class="st">&#39;method&#39;</span>]<span class="sc">}</span><span class="ss">; &quot;</span></span>
-<span id="cb144-13"><a href="nb06.html#cb144-13" tabindex="-1"></a>          <span class="ss">f&quot;</span><span class="sc">{</span>importance[m][<span class="st">&#39;n_explained&#39;</span>]<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> filas explicadas por fold, &quot;</span></span>
-<span id="cb144-14"><a href="nb06.html#cb144-14" tabindex="-1"></a>          <span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(agreement[m])<span class="sc">}</span><span class="ss"> observaciones para LIME vs. SHAP&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb140-1"><a href="nb06.html#cb140-1" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb140-2"><a href="nb06.html#cb140-2" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb140-3"><a href="nb06.html#cb140-3" tabindex="-1"></a></span>
+<span id="cb140-4"><a href="nb06.html#cb140-4" tabindex="-1"></a><span class="im">from</span> src <span class="im">import</span> interpretability_multi <span class="im">as</span> im</span>
+<span id="cb140-5"><a href="nb06.html#cb140-5" tabindex="-1"></a></span>
+<span id="cb140-6"><a href="nb06.html#cb140-6" tabindex="-1"></a>INTERP_DIR <span class="op">=</span> config.RESULTS_DIR <span class="op">/</span> <span class="st">&quot;interpretability&quot;</span></span>
+<span id="cb140-7"><a href="nb06.html#cb140-7" tabindex="-1"></a>MODELS <span class="op">=</span> (<span class="st">&quot;random_forest&quot;</span>, <span class="st">&quot;xgboost&quot;</span>)</span>
+<span id="cb140-8"><a href="nb06.html#cb140-8" tabindex="-1"></a>importance <span class="op">=</span> {m: pd.read_csv(INTERP_DIR <span class="op">/</span> <span class="ss">f&quot;shap_importance_by_fold_</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">.csv&quot;</span>) <span class="cf">for</span> m <span class="kw">in</span> MODELS}</span>
+<span id="cb140-9"><a href="nb06.html#cb140-9" tabindex="-1"></a>agreement <span class="op">=</span> {m: pd.read_csv(INTERP_DIR <span class="op">/</span> <span class="ss">f&quot;lime_vs_shap_</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">.csv&quot;</span>) <span class="cf">for</span> m <span class="kw">in</span> MODELS}</span>
+<span id="cb140-10"><a href="nb06.html#cb140-10" tabindex="-1"></a>best_table <span class="op">=</span> pd.read_csv(config.RESULTS_DIR <span class="op">/</span> <span class="st">&quot;best_per_model.csv&quot;</span>).set_index(<span class="st">&quot;model&quot;</span>)</span>
+<span id="cb140-11"><a href="nb06.html#cb140-11" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
+<span id="cb140-12"><a href="nb06.html#cb140-12" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">: combinación </span><span class="sc">{</span>best_table<span class="sc">.</span>loc[m, <span class="st">&#39;technique&#39;</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>best_table<span class="sc">.</span>loc[m, <span class="st">&#39;method&#39;</span>]<span class="sc">}</span><span class="ss">; &quot;</span></span>
+<span id="cb140-13"><a href="nb06.html#cb140-13" tabindex="-1"></a>          <span class="ss">f&quot;</span><span class="sc">{</span>importance[m][<span class="st">&#39;n_explained&#39;</span>]<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> filas explicadas por fold, &quot;</span></span>
+<span id="cb140-14"><a href="nb06.html#cb140-14" tabindex="-1"></a>          <span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(agreement[m])<span class="sc">}</span><span class="ss"> observaciones para LIME vs. SHAP&quot;</span>)</span></code></pre></div>
 </details>
 <!-- nb:text cell=13 -->
 <pre class="text"><code>random_forest: combinación class_weight | random_search; 300 filas explicadas por fold, 200 observaciones para LIME vs. SHAP
@@ -732,28 +722,28 @@ xgboost: combinación class_weight | bayesian_optuna; 300 filas explicadas por f
 <summary>
 Código (22 líneas)
 </summary>
-<div class="sourceCode" id="cb146"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb146-1"><a href="nb06.html#cb146-1" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="bu">len</span>(MODELS), figsize<span class="op">=</span>(<span class="fl">6.5</span> <span class="op">*</span> <span class="bu">len</span>(MODELS), <span class="fl">4.8</span>))</span>
-<span id="cb146-2"><a href="nb06.html#cb146-2" tabindex="-1"></a><span class="cf">for</span> ax, m <span class="kw">in</span> <span class="bu">zip</span>(axes, MODELS):</span>
-<span id="cb146-3"><a href="nb06.html#cb146-3" tabindex="-1"></a>    imp <span class="op">=</span> importance[m]</span>
-<span id="cb146-4"><a href="nb06.html#cb146-4" tabindex="-1"></a>    top <span class="op">=</span> imp.groupby(<span class="st">&quot;feature&quot;</span>)[<span class="st">&quot;mean_abs_shap&quot;</span>].mean().nlargest(<span class="dv">8</span>).index[::<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb146-5"><a href="nb06.html#cb146-5" tabindex="-1"></a>    pivot <span class="op">=</span> imp.pivot(index<span class="op">=</span><span class="st">&quot;feature&quot;</span>, columns<span class="op">=</span><span class="st">&quot;fold&quot;</span>, values<span class="op">=</span><span class="st">&quot;mean_abs_shap&quot;</span>).loc[top]</span>
-<span id="cb146-6"><a href="nb06.html#cb146-6" tabindex="-1"></a>    pivot.plot.barh(ax<span class="op">=</span>ax, width<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb146-7"><a href="nb06.html#cb146-7" tabindex="-1"></a>    ax.set_title(m)</span>
-<span id="cb146-8"><a href="nb06.html#cb146-8" tabindex="-1"></a>    ax.set_xlabel(<span class="st">&quot;Media de |SHAP| (escala del modelo)&quot;</span>)</span>
-<span id="cb146-9"><a href="nb06.html#cb146-9" tabindex="-1"></a>    ax.set_ylabel(<span class="st">&quot;&quot;</span>)</span>
-<span id="cb146-10"><a href="nb06.html#cb146-10" tabindex="-1"></a>    ax.legend(title<span class="op">=</span><span class="st">&quot;Fold externo&quot;</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb146-11"><a href="nb06.html#cb146-11" tabindex="-1"></a>    ax.grid(axis<span class="op">=</span><span class="st">&quot;x&quot;</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb146-12"><a href="nb06.html#cb146-12" tabindex="-1"></a>fig.suptitle(<span class="st">&quot;Importancia global SHAP por fold externo (8 variables principales)&quot;</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
-<span id="cb146-13"><a href="nb06.html#cb146-13" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb146-14"><a href="nb06.html#cb146-14" tabindex="-1"></a>fig.savefig(config.FIGURES_DIR <span class="op">/</span> <span class="st">&quot;shap_importance_by_fold.png&quot;</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">&quot;tight&quot;</span>)</span>
-<span id="cb146-15"><a href="nb06.html#cb146-15" tabindex="-1"></a>plt.show()</span>
-<span id="cb146-16"><a href="nb06.html#cb146-16" tabindex="-1"></a></span>
-<span id="cb146-17"><a href="nb06.html#cb146-17" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
-<span id="cb146-18"><a href="nb06.html#cb146-18" tabindex="-1"></a>    st <span class="op">=</span> im.importance_stability(importance[m])</span>
-<span id="cb146-19"><a href="nb06.html#cb146-19" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">: Spearman medio entre folds = </span><span class="sc">{</span>st[<span class="st">&#39;spearman_mean_offdiag&#39;</span>]<span class="sc">:.3f}</span><span class="ss">; &quot;</span></span>
-<span id="cb146-20"><a href="nb06.html#cb146-20" tabindex="-1"></a>          <span class="ss">f&quot;Jaccard medio del top-5 = </span><span class="sc">{</span>st[<span class="st">&#39;topk_jaccard_mean_offdiag&#39;</span>]<span class="sc">:.3f}</span><span class="ss">; &quot;</span></span>
-<span id="cb146-21"><a href="nb06.html#cb146-21" tabindex="-1"></a>          <span class="ss">f&quot;siempre en el top-5: </span><span class="sc">{</span>st[<span class="st">&#39;topk_always&#39;</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb146-22"><a href="nb06.html#cb146-22" tabindex="-1"></a>    display(st[<span class="st">&quot;spearman&quot;</span>].<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb142-1"><a href="nb06.html#cb142-1" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="bu">len</span>(MODELS), figsize<span class="op">=</span>(<span class="fl">6.5</span> <span class="op">*</span> <span class="bu">len</span>(MODELS), <span class="fl">4.8</span>))</span>
+<span id="cb142-2"><a href="nb06.html#cb142-2" tabindex="-1"></a><span class="cf">for</span> ax, m <span class="kw">in</span> <span class="bu">zip</span>(axes, MODELS):</span>
+<span id="cb142-3"><a href="nb06.html#cb142-3" tabindex="-1"></a>    imp <span class="op">=</span> importance[m]</span>
+<span id="cb142-4"><a href="nb06.html#cb142-4" tabindex="-1"></a>    top <span class="op">=</span> imp.groupby(<span class="st">&quot;feature&quot;</span>)[<span class="st">&quot;mean_abs_shap&quot;</span>].mean().nlargest(<span class="dv">8</span>).index[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb142-5"><a href="nb06.html#cb142-5" tabindex="-1"></a>    pivot <span class="op">=</span> imp.pivot(index<span class="op">=</span><span class="st">&quot;feature&quot;</span>, columns<span class="op">=</span><span class="st">&quot;fold&quot;</span>, values<span class="op">=</span><span class="st">&quot;mean_abs_shap&quot;</span>).loc[top]</span>
+<span id="cb142-6"><a href="nb06.html#cb142-6" tabindex="-1"></a>    pivot.plot.barh(ax<span class="op">=</span>ax, width<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb142-7"><a href="nb06.html#cb142-7" tabindex="-1"></a>    ax.set_title(m)</span>
+<span id="cb142-8"><a href="nb06.html#cb142-8" tabindex="-1"></a>    ax.set_xlabel(<span class="st">&quot;Media de |SHAP| (escala del modelo)&quot;</span>)</span>
+<span id="cb142-9"><a href="nb06.html#cb142-9" tabindex="-1"></a>    ax.set_ylabel(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb142-10"><a href="nb06.html#cb142-10" tabindex="-1"></a>    ax.legend(title<span class="op">=</span><span class="st">&quot;Fold externo&quot;</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb142-11"><a href="nb06.html#cb142-11" tabindex="-1"></a>    ax.grid(axis<span class="op">=</span><span class="st">&quot;x&quot;</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb142-12"><a href="nb06.html#cb142-12" tabindex="-1"></a>fig.suptitle(<span class="st">&quot;Importancia global SHAP por fold externo (8 variables principales)&quot;</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
+<span id="cb142-13"><a href="nb06.html#cb142-13" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb142-14"><a href="nb06.html#cb142-14" tabindex="-1"></a>fig.savefig(config.FIGURES_DIR <span class="op">/</span> <span class="st">&quot;shap_importance_by_fold.png&quot;</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">&quot;tight&quot;</span>)</span>
+<span id="cb142-15"><a href="nb06.html#cb142-15" tabindex="-1"></a>plt.show()</span>
+<span id="cb142-16"><a href="nb06.html#cb142-16" tabindex="-1"></a></span>
+<span id="cb142-17"><a href="nb06.html#cb142-17" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
+<span id="cb142-18"><a href="nb06.html#cb142-18" tabindex="-1"></a>    st <span class="op">=</span> im.importance_stability(importance[m])</span>
+<span id="cb142-19"><a href="nb06.html#cb142-19" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">: Spearman medio entre folds = </span><span class="sc">{</span>st[<span class="st">&#39;spearman_mean_offdiag&#39;</span>]<span class="sc">:.3f}</span><span class="ss">; &quot;</span></span>
+<span id="cb142-20"><a href="nb06.html#cb142-20" tabindex="-1"></a>          <span class="ss">f&quot;Jaccard medio del top-5 = </span><span class="sc">{</span>st[<span class="st">&#39;topk_jaccard_mean_offdiag&#39;</span>]<span class="sc">:.3f}</span><span class="ss">; &quot;</span></span>
+<span id="cb142-21"><a href="nb06.html#cb142-21" tabindex="-1"></a>          <span class="ss">f&quot;siempre en el top-5: </span><span class="sc">{</span>st[<span class="st">&#39;topk_always&#39;</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb142-22"><a href="nb06.html#cb142-22" tabindex="-1"></a>    display(st[<span class="st">&quot;spearman&quot;</span>].<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div>
 </details>
 <!-- nb:img cell=14 -->
 <div class="float">
@@ -881,32 +871,32 @@ xgboost: Spearman medio entre folds = 0.919; Jaccard medio del top-5 = 0.652; si
 <summary>
 Código (26 líneas)
 </summary>
-<div class="sourceCode" id="cb149"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb149-1"><a href="nb06.html#cb149-1" tabindex="-1"></a>METRICS <span class="op">=</span> {</span>
-<span id="cb149-2"><a href="nb06.html#cb149-2" tabindex="-1"></a>    <span class="st">&quot;spearman_abs&quot;</span>: <span class="st">&quot;Spearman de |atribución|&quot;</span>,</span>
-<span id="cb149-3"><a href="nb06.html#cb149-3" tabindex="-1"></a>    <span class="st">&quot;top5_overlap&quot;</span>: <span class="st">&quot;Solapamiento del top-5&quot;</span>,</span>
-<span id="cb149-4"><a href="nb06.html#cb149-4" tabindex="-1"></a>    <span class="st">&quot;sign_agreement_topk&quot;</span>: <span class="st">&quot;Acuerdo de signo (top-5 de SHAP)&quot;</span>,</span>
-<span id="cb149-5"><a href="nb06.html#cb149-5" tabindex="-1"></a>    <span class="st">&quot;lime_seed_topk_overlap&quot;</span>: <span class="st">&quot;Estabilidad de LIME entre semillas (top-5)&quot;</span>,</span>
-<span id="cb149-6"><a href="nb06.html#cb149-6" tabindex="-1"></a>}</span>
-<span id="cb149-7"><a href="nb06.html#cb149-7" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="bu">len</span>(MODELS), <span class="bu">len</span>(METRICS), figsize<span class="op">=</span>(<span class="dv">4</span> <span class="op">*</span> <span class="bu">len</span>(METRICS), <span class="fl">3.6</span> <span class="op">*</span> <span class="bu">len</span>(MODELS)), sharey<span class="op">=</span><span class="st">&quot;col&quot;</span>)</span>
-<span id="cb149-8"><a href="nb06.html#cb149-8" tabindex="-1"></a>order <span class="op">=</span> [<span class="st">&quot;TN&quot;</span>, <span class="st">&quot;FP&quot;</span>, <span class="st">&quot;FN&quot;</span>, <span class="st">&quot;TP&quot;</span>]</span>
-<span id="cb149-9"><a href="nb06.html#cb149-9" tabindex="-1"></a><span class="cf">for</span> i, m <span class="kw">in</span> <span class="bu">enumerate</span>(MODELS):</span>
-<span id="cb149-10"><a href="nb06.html#cb149-10" tabindex="-1"></a>    <span class="cf">for</span> j, (col, title) <span class="kw">in</span> <span class="bu">enumerate</span>(METRICS.items()):</span>
-<span id="cb149-11"><a href="nb06.html#cb149-11" tabindex="-1"></a>        ax <span class="op">=</span> axes[i, j]</span>
-<span id="cb149-12"><a href="nb06.html#cb149-12" tabindex="-1"></a>        data <span class="op">=</span> [agreement[m].loc[agreement[m][<span class="st">&quot;outcome&quot;</span>] <span class="op">==</span> o, col].dropna() <span class="cf">for</span> o <span class="kw">in</span> order]</span>
-<span id="cb149-13"><a href="nb06.html#cb149-13" tabindex="-1"></a>        ax.boxplot(data, tick_labels<span class="op">=</span>order, showmeans<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb149-14"><a href="nb06.html#cb149-14" tabindex="-1"></a>        ax.set_title(<span class="ss">f&quot;</span><span class="sc">{</span>m<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">&quot;</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb149-15"><a href="nb06.html#cb149-15" tabindex="-1"></a>        ax.set_ylim(<span class="op">-</span><span class="fl">0.05</span>, <span class="fl">1.05</span>)</span>
-<span id="cb149-16"><a href="nb06.html#cb149-16" tabindex="-1"></a>        ax.grid(axis<span class="op">=</span><span class="st">&quot;y&quot;</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb149-17"><a href="nb06.html#cb149-17" tabindex="-1"></a>        <span class="cf">if</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
-<span id="cb149-18"><a href="nb06.html#cb149-18" tabindex="-1"></a>            ax.set_ylabel(<span class="st">&quot;Valor (0 a 1)&quot;</span>)</span>
-<span id="cb149-19"><a href="nb06.html#cb149-19" tabindex="-1"></a>fig.suptitle(<span class="st">&quot;Coincidencia entre LIME y SHAP por tipo de resultado de la observación&quot;</span>, y<span class="op">=</span><span class="fl">1.01</span>)</span>
-<span id="cb149-20"><a href="nb06.html#cb149-20" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb149-21"><a href="nb06.html#cb149-21" tabindex="-1"></a>fig.savefig(config.FIGURES_DIR <span class="op">/</span> <span class="st">&quot;lime_vs_shap_agreement.png&quot;</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">&quot;tight&quot;</span>)</span>
-<span id="cb149-22"><a href="nb06.html#cb149-22" tabindex="-1"></a>plt.show()</span>
-<span id="cb149-23"><a href="nb06.html#cb149-23" tabindex="-1"></a></span>
-<span id="cb149-24"><a href="nb06.html#cb149-24" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
-<span id="cb149-25"><a href="nb06.html#cb149-25" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss"> (n = </span><span class="sc">{</span><span class="bu">len</span>(agreement[m])<span class="sc">}</span><span class="ss"> observaciones, 3 folds)&quot;</span>)</span>
-<span id="cb149-26"><a href="nb06.html#cb149-26" tabindex="-1"></a>    display(im.summarize_agreement(agreement[m]).<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb145"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb145-1"><a href="nb06.html#cb145-1" tabindex="-1"></a>METRICS <span class="op">=</span> {</span>
+<span id="cb145-2"><a href="nb06.html#cb145-2" tabindex="-1"></a>    <span class="st">&quot;spearman_abs&quot;</span>: <span class="st">&quot;Spearman de |atribución|&quot;</span>,</span>
+<span id="cb145-3"><a href="nb06.html#cb145-3" tabindex="-1"></a>    <span class="st">&quot;top5_overlap&quot;</span>: <span class="st">&quot;Solapamiento del top-5&quot;</span>,</span>
+<span id="cb145-4"><a href="nb06.html#cb145-4" tabindex="-1"></a>    <span class="st">&quot;sign_agreement_topk&quot;</span>: <span class="st">&quot;Acuerdo de signo (top-5 de SHAP)&quot;</span>,</span>
+<span id="cb145-5"><a href="nb06.html#cb145-5" tabindex="-1"></a>    <span class="st">&quot;lime_seed_topk_overlap&quot;</span>: <span class="st">&quot;Estabilidad de LIME entre semillas (top-5)&quot;</span>,</span>
+<span id="cb145-6"><a href="nb06.html#cb145-6" tabindex="-1"></a>}</span>
+<span id="cb145-7"><a href="nb06.html#cb145-7" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="bu">len</span>(MODELS), <span class="bu">len</span>(METRICS), figsize<span class="op">=</span>(<span class="dv">4</span> <span class="op">*</span> <span class="bu">len</span>(METRICS), <span class="fl">3.6</span> <span class="op">*</span> <span class="bu">len</span>(MODELS)), sharey<span class="op">=</span><span class="st">&quot;col&quot;</span>)</span>
+<span id="cb145-8"><a href="nb06.html#cb145-8" tabindex="-1"></a>order <span class="op">=</span> [<span class="st">&quot;TN&quot;</span>, <span class="st">&quot;FP&quot;</span>, <span class="st">&quot;FN&quot;</span>, <span class="st">&quot;TP&quot;</span>]</span>
+<span id="cb145-9"><a href="nb06.html#cb145-9" tabindex="-1"></a><span class="cf">for</span> i, m <span class="kw">in</span> <span class="bu">enumerate</span>(MODELS):</span>
+<span id="cb145-10"><a href="nb06.html#cb145-10" tabindex="-1"></a>    <span class="cf">for</span> j, (col, title) <span class="kw">in</span> <span class="bu">enumerate</span>(METRICS.items()):</span>
+<span id="cb145-11"><a href="nb06.html#cb145-11" tabindex="-1"></a>        ax <span class="op">=</span> axes[i, j]</span>
+<span id="cb145-12"><a href="nb06.html#cb145-12" tabindex="-1"></a>        data <span class="op">=</span> [agreement[m].loc[agreement[m][<span class="st">&quot;outcome&quot;</span>] <span class="op">==</span> o, col].dropna() <span class="cf">for</span> o <span class="kw">in</span> order]</span>
+<span id="cb145-13"><a href="nb06.html#cb145-13" tabindex="-1"></a>        ax.boxplot(data, tick_labels<span class="op">=</span>order, showmeans<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb145-14"><a href="nb06.html#cb145-14" tabindex="-1"></a>        ax.set_title(<span class="ss">f&quot;</span><span class="sc">{</span>m<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">&quot;</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb145-15"><a href="nb06.html#cb145-15" tabindex="-1"></a>        ax.set_ylim(<span class="op">-</span><span class="fl">0.05</span>, <span class="fl">1.05</span>)</span>
+<span id="cb145-16"><a href="nb06.html#cb145-16" tabindex="-1"></a>        ax.grid(axis<span class="op">=</span><span class="st">&quot;y&quot;</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb145-17"><a href="nb06.html#cb145-17" tabindex="-1"></a>        <span class="cf">if</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb145-18"><a href="nb06.html#cb145-18" tabindex="-1"></a>            ax.set_ylabel(<span class="st">&quot;Valor (0 a 1)&quot;</span>)</span>
+<span id="cb145-19"><a href="nb06.html#cb145-19" tabindex="-1"></a>fig.suptitle(<span class="st">&quot;Coincidencia entre LIME y SHAP por tipo de resultado de la observación&quot;</span>, y<span class="op">=</span><span class="fl">1.01</span>)</span>
+<span id="cb145-20"><a href="nb06.html#cb145-20" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb145-21"><a href="nb06.html#cb145-21" tabindex="-1"></a>fig.savefig(config.FIGURES_DIR <span class="op">/</span> <span class="st">&quot;lime_vs_shap_agreement.png&quot;</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">&quot;tight&quot;</span>)</span>
+<span id="cb145-22"><a href="nb06.html#cb145-22" tabindex="-1"></a>plt.show()</span>
+<span id="cb145-23"><a href="nb06.html#cb145-23" tabindex="-1"></a></span>
+<span id="cb145-24"><a href="nb06.html#cb145-24" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
+<span id="cb145-25"><a href="nb06.html#cb145-25" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss"> (n = </span><span class="sc">{</span><span class="bu">len</span>(agreement[m])<span class="sc">}</span><span class="ss"> observaciones, 3 folds)&quot;</span>)</span>
+<span id="cb145-26"><a href="nb06.html#cb145-26" tabindex="-1"></a>    display(im.summarize_agreement(agreement[m]).<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div>
 </details>
 <!-- nb:img cell=15 -->
 <div class="float">
@@ -1147,37 +1137,38 @@ xgboost (n = 200 observaciones, 3 folds)</code></pre>
 <!-- multi-fold -->
 </div>
 </div>
-<div id="shap-y-lime-con-más-de-un-fold-y-más-de-una-observación" class="section level2 hasAnchor">
-<h2>SHAP y LIME con más de un fold y más de una observación<a href="nb06.html#shap-y-lime-con-m%C3%A1s-de-un-fold-y-m%C3%A1s-de-una-observaci%C3%B3n" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="shap-y-lime-con-más-de-un-fold-y-más-de-una-observación-secciones-5-y-6" class="section level2 hasAnchor">
+<h2>SHAP y LIME con más de un fold y más de una observación (secciones 5 y 6)<a href="nb06.html#shap-y-lime-con-más-de-un-fold-y-más-de-una-observación-secciones-5-y-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Explicar un solo fold con 100 filas y comparar LIME con SHAP en una sola observación no permite decir si la explicación es estable ni si los dos métodos coinciden en general. Las dos secciones siguientes responden esas dos preguntas.</p>
-<p>Para cada modelo se toma su mejor combinación según la selección del capítulo 08: Random Forest con <code>class_weight</code> y <code>random_search</code>, y XGBoost con <code>class_weight</code> y <code>bayesian_optuna</code>.</p>
+<p>Para cada modelo se toma su mejor combinación según la selección del capítulo 05: Random Forest con <code>class_weight</code> y <code>random_search</code>, y XGBoost con <code>class_weight</code> y <code>bayesian_optuna</code>.</p>
 <!-- nb:code cell=17 -->
 <details>
 <summary>
 Código (14 líneas)
 </summary>
-<div class="sourceCode" id="cb152"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb152-1"><a href="nb06.html#cb152-1" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb152-2"><a href="nb06.html#cb152-2" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb152-3"><a href="nb06.html#cb152-3" tabindex="-1"></a></span>
-<span id="cb152-4"><a href="nb06.html#cb152-4" tabindex="-1"></a><span class="im">from</span> src <span class="im">import</span> interpretability_multi <span class="im">as</span> im</span>
-<span id="cb152-5"><a href="nb06.html#cb152-5" tabindex="-1"></a></span>
-<span id="cb152-6"><a href="nb06.html#cb152-6" tabindex="-1"></a>INTERP_DIR <span class="op">=</span> config.RESULTS_DIR <span class="op">/</span> <span class="st">&quot;interpretability&quot;</span></span>
-<span id="cb152-7"><a href="nb06.html#cb152-7" tabindex="-1"></a>MODELS <span class="op">=</span> (<span class="st">&quot;random_forest&quot;</span>, <span class="st">&quot;xgboost&quot;</span>)</span>
-<span id="cb152-8"><a href="nb06.html#cb152-8" tabindex="-1"></a>importance <span class="op">=</span> {m: pd.read_csv(INTERP_DIR <span class="op">/</span> <span class="ss">f&quot;shap_importance_by_fold_</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">.csv&quot;</span>) <span class="cf">for</span> m <span class="kw">in</span> MODELS}</span>
-<span id="cb152-9"><a href="nb06.html#cb152-9" tabindex="-1"></a>agreement <span class="op">=</span> {m: pd.read_csv(INTERP_DIR <span class="op">/</span> <span class="ss">f&quot;lime_vs_shap_</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">.csv&quot;</span>) <span class="cf">for</span> m <span class="kw">in</span> MODELS}</span>
-<span id="cb152-10"><a href="nb06.html#cb152-10" tabindex="-1"></a>best_table <span class="op">=</span> pd.read_csv(config.RESULTS_DIR <span class="op">/</span> <span class="st">&quot;best_per_model.csv&quot;</span>).set_index(<span class="st">&quot;model&quot;</span>)</span>
-<span id="cb152-11"><a href="nb06.html#cb152-11" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
-<span id="cb152-12"><a href="nb06.html#cb152-12" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">: combinación </span><span class="sc">{</span>best_table<span class="sc">.</span>loc[m, <span class="st">&#39;technique&#39;</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>best_table<span class="sc">.</span>loc[m, <span class="st">&#39;method&#39;</span>]<span class="sc">}</span><span class="ss">; &quot;</span></span>
-<span id="cb152-13"><a href="nb06.html#cb152-13" tabindex="-1"></a>          <span class="ss">f&quot;</span><span class="sc">{</span>importance[m][<span class="st">&#39;n_explained&#39;</span>]<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> filas explicadas por fold, &quot;</span></span>
-<span id="cb152-14"><a href="nb06.html#cb152-14" tabindex="-1"></a>          <span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(agreement[m])<span class="sc">}</span><span class="ss"> observaciones para LIME vs. SHAP&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb148"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb148-1"><a href="nb06.html#cb148-1" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb148-2"><a href="nb06.html#cb148-2" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb148-3"><a href="nb06.html#cb148-3" tabindex="-1"></a></span>
+<span id="cb148-4"><a href="nb06.html#cb148-4" tabindex="-1"></a><span class="im">from</span> src <span class="im">import</span> interpretability_multi <span class="im">as</span> im</span>
+<span id="cb148-5"><a href="nb06.html#cb148-5" tabindex="-1"></a></span>
+<span id="cb148-6"><a href="nb06.html#cb148-6" tabindex="-1"></a>INTERP_DIR <span class="op">=</span> config.RESULTS_DIR <span class="op">/</span> <span class="st">&quot;interpretability&quot;</span></span>
+<span id="cb148-7"><a href="nb06.html#cb148-7" tabindex="-1"></a>MODELS <span class="op">=</span> (<span class="st">&quot;random_forest&quot;</span>, <span class="st">&quot;xgboost&quot;</span>)</span>
+<span id="cb148-8"><a href="nb06.html#cb148-8" tabindex="-1"></a>importance <span class="op">=</span> {m: pd.read_csv(INTERP_DIR <span class="op">/</span> <span class="ss">f&quot;shap_importance_by_fold_</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">.csv&quot;</span>) <span class="cf">for</span> m <span class="kw">in</span> MODELS}</span>
+<span id="cb148-9"><a href="nb06.html#cb148-9" tabindex="-1"></a>agreement <span class="op">=</span> {m: pd.read_csv(INTERP_DIR <span class="op">/</span> <span class="ss">f&quot;lime_vs_shap_</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">.csv&quot;</span>) <span class="cf">for</span> m <span class="kw">in</span> MODELS}</span>
+<span id="cb148-10"><a href="nb06.html#cb148-10" tabindex="-1"></a>best_table <span class="op">=</span> pd.read_csv(config.RESULTS_DIR <span class="op">/</span> <span class="st">&quot;best_per_model.csv&quot;</span>).set_index(<span class="st">&quot;model&quot;</span>)</span>
+<span id="cb148-11"><a href="nb06.html#cb148-11" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
+<span id="cb148-12"><a href="nb06.html#cb148-12" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">: combinación </span><span class="sc">{</span>best_table<span class="sc">.</span>loc[m, <span class="st">&#39;technique&#39;</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>best_table<span class="sc">.</span>loc[m, <span class="st">&#39;method&#39;</span>]<span class="sc">}</span><span class="ss">; &quot;</span></span>
+<span id="cb148-13"><a href="nb06.html#cb148-13" tabindex="-1"></a>          <span class="ss">f&quot;</span><span class="sc">{</span>importance[m][<span class="st">&#39;n_explained&#39;</span>]<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> filas explicadas por fold, &quot;</span></span>
+<span id="cb148-14"><a href="nb06.html#cb148-14" tabindex="-1"></a>          <span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(agreement[m])<span class="sc">}</span><span class="ss"> observaciones para LIME vs. SHAP&quot;</span>)</span></code></pre></div>
 </details>
 <!-- nb:text cell=17 -->
 <pre class="text"><code>random_forest: combinación class_weight | random_search; 300 filas explicadas por fold, 200 observaciones para LIME vs. SHAP
 xgboost: combinación class_weight | bayesian_optuna; 300 filas explicadas por fold, 200 observaciones para LIME vs. SHAP</code></pre>
 <!-- nb:md cell=18 -->
 <!-- multi-fold -->
-<div id="shap-global-en-los-5-folds-externos" class="section level3 hasAnchor">
-<h3>5. SHAP global en los 5 folds externos<a href="nb06.html#shap-global-en-los-5-folds-externos" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+</div>
+<div id="shap-global-en-los-5-folds-externos" class="section level2 hasAnchor">
+<h2>5. SHAP global en los 5 folds externos<a href="nb06.html#shap-global-en-los-5-folds-externos" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>En cada fold externo se reajusta el pipeline completo con los <code>best_params</code> que eligió el bucle interno de ese fold, y se calculan los valores SHAP (<code>TreeExplainer</code>, exacto) sobre 300 filas al azar del conjunto de prueba de ese mismo fold. La importancia de una variable es la media de |SHAP| sobre esas filas, y las columnas one-hot de <code>SEX</code>, <code>EDUCATION</code> y <code>MARRIAGE</code> se suman de vuelta a su variable original. Después se mide qué tan parecido queda el ranking entre folds con la correlación de Spearman y con el solapamiento (Jaccard) del top 5.</p>
 <p>Las magnitudes de distintos folds no son estrictamente comparables, porque cada fold usa un modelo con hiperparámetros distintos. Por eso la estabilidad se juzga con el orden de las variables y no con el valor absoluto.</p>
 <!-- nb:code cell=19 -->
@@ -1185,28 +1176,28 @@ xgboost: combinación class_weight | bayesian_optuna; 300 filas explicadas por f
 <summary>
 Código (22 líneas)
 </summary>
-<div class="sourceCode" id="cb154"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb154-1"><a href="nb06.html#cb154-1" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="bu">len</span>(MODELS), figsize<span class="op">=</span>(<span class="fl">6.5</span> <span class="op">*</span> <span class="bu">len</span>(MODELS), <span class="fl">4.8</span>))</span>
-<span id="cb154-2"><a href="nb06.html#cb154-2" tabindex="-1"></a><span class="cf">for</span> ax, m <span class="kw">in</span> <span class="bu">zip</span>(axes, MODELS):</span>
-<span id="cb154-3"><a href="nb06.html#cb154-3" tabindex="-1"></a>    imp <span class="op">=</span> importance[m]</span>
-<span id="cb154-4"><a href="nb06.html#cb154-4" tabindex="-1"></a>    top <span class="op">=</span> imp.groupby(<span class="st">&quot;feature&quot;</span>)[<span class="st">&quot;mean_abs_shap&quot;</span>].mean().nlargest(<span class="dv">8</span>).index[::<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb154-5"><a href="nb06.html#cb154-5" tabindex="-1"></a>    pivot <span class="op">=</span> imp.pivot(index<span class="op">=</span><span class="st">&quot;feature&quot;</span>, columns<span class="op">=</span><span class="st">&quot;fold&quot;</span>, values<span class="op">=</span><span class="st">&quot;mean_abs_shap&quot;</span>).loc[top]</span>
-<span id="cb154-6"><a href="nb06.html#cb154-6" tabindex="-1"></a>    pivot.plot.barh(ax<span class="op">=</span>ax, width<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb154-7"><a href="nb06.html#cb154-7" tabindex="-1"></a>    ax.set_title(m)</span>
-<span id="cb154-8"><a href="nb06.html#cb154-8" tabindex="-1"></a>    ax.set_xlabel(<span class="st">&quot;Media de |SHAP| (escala del modelo)&quot;</span>)</span>
-<span id="cb154-9"><a href="nb06.html#cb154-9" tabindex="-1"></a>    ax.set_ylabel(<span class="st">&quot;&quot;</span>)</span>
-<span id="cb154-10"><a href="nb06.html#cb154-10" tabindex="-1"></a>    ax.legend(title<span class="op">=</span><span class="st">&quot;Fold externo&quot;</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb154-11"><a href="nb06.html#cb154-11" tabindex="-1"></a>    ax.grid(axis<span class="op">=</span><span class="st">&quot;x&quot;</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb154-12"><a href="nb06.html#cb154-12" tabindex="-1"></a>fig.suptitle(<span class="st">&quot;Importancia global SHAP por fold externo (8 variables principales)&quot;</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
-<span id="cb154-13"><a href="nb06.html#cb154-13" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb154-14"><a href="nb06.html#cb154-14" tabindex="-1"></a>fig.savefig(config.FIGURES_DIR <span class="op">/</span> <span class="st">&quot;shap_importance_by_fold.png&quot;</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">&quot;tight&quot;</span>)</span>
-<span id="cb154-15"><a href="nb06.html#cb154-15" tabindex="-1"></a>plt.show()</span>
-<span id="cb154-16"><a href="nb06.html#cb154-16" tabindex="-1"></a></span>
-<span id="cb154-17"><a href="nb06.html#cb154-17" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
-<span id="cb154-18"><a href="nb06.html#cb154-18" tabindex="-1"></a>    st <span class="op">=</span> im.importance_stability(importance[m])</span>
-<span id="cb154-19"><a href="nb06.html#cb154-19" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">: Spearman medio entre folds = </span><span class="sc">{</span>st[<span class="st">&#39;spearman_mean_offdiag&#39;</span>]<span class="sc">:.3f}</span><span class="ss">; &quot;</span></span>
-<span id="cb154-20"><a href="nb06.html#cb154-20" tabindex="-1"></a>          <span class="ss">f&quot;Jaccard medio del top-5 = </span><span class="sc">{</span>st[<span class="st">&#39;topk_jaccard_mean_offdiag&#39;</span>]<span class="sc">:.3f}</span><span class="ss">; &quot;</span></span>
-<span id="cb154-21"><a href="nb06.html#cb154-21" tabindex="-1"></a>          <span class="ss">f&quot;siempre en el top-5: </span><span class="sc">{</span>st[<span class="st">&#39;topk_always&#39;</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb154-22"><a href="nb06.html#cb154-22" tabindex="-1"></a>    display(st[<span class="st">&quot;spearman&quot;</span>].<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb150"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb150-1"><a href="nb06.html#cb150-1" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="bu">len</span>(MODELS), figsize<span class="op">=</span>(<span class="fl">6.5</span> <span class="op">*</span> <span class="bu">len</span>(MODELS), <span class="fl">4.8</span>))</span>
+<span id="cb150-2"><a href="nb06.html#cb150-2" tabindex="-1"></a><span class="cf">for</span> ax, m <span class="kw">in</span> <span class="bu">zip</span>(axes, MODELS):</span>
+<span id="cb150-3"><a href="nb06.html#cb150-3" tabindex="-1"></a>    imp <span class="op">=</span> importance[m]</span>
+<span id="cb150-4"><a href="nb06.html#cb150-4" tabindex="-1"></a>    top <span class="op">=</span> imp.groupby(<span class="st">&quot;feature&quot;</span>)[<span class="st">&quot;mean_abs_shap&quot;</span>].mean().nlargest(<span class="dv">8</span>).index[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb150-5"><a href="nb06.html#cb150-5" tabindex="-1"></a>    pivot <span class="op">=</span> imp.pivot(index<span class="op">=</span><span class="st">&quot;feature&quot;</span>, columns<span class="op">=</span><span class="st">&quot;fold&quot;</span>, values<span class="op">=</span><span class="st">&quot;mean_abs_shap&quot;</span>).loc[top]</span>
+<span id="cb150-6"><a href="nb06.html#cb150-6" tabindex="-1"></a>    pivot.plot.barh(ax<span class="op">=</span>ax, width<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb150-7"><a href="nb06.html#cb150-7" tabindex="-1"></a>    ax.set_title(m)</span>
+<span id="cb150-8"><a href="nb06.html#cb150-8" tabindex="-1"></a>    ax.set_xlabel(<span class="st">&quot;Media de |SHAP| (escala del modelo)&quot;</span>)</span>
+<span id="cb150-9"><a href="nb06.html#cb150-9" tabindex="-1"></a>    ax.set_ylabel(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb150-10"><a href="nb06.html#cb150-10" tabindex="-1"></a>    ax.legend(title<span class="op">=</span><span class="st">&quot;Fold externo&quot;</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb150-11"><a href="nb06.html#cb150-11" tabindex="-1"></a>    ax.grid(axis<span class="op">=</span><span class="st">&quot;x&quot;</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb150-12"><a href="nb06.html#cb150-12" tabindex="-1"></a>fig.suptitle(<span class="st">&quot;Importancia global SHAP por fold externo (8 variables principales)&quot;</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
+<span id="cb150-13"><a href="nb06.html#cb150-13" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb150-14"><a href="nb06.html#cb150-14" tabindex="-1"></a>fig.savefig(config.FIGURES_DIR <span class="op">/</span> <span class="st">&quot;shap_importance_by_fold.png&quot;</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">&quot;tight&quot;</span>)</span>
+<span id="cb150-15"><a href="nb06.html#cb150-15" tabindex="-1"></a>plt.show()</span>
+<span id="cb150-16"><a href="nb06.html#cb150-16" tabindex="-1"></a></span>
+<span id="cb150-17"><a href="nb06.html#cb150-17" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
+<span id="cb150-18"><a href="nb06.html#cb150-18" tabindex="-1"></a>    st <span class="op">=</span> im.importance_stability(importance[m])</span>
+<span id="cb150-19"><a href="nb06.html#cb150-19" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss">: Spearman medio entre folds = </span><span class="sc">{</span>st[<span class="st">&#39;spearman_mean_offdiag&#39;</span>]<span class="sc">:.3f}</span><span class="ss">; &quot;</span></span>
+<span id="cb150-20"><a href="nb06.html#cb150-20" tabindex="-1"></a>          <span class="ss">f&quot;Jaccard medio del top-5 = </span><span class="sc">{</span>st[<span class="st">&#39;topk_jaccard_mean_offdiag&#39;</span>]<span class="sc">:.3f}</span><span class="ss">; &quot;</span></span>
+<span id="cb150-21"><a href="nb06.html#cb150-21" tabindex="-1"></a>          <span class="ss">f&quot;siempre en el top-5: </span><span class="sc">{</span>st[<span class="st">&#39;topk_always&#39;</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb150-22"><a href="nb06.html#cb150-22" tabindex="-1"></a>    display(st[<span class="st">&quot;spearman&quot;</span>].<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div>
 </details>
 <!-- nb:img cell=19 -->
 <div class="float">
@@ -1331,16 +1322,16 @@ xgboost: Spearman medio entre folds = 0.919; Jaccard medio del top-5 = 0.652; si
 </table>
 <!-- nb:md cell=20 -->
 <ul>
-<li><strong>Random Forest es estable.</strong> Las cuatro primeras variables son las mismas y en el mismo orden en los cinco folds (<code>PAY_0</code>, <code>PAY_2</code>, <code>LIMIT_BAL_LOG</code>, <code>PAY_3</code>); solo la quinta cambia (<code>PAY_4</code>, <code>PAY_AMT*_LOG</code> o <code>BILL_AMT_MEAN_6M_LOG</code>). El Jaccard medio del top 5 es 0.77 y el Spearman medio sobre el ranking completo, 0.96. Los valores de <code>PAY_0</code> son casi iguales entre folds (0.073 a 0.081). La conclusión de la sección 3 (el historial de pagos domina) no depende del fold elegido.</li>
-<li><strong>XGBoost es estable en lo principal y menos en el resto.</strong> <code>PAY_0</code> es la primera variable en los cinco folds y <code>LIMIT_BAL_LOG</code> y <code>BILL_AMT_MEAN_6M_LOG</code> están siempre en el top 5. Pero el top 5 completo cambia entre folds (Jaccard medio 0.65): <code>PAY_2</code> y <code>PAY_3</code> salen del top 5 en algunos folds (por ejemplo el 2) y entran <code>PAY_AMT1_LOG</code>, <code>PAY_AMT2_LOG</code> o <code>PAY_AMT3_LOG</code>. El Spearman medio sobre todas las variables es de 0.92.</li>
+<li><strong>Random Forest es estable.</strong> Las cuatro primeras variables son las mismas y en el mismo orden en los cinco folds (<code>PAY_0</code>, <code>PAY_2</code>, <code>LIMIT_BAL_LOG</code>, <code>PAY_3</code>); solo la quinta cambia (<code>PAY_4</code>, <code>PAY_AMT3_LOG</code> o <code>PAY_AMT1_LOG</code>). El Jaccard medio del top 5 es 0.77 y el Spearman medio sobre el ranking completo, 0.96. Los valores de <code>PAY_0</code> son casi iguales entre folds (0.073 a 0.081). La conclusión de la sección 2 (el historial de pagos domina) no depende del fold elegido.</li>
+<li><strong>XGBoost es estable en lo principal y menos en el resto.</strong> <code>PAY_0</code> es la primera variable en los cinco folds y <code>LIMIT_BAL_LOG</code> y <code>BILL_AMT_MEAN_6M_LOG</code> están siempre en el top 5. Pero el top 5 completo cambia entre folds (Jaccard medio 0.65): <code>PAY_2</code> sale del top 5 en el fold 2 y <code>PAY_3</code> solo entra en el fold 4 y entran <code>PAY_AMT1_LOG</code>, <code>PAY_AMT2_LOG</code> o <code>PAY_AMT3_LOG</code>. El Spearman medio sobre todas las variables es de 0.92.</li>
 <li><strong>La magnitud de <code>PAY_0</code> en XGBoost varía entre folds</strong> (0.38 a 0.47 en log-odds). Es esperable, porque cada fold eligió hiperparámetros distintos, así que no conviene comparar magnitudes entre folds, solo el orden.</li>
-<li><strong>Qué se puede afirmar y qué no.</strong> El historial de pagos (<code>PAY_0</code> primero, luego <code>PAY_2</code> y <code>PAY_3</code>) y el límite de crédito como segundo o tercer factor se sostienen en los cinco folds y en los dos modelos. El orden fino de las variables de montos (<code>PAY_AMT*_LOG</code>, <code>BILL_AMT_MEAN_6M_LOG</code>) no es estable en XGBoost y no debe interpretarse.</li>
+<li><strong>Qué se puede afirmar y qué no.</strong> <code>PAY_0</code> como primera variable y el límite de crédito (<code>LIMIT_BAL_LOG</code>) entre las tres primeras se sostienen en los cinco folds y en los dos modelos; <code>PAY_2</code> y <code>PAY_3</code> lo hacen en Random Forest, pero no en XGBoost. El orden fino de las variables de montos (<code>PAY_AMT*_LOG</code>, <code>BILL_AMT_MEAN_6M_LOG</code>) no es estable en XGBoost y no debe interpretarse.</li>
 </ul>
 <!-- nb:md cell=21 -->
 <!-- multi-fold -->
 </div>
-<div id="lime-frente-a-shap-en-200-observaciones-por-modelo" class="section level3 hasAnchor">
-<h3>6. LIME frente a SHAP en 200 observaciones por modelo<a href="nb06.html#lime-frente-a-shap-en-200-observaciones-por-modelo" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="lime-frente-a-shap-en-200-observaciones-por-modelo" class="section level2 hasAnchor">
+<h2>6. LIME frente a SHAP en 200 observaciones por modelo<a href="nb06.html#lime-frente-a-shap-en-200-observaciones-por-modelo" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>En cada fold externo se toman 10 observaciones al azar de cada celda de la matriz de confusión (verdaderos negativos, falsos positivos, falsos negativos y verdaderos positivos), no solo los casos extremos. Para cada una se calcula el SHAP exacto y la explicación de LIME (10 variables, sobre el mismo espacio transformado que ve el modelo) y se mide:</p>
 <ul>
 <li><strong>Spearman de |atribución|:</strong> correlación entre el orden de importancia de SHAP y el de LIME sobre todas las variables (las que LIME no reporta valen 0).</li>
@@ -1354,32 +1345,32 @@ xgboost: Spearman medio entre folds = 0.919; Jaccard medio del top-5 = 0.652; si
 <summary>
 Código (26 líneas)
 </summary>
-<div class="sourceCode" id="cb157"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb157-1"><a href="nb06.html#cb157-1" tabindex="-1"></a>METRICS <span class="op">=</span> {</span>
-<span id="cb157-2"><a href="nb06.html#cb157-2" tabindex="-1"></a>    <span class="st">&quot;spearman_abs&quot;</span>: <span class="st">&quot;Spearman de |atribución|&quot;</span>,</span>
-<span id="cb157-3"><a href="nb06.html#cb157-3" tabindex="-1"></a>    <span class="st">&quot;top5_overlap&quot;</span>: <span class="st">&quot;Solapamiento del top-5&quot;</span>,</span>
-<span id="cb157-4"><a href="nb06.html#cb157-4" tabindex="-1"></a>    <span class="st">&quot;sign_agreement_topk&quot;</span>: <span class="st">&quot;Acuerdo de signo (top-5 de SHAP)&quot;</span>,</span>
-<span id="cb157-5"><a href="nb06.html#cb157-5" tabindex="-1"></a>    <span class="st">&quot;lime_seed_topk_overlap&quot;</span>: <span class="st">&quot;Estabilidad de LIME entre semillas (top-5)&quot;</span>,</span>
-<span id="cb157-6"><a href="nb06.html#cb157-6" tabindex="-1"></a>}</span>
-<span id="cb157-7"><a href="nb06.html#cb157-7" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="bu">len</span>(MODELS), <span class="bu">len</span>(METRICS), figsize<span class="op">=</span>(<span class="dv">4</span> <span class="op">*</span> <span class="bu">len</span>(METRICS), <span class="fl">3.6</span> <span class="op">*</span> <span class="bu">len</span>(MODELS)), sharey<span class="op">=</span><span class="st">&quot;col&quot;</span>)</span>
-<span id="cb157-8"><a href="nb06.html#cb157-8" tabindex="-1"></a>order <span class="op">=</span> [<span class="st">&quot;TN&quot;</span>, <span class="st">&quot;FP&quot;</span>, <span class="st">&quot;FN&quot;</span>, <span class="st">&quot;TP&quot;</span>]</span>
-<span id="cb157-9"><a href="nb06.html#cb157-9" tabindex="-1"></a><span class="cf">for</span> i, m <span class="kw">in</span> <span class="bu">enumerate</span>(MODELS):</span>
-<span id="cb157-10"><a href="nb06.html#cb157-10" tabindex="-1"></a>    <span class="cf">for</span> j, (col, title) <span class="kw">in</span> <span class="bu">enumerate</span>(METRICS.items()):</span>
-<span id="cb157-11"><a href="nb06.html#cb157-11" tabindex="-1"></a>        ax <span class="op">=</span> axes[i, j]</span>
-<span id="cb157-12"><a href="nb06.html#cb157-12" tabindex="-1"></a>        data <span class="op">=</span> [agreement[m].loc[agreement[m][<span class="st">&quot;outcome&quot;</span>] <span class="op">==</span> o, col].dropna() <span class="cf">for</span> o <span class="kw">in</span> order]</span>
-<span id="cb157-13"><a href="nb06.html#cb157-13" tabindex="-1"></a>        ax.boxplot(data, tick_labels<span class="op">=</span>order, showmeans<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb157-14"><a href="nb06.html#cb157-14" tabindex="-1"></a>        ax.set_title(<span class="ss">f&quot;</span><span class="sc">{</span>m<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">&quot;</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb157-15"><a href="nb06.html#cb157-15" tabindex="-1"></a>        ax.set_ylim(<span class="op">-</span><span class="fl">0.05</span>, <span class="fl">1.05</span>)</span>
-<span id="cb157-16"><a href="nb06.html#cb157-16" tabindex="-1"></a>        ax.grid(axis<span class="op">=</span><span class="st">&quot;y&quot;</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb157-17"><a href="nb06.html#cb157-17" tabindex="-1"></a>        <span class="cf">if</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
-<span id="cb157-18"><a href="nb06.html#cb157-18" tabindex="-1"></a>            ax.set_ylabel(<span class="st">&quot;Valor (0 a 1)&quot;</span>)</span>
-<span id="cb157-19"><a href="nb06.html#cb157-19" tabindex="-1"></a>fig.suptitle(<span class="st">&quot;Coincidencia entre LIME y SHAP por tipo de resultado de la observación&quot;</span>, y<span class="op">=</span><span class="fl">1.01</span>)</span>
-<span id="cb157-20"><a href="nb06.html#cb157-20" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb157-21"><a href="nb06.html#cb157-21" tabindex="-1"></a>fig.savefig(config.FIGURES_DIR <span class="op">/</span> <span class="st">&quot;lime_vs_shap_agreement.png&quot;</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">&quot;tight&quot;</span>)</span>
-<span id="cb157-22"><a href="nb06.html#cb157-22" tabindex="-1"></a>plt.show()</span>
-<span id="cb157-23"><a href="nb06.html#cb157-23" tabindex="-1"></a></span>
-<span id="cb157-24"><a href="nb06.html#cb157-24" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
-<span id="cb157-25"><a href="nb06.html#cb157-25" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss"> (n = </span><span class="sc">{</span><span class="bu">len</span>(agreement[m])<span class="sc">}</span><span class="ss"> observaciones, 3 folds)&quot;</span>)</span>
-<span id="cb157-26"><a href="nb06.html#cb157-26" tabindex="-1"></a>    display(im.summarize_agreement(agreement[m]).<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb153-1"><a href="nb06.html#cb153-1" tabindex="-1"></a>METRICS <span class="op">=</span> {</span>
+<span id="cb153-2"><a href="nb06.html#cb153-2" tabindex="-1"></a>    <span class="st">&quot;spearman_abs&quot;</span>: <span class="st">&quot;Spearman de |atribución|&quot;</span>,</span>
+<span id="cb153-3"><a href="nb06.html#cb153-3" tabindex="-1"></a>    <span class="st">&quot;top5_overlap&quot;</span>: <span class="st">&quot;Solapamiento del top-5&quot;</span>,</span>
+<span id="cb153-4"><a href="nb06.html#cb153-4" tabindex="-1"></a>    <span class="st">&quot;sign_agreement_topk&quot;</span>: <span class="st">&quot;Acuerdo de signo (top-5 de SHAP)&quot;</span>,</span>
+<span id="cb153-5"><a href="nb06.html#cb153-5" tabindex="-1"></a>    <span class="st">&quot;lime_seed_topk_overlap&quot;</span>: <span class="st">&quot;Estabilidad de LIME entre semillas (top-5)&quot;</span>,</span>
+<span id="cb153-6"><a href="nb06.html#cb153-6" tabindex="-1"></a>}</span>
+<span id="cb153-7"><a href="nb06.html#cb153-7" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="bu">len</span>(MODELS), <span class="bu">len</span>(METRICS), figsize<span class="op">=</span>(<span class="dv">4</span> <span class="op">*</span> <span class="bu">len</span>(METRICS), <span class="fl">3.6</span> <span class="op">*</span> <span class="bu">len</span>(MODELS)), sharey<span class="op">=</span><span class="st">&quot;col&quot;</span>)</span>
+<span id="cb153-8"><a href="nb06.html#cb153-8" tabindex="-1"></a>order <span class="op">=</span> [<span class="st">&quot;TN&quot;</span>, <span class="st">&quot;FP&quot;</span>, <span class="st">&quot;FN&quot;</span>, <span class="st">&quot;TP&quot;</span>]</span>
+<span id="cb153-9"><a href="nb06.html#cb153-9" tabindex="-1"></a><span class="cf">for</span> i, m <span class="kw">in</span> <span class="bu">enumerate</span>(MODELS):</span>
+<span id="cb153-10"><a href="nb06.html#cb153-10" tabindex="-1"></a>    <span class="cf">for</span> j, (col, title) <span class="kw">in</span> <span class="bu">enumerate</span>(METRICS.items()):</span>
+<span id="cb153-11"><a href="nb06.html#cb153-11" tabindex="-1"></a>        ax <span class="op">=</span> axes[i, j]</span>
+<span id="cb153-12"><a href="nb06.html#cb153-12" tabindex="-1"></a>        data <span class="op">=</span> [agreement[m].loc[agreement[m][<span class="st">&quot;outcome&quot;</span>] <span class="op">==</span> o, col].dropna() <span class="cf">for</span> o <span class="kw">in</span> order]</span>
+<span id="cb153-13"><a href="nb06.html#cb153-13" tabindex="-1"></a>        ax.boxplot(data, tick_labels<span class="op">=</span>order, showmeans<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb153-14"><a href="nb06.html#cb153-14" tabindex="-1"></a>        ax.set_title(<span class="ss">f&quot;</span><span class="sc">{</span>m<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">&quot;</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb153-15"><a href="nb06.html#cb153-15" tabindex="-1"></a>        ax.set_ylim(<span class="op">-</span><span class="fl">0.05</span>, <span class="fl">1.05</span>)</span>
+<span id="cb153-16"><a href="nb06.html#cb153-16" tabindex="-1"></a>        ax.grid(axis<span class="op">=</span><span class="st">&quot;y&quot;</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb153-17"><a href="nb06.html#cb153-17" tabindex="-1"></a>        <span class="cf">if</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb153-18"><a href="nb06.html#cb153-18" tabindex="-1"></a>            ax.set_ylabel(<span class="st">&quot;Valor (0 a 1)&quot;</span>)</span>
+<span id="cb153-19"><a href="nb06.html#cb153-19" tabindex="-1"></a>fig.suptitle(<span class="st">&quot;Coincidencia entre LIME y SHAP por tipo de resultado de la observación&quot;</span>, y<span class="op">=</span><span class="fl">1.01</span>)</span>
+<span id="cb153-20"><a href="nb06.html#cb153-20" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb153-21"><a href="nb06.html#cb153-21" tabindex="-1"></a>fig.savefig(config.FIGURES_DIR <span class="op">/</span> <span class="st">&quot;lime_vs_shap_agreement.png&quot;</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">&quot;tight&quot;</span>)</span>
+<span id="cb153-22"><a href="nb06.html#cb153-22" tabindex="-1"></a>plt.show()</span>
+<span id="cb153-23"><a href="nb06.html#cb153-23" tabindex="-1"></a></span>
+<span id="cb153-24"><a href="nb06.html#cb153-24" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> MODELS:</span>
+<span id="cb153-25"><a href="nb06.html#cb153-25" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="sc">{</span>m<span class="sc">}</span><span class="ss"> (n = </span><span class="sc">{</span><span class="bu">len</span>(agreement[m])<span class="sc">}</span><span class="ss"> observaciones, 3 folds)&quot;</span>)</span>
+<span id="cb153-26"><a href="nb06.html#cb153-26" tabindex="-1"></a>    display(im.summarize_agreement(agreement[m]).<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div>
 </details>
 <!-- nb:img cell=22 -->
 <div class="float">
@@ -1661,7 +1652,7 @@ xgboost (n = 200 observaciones, 3 folds)</code></pre>
 <li><strong>Depende del tipo de observación.</strong> El Spearman es más alto en los verdaderos positivos (0.655 y 0.565) y más bajo en los falsos negativos y verdaderos negativos (0.50 en Random Forest y 0.51 a 0.52 en XGBoost). Con 50 observaciones por celda, esas diferencias son descriptivas.</li>
 <li><strong>Consistencia entre folds.</strong> El Spearman medio por fold va de 0.51 a 0.64 en Random Forest y de 0.45 a 0.60 en XGBoost: el patrón general se repite, pero con variación apreciable.</li>
 </ul>
-<p>Esto ya permite concluir algo que la observación única de la versión anterior no permitía: la discusión de la sección siguiente (cuándo divergen LIME y SHAP) se confirma como tendencia, no como anécdota.</p>
+<p>Esto ya permite concluir algo que la observación única de la sección 4 no permitía: la discusión de la sección 4.1 (cuándo divergen LIME y SHAP) se confirma como tendencia, no como anécdota.</p>
 <!-- nb:md cell=24 -->
 <!-- multi-fold -->
 <p>Limitaciones de las secciones 5 y 6.
@@ -1672,7 +1663,6 @@ xgboost (n = 200 observaciones, 3 folds)</code></pre>
 - LIME depende de su configuración (kernel, número de perturbaciones, número de variables). Se usó la configuración por defecto de la librería, y los resultados podrían cambiar con otra.
 - Con variables correlacionadas, ni SHAP ni LIME identifican causas: describen cómo usa el modelo sus entradas.</p>
 <!-- nb:extra -->
-</div>
 </div>
 <div id="figuras-guardadas-en-resultsfigures-1" class="section level2 hasAnchor">
 <h2>Figuras guardadas en results/figures<a href="nb06.html#figuras-guardadas-en-resultsfigures-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -1730,42 +1720,42 @@ xgboost (n = 200 observaciones, 3 folds)</code></pre>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
-  "sharing": {
-    "github": false,
-    "facebook": true,
-    "twitter": true,
-    "linkedin": false,
-    "weibo": false,
-    "instapaper": false,
-    "vk": false,
-    "whatsapp": false,
-    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-  },
-  "fontsettings": {
-    "theme": "white",
-    "family": "sans",
-    "size": 2
-  },
-  "edit": {
-    "link": null,
-    "text": null
-  },
-  "history": {
-    "link": null,
-    "text": null
-  },
-  "view": {
-    "link": null,
-    "text": null
-  },
-  "download": null,
-  "search": {
-    "engine": "fuse",
-    "options": null
-  },
-  "toc": {
-    "collapse": "subsection"
-  }
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
 });
 });
 </script>

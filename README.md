@@ -39,7 +39,7 @@ El libro reproduce completo el [Jupyter Book del proyecto](https://github.com/va
 | `12_nb10_modelo_original_cs_fof.Rmd` | Notebook 10: modelo original (CS-FOF), LightGBM y CatBoost |
 | `13_nb12_colab_5x5.Rmd` | Notebook 12: corrida 5 x 5 en Colab |
 
-Los notebooks 01 a 12 se escribieron en Python y su experimento (GPU, Colab) fue muy largo, así que **no se reejecutan**: cada capítulo muestra el texto, el código de Python (plegado, sin ejecutar) y los resultados guardados en el notebook (tablas y gráficos). El EDA (notebook 00) sí se recalcula en R a partir de `data/raw/`; solo las secciones de SHAP y de preprocesamiento final (que dependen de `src/` y del modelo de Python) muestran las salidas del notebook.
+Los notebooks 01 a 12 se escribieron en Python y su experimento (GPU, Colab) fue muy largo, así que **no se reejecutan**: cada capítulo muestra el texto, el código de Python (plegado, sin ejecutar) y los resultados guardados en el notebook (tablas y gráficos). El EDA (notebook 00) sí se recalcula en R a partir de `data/raw/`; solo la sección de preprocesamiento final (que depende de `src/`) muestra las salidas del notebook.
 
 ---
 
